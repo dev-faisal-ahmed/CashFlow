@@ -4,14 +4,14 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserProvider } from 'src/schemas/user.schema';
 import { CommonConfigService } from 'src/common/config/config.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginWithGoogleDto } from './dto/login.dto';
+import { LoginWithCredentials, LoginWithGoogleDto, RegisterDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -59,5 +59,31 @@ export class AuthService {
     const { _id, name, image, email } = user;
 
     return { _id, name, image, email };
+  }
+
+  async loginWithCredentials(dto: LoginWithCredentials) {
+    const projection = { _id: 1, email: 1, image: 1, name: 1, password: 1 };
+
+    const isUserExist = await this.userModel.findOne(
+      { email: dto.email, provider: UserProvider.CREDENTIALS },
+      projection,
+    );
+
+    if (!isUserExist) throw new NotFoundException('User not found!');
+
+    const isPasswordMatch = await bcrypt.compare(
+      dto.password,
+      isUserExist.password,
+    );
+
+    if (!isPasswordMatch)
+      throw new ConflictException('Password does not match!');
+
+    return {
+      _id: isUserExist._id,
+      name: isUserExist.name,
+      email: isUserExist.email,
+      image: isUserExist.image,
+    };
   }
 }

@@ -1,8 +1,7 @@
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { Body, Controller, Post } from '@nestjs/common';
+import { LoginWithCredentials, LoginWithGoogleDto, RegisterDto } from './dto';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginWithGoogleDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +16,12 @@ export class AuthController {
   @Post('login/google')
   async loginWithGoogle(@Body() dto: LoginWithGoogleDto) {
     const user = await this.authService.loginWithGoogle(dto);
-    return new ResponseDto('Successfully logged In', user);
+    return new ResponseDto('Successfully logged in!', user);
+  }
+
+  @Post('login/credentials')
+  async loginWithCredentials(@Body() dto: LoginWithCredentials) {
+    const user = await this.authService.loginWithCredentials(dto);
+    return new ResponseDto('Successfully logged in!', user);
   }
 }
