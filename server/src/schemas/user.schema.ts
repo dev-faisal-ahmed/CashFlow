@@ -1,6 +1,11 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema()
+export enum UserProvider {
+  GOOGLE = 'GOOGLE',
+  CREDENTIALS = 'CREDENTIALS',
+}
+
+@Schema({ collection: 'users' })
 export class User {
   @Prop({ required: true })
   name: string;
@@ -14,8 +19,8 @@ export class User {
   @Prop({ required: false })
   image: string;
 
-  @Prop({ required: true })
-  provider: string;
+  @Prop({ default: UserProvider.CREDENTIALS, enum: UserProvider })
+  provider: UserProvider;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
