@@ -1,26 +1,33 @@
+import * as bcrypt from 'bcrypt';
+
 import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 
+import { CommonConfigService } from 'src/common/config/config.service';
 import { RegisterUserWithCredentialsDto } from './dto/register.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas/user.schema';
-import { HASH_SALT } from 'src/config';
 import { Model } from 'mongoose';
-
-import bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly env: CommonConfigService,
+  ) {}
 
   async registerWithCredentials(dto: RegisterUserWithCredentialsDto) {
+    console.log(dto);
     const isUserExist = await this.userModel.findOne({ email: dto.email });
     if (isUserExist) throw new ConflictException('Email already exist');
 
-    const hashedPassword = await bcrypt.hash(dto.password, Number(HASH_SALT));
+    const hashedPassword = await bcrypt.hash(
+      dto.password,
+      this.env.getHashSalt(),
+    );
 
     const user = await this.userModel.create({
       ...dto,
