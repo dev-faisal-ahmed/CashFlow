@@ -1,23 +1,23 @@
 import * as bcrypt from 'bcrypt';
 
 import {
-  ConflictException,
   Injectable,
-  InternalServerErrorException,
+  ConflictException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserProvider } from 'src/schemas/user.schema';
-import { CommonConfigService } from 'src/common/config/config.service';
 import { LoginWithCredentials, LoginWithGoogleDto, RegisterDto } from './dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-    private readonly env: CommonConfigService,
+    private readonly config: ConfigService,
   ) {}
 
   async registerWithCredentials(dto: RegisterDto) {
@@ -26,7 +26,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(
       dto.password,
-      this.env.getHashSalt(),
+      Number(this.config.get('HASH_SALT')),
     );
 
     const user = await this.userModel.create({

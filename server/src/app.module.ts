@@ -2,20 +2,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.modules';
 import { ConfigModule } from '@nestjs/config';
-import { CommonConfigService } from './common/config/config.service';
-import { CommonConfigModule } from './common/config/config.module';
+import { mongoConfig } from './config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    CommonConfigModule,
-    MongooseModule.forRootAsync({
-      imports: [CommonConfigModule],
-      inject: [CommonConfigService],
-      useFactory: (configService: CommonConfigService) => ({
-        uri: configService.getMongoUri(),
-      }),
-    }),
+    ConfigModule.forRoot({ isGlobal: true, load: [mongoConfig] }),
+    MongooseModule.forRootAsync({ useFactory: mongoConfig }),
     AuthModule,
   ],
 })
