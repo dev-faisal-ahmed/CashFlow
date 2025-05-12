@@ -34,3 +34,13 @@ export class LoginWithCredentials {
   @IsString()
   password: string;
 }
+
+export class ResetPassword {
+  @IsNotEmpty()
+  @IsString()
+  oldPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
