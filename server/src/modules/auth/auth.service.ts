@@ -1,13 +1,20 @@
 import * as bcrypt from 'bcrypt';
 
 import {
+  LoginWithCredentialsDto,
   LoginWithGoogleDto,
   loginWithGoogleSchema,
   RegisterWithCredentialsDto,
 } from './auth.dto';
 
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { appConfig } from 'src/config';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { UserProvider } from 'src/schemas/user.schema';
@@ -25,7 +32,7 @@ export class AuthService {
   async registerWithCredentials(dto: RegisterWithCredentialsDto) {
     const existingUser = await this.userService.findByEmail(dto.email);
 
-    if (!existingUser) throw new BadRequestException('User already exist');
+    if (existingUser) throw new BadRequestException('User already exist');
 
     const password = await this.hashPassword(dto.password);
 
@@ -61,8 +68,31 @@ export class AuthService {
     return this.generateToken(user);
   }
 
+  async loginWithCredentials(dto: LoginWithCredentialsDto) {
+    const isUserExist = await this.userService.findByEmail(dto.email);
+    if (!isUserExist) throw new NotFoundException('User not found');
+
+    const isPasswordMatch = await this.comparePassword(
+      dto.password,
+      isUserExist.password,
+    );
+
+    if (!isPasswordMatch)
+      throw new BadRequestException('Password did not match');
+
+    return this.generateToken(isUserExist);
+  }
+
+  // helper methods
   private async hashPassword(password: string) {
     return bcrypt.hash(password, this.envConfig.HASH_SALT);
+  }
+
+  private async comparePassword(
+    givenPassword: string,
+    encryptedPassword: string,
+  ) {
+    return bcrypt.compare(givenPassword, encryptedPassword);
   }
 
   private generateToken(payload: LoggedUser) {

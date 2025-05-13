@@ -1,9 +1,15 @@
+import {
+  LoginWithCredentialsDto,
+  loginWithCredentialsSchema,
+  RegisterWithCredentialsDto,
+} from './auth.dto';
+
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterWithCredentialsDto } from './auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { LoggedUser } from 'src/common/types';
+import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +21,16 @@ export class AuthController {
     return new ResponseDto(message);
   }
 
-  @Get('google')
+  @Post('login')
+  async loginWithCredentials(
+    @Body(new ZodValidationPipe(loginWithCredentialsSchema))
+    dto: LoginWithCredentialsDto,
+  ) {
+    const accessToken = await this.authService.loginWithCredentials(dto);
+    return new ResponseDto('Successfully logged in', accessToken);
+  }
+
+  @Get('login/google')
   @UseGuards(AuthGuard('google'))
   async loginWithGoogle() {}
 
