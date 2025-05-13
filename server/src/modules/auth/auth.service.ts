@@ -1,8 +1,13 @@
 import * as bcrypt from 'bcrypt';
 
+import {
+  LoginWithGoogleDto,
+  loginWithGoogleSchema,
+  RegisterWithCredentialsDto,
+} from './auth.dto';
+
 import { appConfig } from 'src/config';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { RegisterWithCredentialsDto } from './auth.dto';
 import { ConfigType } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { UserProvider } from 'src/schemas/user.schema';
@@ -35,11 +40,33 @@ export class AuthService {
     return 'User Created Successfully';
   }
 
+  async loginWithGoogle(dto: LoginWithGoogleDto) {
+    const result = loginWithGoogleSchema.safeParse(dto);
+
+    if (!result.success) throw new BadRequestException('Invalid user data');
+    const validatedUser = result.data;
+
+    const isUserExist = await this.userService.findByEmail(validatedUser.email);
+    // when user already exist
+    if (isUserExist) return this.generateToken(isUserExist);
+
+    // creating new user
+    const user = await this.userService.createUser({
+      ...validatedUser,
+      provider: UserProvider.GOOGLE,
+    });
+
+    if (!user) throw new BadRequestException('Failed create user');
+
+    return this.generateToken(user);
+  }
+
   private async hashPassword(password: string) {
     return bcrypt.hash(password, this.envConfig.HASH_SALT);
   }
 
-  private buildToken(payload: LoggedUser) {
-    return this.jwtService.sign(payload);
+  private generateToken(payload: LoggedUser) {
+    const { _id, name, email, image, provider } = payload;
+    return this.jwtService.sign({ _id, name, email, image, provider });
   }
 }
