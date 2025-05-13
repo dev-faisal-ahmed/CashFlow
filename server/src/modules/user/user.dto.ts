@@ -1,0 +1,12 @@
+import { UserProvider } from 'src/schemas/user.schema';
+import { z } from 'zod';
+
+export const createUserSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid Email'),
+  password: z.string().optional(),
+  image: z.string().optional(),
+  provider: z.nativeEnum(UserProvider),
+});
+
+export type CreateUserDto = z.infer<typeof createUserSchema>;
