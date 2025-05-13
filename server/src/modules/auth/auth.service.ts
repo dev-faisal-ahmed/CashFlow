@@ -6,12 +6,15 @@ import { RegisterWithCredentialsDto } from './auth.dto';
 import { ConfigType } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { UserProvider } from 'src/schemas/user.schema';
+import { LoggedUser } from 'src/common/types';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     @Inject(appConfig.KEY) private envConfig: ConfigType<typeof appConfig>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async registerWithCredentials(dto: RegisterWithCredentialsDto) {
@@ -32,7 +35,11 @@ export class AuthService {
     return 'User Created Successfully';
   }
 
-  async hashPassword(password: string) {
+  private async hashPassword(password: string) {
     return bcrypt.hash(password, this.envConfig.HASH_SALT);
+  }
+
+  private buildToken(payload: LoggedUser) {
+    return this.jwtService.sign(payload);
   }
 }

@@ -6,7 +6,7 @@ import { appConfig, mongoConfig } from './config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [mongoConfig] }),
+    ConfigModule.forRoot({ isGlobal: true, load: [mongoConfig, appConfig] }),
     ConfigModule.forFeature(appConfig),
     MongooseModule.forRootAsync({ useFactory: mongoConfig }),
     AuthModule,
