@@ -1,89 +1,38 @@
 import * as bcrypt from 'bcrypt';
 
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
-
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserProvider } from 'src/schemas/user.schema';
-import { LoginWithCredentials, LoginWithGoogleDto, RegisterDto } from './dto';
-import { ConfigService } from '@nestjs/config';
+import { appConfig } from 'src/config';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { RegisterWithCredentialsDto } from './auth.dto';
+import { ConfigType } from '@nestjs/config';
+import { UserService } from '../user/user.service';
+import { UserProvider } from 'src/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    private readonly config: ConfigService,
+    private readonly userService: UserService,
+    @Inject(appConfig.KEY) private envConfig: ConfigType<typeof appConfig>,
   ) {}
 
-  async registerWithCredentials(dto: RegisterDto) {
-    const isUserExist = await this.userModel.findOne({ email: dto.email });
-    if (isUserExist) throw new ConflictException('Email already exist');
+  async registerWithCredentials(dto: RegisterWithCredentialsDto) {
+    const existingUser = await this.userService.findByEmail(dto.email);
 
-    const hashedPassword = await bcrypt.hash(
-      dto.password,
-      Number(this.config.get('HASH_SALT')),
-    );
+    if (!existingUser) throw new BadRequestException('User already exist');
 
-    const user = await this.userModel.create({
+    const password = await this.hashPassword(dto.password);
+
+    const user = await this.userService.createUser({
       ...dto,
-      password: hashedPassword,
+      password,
       provider: UserProvider.CREDENTIALS,
     });
 
-    if (!user) throw new InternalServerErrorException('Failed to create user');
+    if (!user) throw new BadRequestException('Failed to create user!');
 
-    return 'User created successfully';
+    return 'User Created Successfully';
   }
 
-  async loginWithGoogle(dto: LoginWithGoogleDto) {
-    const projection = { _id: 1, email: 1, image: 1, name: 1 };
-
-    const isUserExist = await this.userModel.findOne(
-      { email: dto.email },
-      projection,
-    );
-
-    if (isUserExist) return isUserExist;
-
-    const user = await this.userModel.create({
-      ...dto,
-      provider: UserProvider.GOOGLE,
-    });
-
-    if (!user) throw new InternalServerErrorException('Failed to create user');
-    const { _id, name, image, email } = user;
-
-    return { _id, name, image, email };
-  }
-
-  async loginWithCredentials(dto: LoginWithCredentials) {
-    const projection = { _id: 1, email: 1, image: 1, name: 1, password: 1 };
-
-    const isUserExist = await this.userModel.findOne(
-      { email: dto.email, provider: UserProvider.CREDENTIALS },
-      projection,
-    );
-
-    if (!isUserExist) throw new NotFoundException('User not found!');
-
-    const isPasswordMatch = await bcrypt.compare(
-      dto.password,
-      isUserExist.password,
-    );
-
-    if (!isPasswordMatch)
-      throw new ConflictException('Password does not match!');
-
-    return {
-      _id: isUserExist._id,
-      name: isUserExist.name,
-      email: isUserExist.email,
-      image: isUserExist.image,
-    };
+  async hashPassword(password: string) {
+    return bcrypt.hash(password, this.envConfig.HASH_SALT);
   }
 }

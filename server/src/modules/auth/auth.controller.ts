@@ -1,6 +1,10 @@
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { Body, Controller, Post } from '@nestjs/common';
-import { LoginWithCredentials, LoginWithGoogleDto, RegisterDto } from './dto';
+import {
+  LoginWithCredentials,
+  LoginWithGoogleDto,
+  RegisterDto,
+} from './auth.dto';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
