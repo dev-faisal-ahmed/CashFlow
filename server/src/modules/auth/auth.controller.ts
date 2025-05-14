@@ -4,12 +4,11 @@ import {
   RegisterWithCredentialsDto,
 } from './auth.dto';
 
-import { ResponseDto } from 'src/common/dto/response.dto';
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { LoggedUser } from 'src/common/types';
-import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 
 @Controller('auth')
 export class AuthController {
@@ -17,8 +16,7 @@ export class AuthController {
 
   @Post('register')
   async registerWithCredentials(@Body() dto: RegisterWithCredentialsDto) {
-    const message = await this.authService.registerWithCredentials(dto);
-    return new ResponseDto(message);
+    return this.authService.registerWithCredentials(dto);
   }
 
   @Post('login')
@@ -26,8 +24,7 @@ export class AuthController {
     @Body(new ZodValidationPipe(loginWithCredentialsSchema))
     dto: LoginWithCredentialsDto,
   ) {
-    const accessToken = await this.authService.loginWithCredentials(dto);
-    return new ResponseDto('Successfully logged in', accessToken);
+    return this.authService.loginWithCredentials(dto);
   }
 
   @Get('login/google')
@@ -37,10 +34,6 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   async googleRedirect(@Req() req: any) {
-    const accessToken = await this.authService.loginWithGoogle(
-      req.user as LoggedUser,
-    );
-
-    return new ResponseDto('Successfully logged in', accessToken);
+    return await this.authService.loginWithGoogle(req.user as LoggedUser);
   }
 }

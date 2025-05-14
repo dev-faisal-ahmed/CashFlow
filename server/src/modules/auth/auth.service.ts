@@ -20,6 +20,7 @@ import { UserService } from '../user/user.service';
 import { UserProvider } from 'src/schemas/user.schema';
 import { LoggedUser } from 'src/common/types';
 import { JwtService } from '@nestjs/jwt';
+import { ResponseDto } from 'src/common/dto/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Failed to create user!');
 
-    return 'User Created Successfully';
+    return new ResponseDto('User created successfully');
   }
 
   async loginWithGoogle(dto: LoginWithGoogleDto) {
@@ -65,7 +66,7 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Failed create user');
 
-    return this.generateToken(user);
+    return new ResponseDto('Successfully logged in', this.generateToken(user));
   }
 
   async loginWithCredentials(dto: LoginWithCredentialsDto) {
@@ -80,7 +81,10 @@ export class AuthService {
     if (!isPasswordMatch)
       throw new BadRequestException('Password did not match');
 
-    return this.generateToken(isUserExist);
+    return new ResponseDto(
+      'Successfully logged in',
+      this.generateToken(isUserExist),
+    );
   }
 
   // helper methods
