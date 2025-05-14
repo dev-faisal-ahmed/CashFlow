@@ -1,9 +1,4 @@
-import {
-  LoginWithCredentialsDto,
-  loginWithCredentialsSchema,
-  RegisterWithCredentialsDto,
-} from './auth.dto';
-
+import { LoginWithCredentialsDto, loginWithCredentialsSchema, RegisterWithCredentialsDto } from './auth.dto';
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 import { AuthService } from './auth.service';

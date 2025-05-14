@@ -1,26 +1,14 @@
 import * as bcrypt from 'bcrypt';
 
-import {
-  LoginWithCredentialsDto,
-  LoginWithGoogleDto,
-  loginWithGoogleSchema,
-  RegisterWithCredentialsDto,
-} from './auth.dto';
-
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-
+import { LoginWithCredentialsDto, LoginWithGoogleDto, loginWithGoogleSchema, RegisterWithCredentialsDto } from './auth.dto';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { appConfig } from 'src/config';
 import { ConfigType } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { UserProvider } from 'src/schemas/user.schema';
 import { LoggedUser } from 'src/common/types';
-import { JwtService } from '@nestjs/jwt';
 import { ResponseDto } from 'src/common/dto/response.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -73,18 +61,11 @@ export class AuthService {
     const isUserExist = await this.userService.findByEmail(dto.email);
     if (!isUserExist) throw new NotFoundException('User not found');
 
-    const isPasswordMatch = await this.comparePassword(
-      dto.password,
-      isUserExist.password,
-    );
+    const isPasswordMatch = await this.comparePassword(dto.password, isUserExist.password);
 
-    if (!isPasswordMatch)
-      throw new BadRequestException('Password did not match');
+    if (!isPasswordMatch) throw new BadRequestException('Password did not match');
 
-    return new ResponseDto(
-      'Successfully logged in',
-      this.generateToken(isUserExist),
-    );
+    return new ResponseDto('Successfully logged in', this.generateToken(isUserExist));
   }
 
   // helper methods
@@ -92,10 +73,7 @@ export class AuthService {
     return bcrypt.hash(password, this.envConfig.HASH_SALT);
   }
 
-  private async comparePassword(
-    givenPassword: string,
-    encryptedPassword: string,
-  ) {
+  private async comparePassword(givenPassword: string, encryptedPassword: string) {
     return bcrypt.compare(givenPassword, encryptedPassword);
   }
 

@@ -17,12 +17,8 @@ export const loginWithCredentialsSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-export type RegisterWithCredentialsDto = z.infer<
-  typeof registerWithCredentialsSchema
->;
+export type RegisterWithCredentialsDto = z.infer<typeof registerWithCredentialsSchema>;
 
 export type LoginWithGoogleDto = z.infer<typeof loginWithGoogleSchema>;
 
-export type LoginWithCredentialsDto = z.infer<
-  typeof loginWithCredentialsSchema
->;
+export type LoginWithCredentialsDto = z.infer<typeof loginWithCredentialsSchema>;
