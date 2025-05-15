@@ -9,4 +9,11 @@ export const createUserSchema = z.object({
   provider: z.nativeEnum(UserProvider),
 });
 
+export const updateUserSchema = z.object({
+  name: z.string().min(1, 'Name is required').optional(),
+  password: z.string().optional(),
+  image: z.string().optional(),
+});
+
 export type CreateUserDto = z.infer<typeof createUserSchema>;
+export type UpdateUserDto = z.infer<typeof updateUserSchema>;

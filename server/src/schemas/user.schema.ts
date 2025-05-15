@@ -25,4 +25,4 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-export type UserType = Omit<HydratedDocument<User>, keyof Document<User>>;
+export type UserType = Pick<HydratedDocument<User>, '_id' | 'name' | 'email' | 'password' | 'image' | 'provider'>;

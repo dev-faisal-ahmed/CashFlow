@@ -2,12 +2,12 @@ import * as bcrypt from 'bcrypt';
 
 import { ChangePasswordDto, LoginWithCredentialsDto, LoginWithGoogleDto, loginWithGoogleSchema, RegisterWithCredentialsDto } from './auth.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { appConfig } from 'src/config';
-import { ConfigType } from '@nestjs/config';
-import { UserService } from '../user/user.service';
-import { UserDocument, UserProvider } from 'src/schemas/user.schema';
-import { LoggedUser } from 'src/common/types';
 import { ResponseDto } from 'src/common/dto/response.dto';
+import { UserType, UserProvider } from 'src/schemas/user.schema';
+import { UserService } from '../user/user.service';
+import { appConfig } from 'src/config';
+import { LoggedUser } from 'src/common/types';
+import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -20,11 +20,9 @@ export class AuthService {
 
   async registerWithCredentials(dto: RegisterWithCredentialsDto) {
     const existingUser = await this.userService.findByEmail(dto.email);
-
     if (existingUser) throw new BadRequestException('User already exist');
 
     const password = await this.hashPassword(dto.password);
-
     const user = await this.userService.createUser({
       ...dto,
       password,
@@ -68,8 +66,14 @@ export class AuthService {
     return new ResponseDto('Successfully logged in', this.generateToken(isUserExist));
   }
 
-  async changePassword(dto: ChangePasswordDto, user: UserDocument) {
+  async changePassword(dto: ChangePasswordDto, user: UserType) {
     const isPasswordMatched = await this.comparePassword(dto.oldPassword, user.password);
+    if (!isPasswordMatched) throw new BadRequestException('Password does not match');
+
+    const hashedPassword = await this.hashPassword(dto.newPassword);
+    await this.userService.updateUserById(user._id, { password: hashedPassword });
+
+    return new ResponseDto('Password changed successfully');
   }
 
   // helper methods
