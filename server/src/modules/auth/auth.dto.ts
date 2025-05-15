@@ -17,8 +17,12 @@ export const loginWithCredentialsSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+export const changePasswordSchema = z.object({
+  oldPassword: z.string().min(1, 'Please provide old password'),
+  newPassword: z.string().min(1, 'Please provide new password'),
+});
+
 export type RegisterWithCredentialsDto = z.infer<typeof registerWithCredentialsSchema>;
-
 export type LoginWithGoogleDto = z.infer<typeof loginWithGoogleSchema>;
-
 export type LoginWithCredentialsDto = z.infer<typeof loginWithCredentialsSchema>;
+export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;

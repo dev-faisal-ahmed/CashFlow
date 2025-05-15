@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Document } from 'mongoose';
 
 export enum UserProvider {
   GOOGLE = 'GOOGLE',
@@ -24,3 +25,4 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+export type UserType = Omit<HydratedDocument<User>, keyof Document<User>>;

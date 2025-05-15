@@ -1,11 +1,11 @@
 import * as bcrypt from 'bcrypt';
 
-import { LoginWithCredentialsDto, LoginWithGoogleDto, loginWithGoogleSchema, RegisterWithCredentialsDto } from './auth.dto';
+import { ChangePasswordDto, LoginWithCredentialsDto, LoginWithGoogleDto, loginWithGoogleSchema, RegisterWithCredentialsDto } from './auth.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { appConfig } from 'src/config';
 import { ConfigType } from '@nestjs/config';
 import { UserService } from '../user/user.service';
-import { UserProvider } from 'src/schemas/user.schema';
+import { UserDocument, UserProvider } from 'src/schemas/user.schema';
 import { LoggedUser } from 'src/common/types';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -66,6 +66,10 @@ export class AuthService {
     if (!isPasswordMatch) throw new BadRequestException('Password did not match');
 
     return new ResponseDto('Successfully logged in', this.generateToken(isUserExist));
+  }
+
+  async changePassword(dto: ChangePasswordDto, user: UserDocument) {
+    const isPasswordMatched = await this.comparePassword(dto.oldPassword, user.password);
   }
 
   // helper methods
