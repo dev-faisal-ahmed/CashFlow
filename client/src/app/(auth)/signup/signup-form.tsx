@@ -13,22 +13,14 @@ const singupFormSchema = z.object({
   confirmPassword: z.string(),
 });
 
-// const loginFormSchema = z.object({
-//   email: z.string().email("Invalid Email"),
-//   password: z.string().min(1, "Password is required"),
-// });
-
 // Main Types
 type SignupFormSchema = z.infer<typeof singupFormSchema>;
-// type LoginInFormSchema = z.infer<typeof loginFormSchema>;
 
 // Main Component
-
 type SignupFormProps = { onSubmit: (formData: SignupFormSchema) => void };
 
 export const SignupForm = ({ onSubmit }: SignupFormProps) => {
   const form = useForm<SignupFormSchema>({ resolver: zodResolver(singupFormSchema) });
-
   const handleSignup = form.handleSubmit((formData) => onSubmit(formData));
 
   return (
@@ -38,4 +30,6 @@ export const SignupForm = ({ onSubmit }: SignupFormProps) => {
   );
 };
 
-export const LoginForm = () => {};
+// Hooks
+
+// Functions
