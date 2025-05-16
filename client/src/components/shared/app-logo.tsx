@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 import { IoWallet } from "react-icons/io5";
 
 // Font
-const font = Poppins({ weight: "600" });
+const font = Poppins({ subsets: ["latin"], weight: "600" });
 
 // Config
 const CONFIG = {

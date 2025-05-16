@@ -8,7 +8,7 @@ import { PropsWithChildren } from "react";
 export default function AuthLayout({ children }: PropsWithChildren) {
   return (
     <main className="flex h-dvh">
-      <section className="hidden max-w-120 min-w-100 bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
+      <section className="hidden w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
         <Link href="/">
           <AppLogo className="" />
         </Link>
@@ -36,8 +36,8 @@ const ReviewCard = () => (
   <div className="mt-auto rounded-lg border border-blue-800 bg-blue-800/50 p-6 shadow-sm">
     <h1 className="font-semibold">This app changed how I manage my money</h1>
     <p className="mt-4 text-sm font-thin">
-      I used to lose track of my expenses and loans all the time. Now everything is clear — I know where my money is, what I owe, and what’s
-      coming in. It even suggests where I can cut costs!
+      I used to lose track of my expenses and loans all the time. Now everything is clear — I know where my money is, what I owe, and
+      what&apos;s coming in. It even suggests where I can cut costs!
     </p>
     <div className="mt-6 flex items-center gap-4">
       <CommonAvatar name={review.userName} size="SM" />

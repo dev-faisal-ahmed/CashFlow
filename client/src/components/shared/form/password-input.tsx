@@ -10,7 +10,9 @@ export const PasswordInput = ({ ...props }: PasswordInputProps) => {
   return (
     <div className="relative">
       <Input {...props} type={showPass ? "text" : "password"} />
-      <button onClick={() => setShowPass((prev) => !prev)}>{showPass ? <EyeClosedIcon /> : <EyeIcon />}</button>
+      <button type="button" className="absolute top-1/2 right-2 -translate-y-1/2" onClick={() => setShowPass((prev) => !prev)}>
+        {showPass ? <EyeClosedIcon size={16} /> : <EyeIcon size={16} />}
+      </button>
     </div>
   );
 };
