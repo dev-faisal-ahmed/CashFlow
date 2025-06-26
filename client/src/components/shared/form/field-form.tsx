@@ -21,7 +21,7 @@ export const FieldForm = <TFieldValues extends FieldValues, TName extends FieldP
   description,
   children,
   formItemProps,
-  showMessage = false,
+  showMessage = true,
   ...props
 }: FieldFormProps<TFieldValues, TName>) => (
   <FormField

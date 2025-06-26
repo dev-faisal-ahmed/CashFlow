@@ -21,5 +21,5 @@ export const errorMessageGen = (error: unknown, defaultMessage: string = "Someth
 };
 
 export const errorToast = (error: unknown) => {
-  toast.error(errorMessageGen(error));
+  toast.error(errorMessageGen(error) || "Something Went wrong");
 };

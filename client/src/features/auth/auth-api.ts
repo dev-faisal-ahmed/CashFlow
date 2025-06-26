@@ -3,9 +3,9 @@ import { TSigUpForm } from "./auth-types";
 import { api } from "@/lib/api";
 import { apiUrl } from "@/lib/api-url";
 
-export const register = async (payload: RegisterPayload): PromiseResponse => {
+export const signup = async (payload: SignupPayload): PromiseResponse => {
   const { data } = await api.post(apiUrl.auth.register, payload);
   return data;
 };
 
-type RegisterPayload = Pick<TSigUpForm, "name" | "email" | "password">;
+type SignupPayload = Pick<TSigUpForm, "name" | "email" | "password">;
