@@ -3,7 +3,39 @@
 import { errorToast } from "@/lib/utils";
 import { DefaultError, isServer, MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { PropsWithChildren } from "react";
+import { FC, PropsWithChildren } from "react";
+import { toast } from "sonner";
+
+export const QueryProvider: FC<PropsWithChildren> = ({ children }) => {
+  const queryClient = getQueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} position="bottom" buttonPosition="bottom-right" />
+      {children}
+    </QueryClientProvider>
+  );
+};
+
+let browserQueryClient: QueryClient | undefined = undefined;
+
+const getQueryClient = () => {
+  if (isServer) return makeQueryClient();
+  else {
+    if (!browserQueryClient) browserQueryClient = makeQueryClient();
+    return browserQueryClient;
+  }
+};
+
+const TIME = 10 * 60 * 1000;
+
+const makeQueryClient = () => {
+  return new QueryClient({
+    defaultOptions: { queries: { staleTime: TIME } },
+    queryCache: new QueryCache({ onError: onGlobalQueryError }),
+    mutationCache: new MutationCache({ onError: onGlobalMutationError, onSuccess: onGlobalMutationSuccess }),
+  });
+};
 
 const onGlobalQueryError = (error: DefaultError, query: unknown) => {
   if (error instanceof Error) {
@@ -33,33 +65,12 @@ const onGlobalMutationError = (error: DefaultError, mutation: unknown) => {
   }
 };
 
-const TIME = 20 * 60 * 1000;
+type ResponseWithMessage = { message?: string };
+export const onGlobalMutationSuccess = (data: unknown) => {
+  if (isServer) return;
 
-const makeQueryClient = () => {
-  return new QueryClient({
-    defaultOptions: { queries: { staleTime: TIME } },
-    queryCache: new QueryCache({ onError: onGlobalQueryError }),
-    mutationCache: new MutationCache({ onError: onGlobalMutationError }),
-  });
-};
+  const response = data as ResponseWithMessage;
+  const message = typeof response?.message === "string" ? response.message : "Action completed successfully";
 
-let browserQueryClient: QueryClient | undefined = undefined;
-
-const getQueryClient = () => {
-  if (isServer) return makeQueryClient();
-  else {
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  }
-};
-
-export const QueryProvider = ({ children }: PropsWithChildren) => {
-  const queryClient = getQueryClient();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} position="bottom" buttonPosition="bottom-right" />
-      {children}
-    </QueryClientProvider>
-  );
+  toast.success(message);
 };

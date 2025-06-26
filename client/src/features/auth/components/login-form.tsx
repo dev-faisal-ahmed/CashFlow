@@ -1,26 +1,23 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { AuthEntryCard } from "./auth-entry-card";
 import { AuthFormFields } from "./auth-form-fields";
-import { TLoginForm } from "../auth-types";
 import { Form } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../auth-schema";
 import { Button } from "@/components/ui/button";
+import { useLogin } from "../auth-hook";
 
 export const LoginForm = () => {
-  const form = useForm<TLoginForm>({
-    defaultValues: { email: "", password: "" },
-    resolver: zodResolver(loginSchema),
-  });
+  const { form, handleLogin, isPending } = useLogin();
 
   return (
     <AuthEntryCard formType="login">
       <Form {...form}>
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={handleLogin}>
           <AuthFormFields formType="login" />
-          <Button className="mt-6">Login</Button>
+
+          <Button className="mt-6" isLoading={isPending}>
+            {isPending ? "Logging in..." : "Login"}
+          </Button>
         </form>
       </Form>
     </AuthEntryCard>
