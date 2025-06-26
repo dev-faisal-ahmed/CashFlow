@@ -7,6 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { login, signup } from "./auth-api";
 import { useRouter, useSearchParams } from "next/navigation";
 import { storeToken } from "@/lib/server-action";
+import { apiUrl } from "@/lib/api-url";
+import { API_URL } from "@/lib/config";
 
 const singupKey = `${QK.AUTH}_SIGNUP`;
 export const useSignup = () => {
@@ -41,9 +43,9 @@ export const useLogin = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { mutate, isPending } = useMutation({ mutationKey: [loginKey], mutationFn: login });
-
   const callbackUrl = searchParams.get("callback") || "/";
+
+  const { mutate, isPending } = useMutation({ mutationKey: [loginKey], mutationFn: login });
 
   const handleLogin = form.handleSubmit((formData) => {
     mutate(formData, {
@@ -56,4 +58,13 @@ export const useLogin = () => {
   });
 
   return { form, handleLogin, isPending };
+};
+
+export const useGoogleLogin = () => {
+  const handleGoogleLogin = () => {
+    const callbackUrl = encodeURIComponent(window.location.origin + "/auth/callback");
+    window.location.href = `${API_URL}${apiUrl.auth.loginWithGoogle}?callbackUrl=${callbackUrl}`;
+  };
+
+  return { handleGoogleLogin };
 };

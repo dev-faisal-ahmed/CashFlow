@@ -1,9 +1,8 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { FC, PropsWithChildren } from "react";
-import { FcGoogle } from "react-icons/fc";
+import { GoogleLogin } from "./google-login";
 
 type AuthEntryCardProps = PropsWithChildren<{ formType: "signup" | "login" }>;
 
@@ -36,9 +35,7 @@ export const AuthEntryCard: FC<AuthEntryCardProps> = ({ children, formType }) =>
       </div>
 
       {/* login with google */}
-      <Button variant="outline" className="mt-4 w-full">
-        <FcGoogle /> Continue with Google
-      </Button>
+      <GoogleLogin />
 
       {/* or separator */}
       <section className="relative">

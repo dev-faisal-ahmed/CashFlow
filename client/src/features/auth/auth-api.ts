@@ -13,5 +13,10 @@ export const login = async (payload: LoginPayload): PromiseResponse<string> => {
   return data;
 };
 
+export const googleLogin = async (): PromiseResponse<string> => {
+  const { data } = await api.get(apiUrl.auth.loginWithGoogle);
+  return data;
+};
+
 type SignupPayload = Pick<TSigUpForm, "name" | "email" | "password">;
 type LoginPayload = TLoginForm;

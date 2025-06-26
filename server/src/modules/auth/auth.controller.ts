@@ -1,5 +1,5 @@
 import { ChangePasswordDto, LoginWithCredentialsDto, loginWithCredentialsSchema, RegisterWithCredentialsDto } from './auth.dto';
-import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { AuthGuard } from 'src/common/guard/auth.guard';
@@ -7,6 +7,7 @@ import { User } from 'src/common/decorators/user.decorator';
 import { UserType } from 'src/schemas/user.schema';
 import { AuthService } from './auth.service';
 import { LoggedUser } from 'src/common/types';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -31,8 +32,10 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(PassportAuthGuard('google'))
-  async googleRedirect(@Req() req: any) {
-    return this.authService.loginWithGoogle(req.user as LoggedUser);
+  async googleRedirect(@Req() req: any, @Res() res: Response) {
+    const callbackUrl = req.query.callbackUrl || 'http://localhost:3000';
+    const token = await this.authService.loginWithGoogle(req.user as LoggedUser);
+    res.redirect(`${callbackUrl}?token=${token}`);
   }
 
   @Patch('change-password')

@@ -52,7 +52,7 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Failed create user');
 
-    return new ResponseDto('Successfully logged in', this.generateToken(user));
+    return this.generateToken(user);
   }
 
   async loginWithCredentials(dto: LoginWithCredentialsDto) {
