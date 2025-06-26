@@ -28,7 +28,7 @@ export const FieldForm = <TFieldValues extends FieldValues, TName extends FieldP
     {...props}
     render={(filedProps) => (
       <FormItem {...formItemProps}>
-        {label && <Label>{label}</Label>}
+        {label && <Label className="text-muted-foreground font-semibold">{label}</Label>}
         <FormControl>{children(filedProps)}</FormControl>
         {description && <FormDescription>{description}</FormDescription>}
         {showMessage && <FormMessage />}

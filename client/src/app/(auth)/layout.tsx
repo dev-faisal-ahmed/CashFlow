@@ -6,9 +6,9 @@ import { IoIosStar } from "react-icons/io";
 import { FC, PropsWithChildren } from "react";
 
 // Main Component
-const AuthLayout: FC<PropsWithChildren> = ({ children }) => (
-  <main className="flex items-center">
-    <section className="h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
+const Layout: FC<PropsWithChildren> = ({ children }) => (
+  <main className="flex h-dvh items-center md:h-screen">
+    <section className="hidden h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
       <Link href="/">
         <AppLogo className="" />
       </Link>
@@ -33,7 +33,7 @@ const review = {
 };
 
 const ReviewCard = () => (
-  <div className="mt-auto rounded-lg border border-blue-800 bg-blue-800/50 p-6 shadow-sm">
+  <div className="mt-auto rounded-md border border-blue-800 bg-blue-800/50 p-6 shadow-sm">
     <h1 className="font-semibold">This app changed how I manage my money</h1>
     <p className="mt-4 text-sm font-thin">
       I used to lose track of my expenses and loans all the time. Now everything is clear — I know where my money is, what I owe, and
@@ -50,4 +50,4 @@ const ReviewCard = () => (
 );
 
 // Exports
-export default AuthLayout;
+export default Layout;
