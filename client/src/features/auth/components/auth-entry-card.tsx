@@ -17,8 +17,8 @@ const FORM_CONFIG = {
   },
 
   login: {
-    title: "Create Account",
-    description: "Enter your details to create an account",
+    title: "Login",
+    description: "Enter your credentials to login",
     question: "Don't have any account?",
     alterNative: "signup",
     alternativeLink: "/signup",

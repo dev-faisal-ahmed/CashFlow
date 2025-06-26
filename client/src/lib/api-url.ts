@@ -1,0 +1,8 @@
+export const apiUrl = {
+  auth: {
+    login: "/auth/login",
+    register: "/auth/register",
+    loginWithGoogle: "/auth/login/google",
+    changePassword: "/auth/change-password",
+  },
+};
