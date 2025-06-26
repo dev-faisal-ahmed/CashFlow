@@ -35,7 +35,9 @@ export class AuthController {
   async googleRedirect(@Req() req: any, @Res() res: Response) {
     const callbackUrl = req.query.callbackUrl || 'http://localhost:3000';
     const token = await this.authService.loginWithGoogle(req.user as LoggedUser);
-    res.redirect(`${callbackUrl}?token=${token}`);
+
+    res.cookie('token', token, { httpOnly: true });
+    res.redirect(`${callbackUrl}`);
   }
 
   @Patch('change-password')

@@ -1,5 +1,6 @@
 "use client";
 
+import { Spinner } from "@/components/ui/spinner";
 import { storeToken } from "@/lib/server-action";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -14,11 +15,15 @@ export const GoogleTokenHandler = () => {
       if (token) {
         await storeToken(token);
         router.replace("/");
-      }
+      } else router.replace("/login");
     };
 
     handleStoreToken();
   }, [token, router]);
 
-  return null;
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <Spinner />
+    </div>
+  );
 };

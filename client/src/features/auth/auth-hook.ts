@@ -6,9 +6,9 @@ import { loginSchema, signupSchema } from "./auth-schema";
 import { useMutation } from "@tanstack/react-query";
 import { login, signup } from "./auth-api";
 import { useRouter, useSearchParams } from "next/navigation";
-import { storeToken } from "@/lib/server-action";
 import { apiUrl } from "@/lib/api-url";
 import { API_URL } from "@/lib/config";
+import { storeToken } from "@/lib/server-action";
 
 const singupKey = `${QK.AUTH}_SIGNUP`;
 export const useSignup = () => {
