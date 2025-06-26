@@ -3,30 +3,30 @@ import Link from "next/link";
 import { AppLogo } from "@/components/shared/app-logo";
 import { CommonAvatar } from "@/components/shared/common-avatar";
 import { IoIosStar } from "react-icons/io";
-import { PropsWithChildren } from "react";
+import { FC, PropsWithChildren } from "react";
 
-export default function AuthLayout({ children }: PropsWithChildren) {
-  return (
-    <main className="flex h-dvh">
-      <section className="hidden w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
-        <Link href="/">
-          <AppLogo className="" />
-        </Link>
-        <div className="mt-20">
-          <h1 className="text-4xl leading-12 font-semibold tracking-wider">Track, analyze, and control your money effortlessly.</h1>
-          <p className="mt-6 font-thin">
-            From daily expenses to income insights, borrowing and lending to category-based analytics — manage your entire financial life
-            from one powerful dashboard. Whether you&apos;re budgeting smarter or just trying to see where your money goes, we&apos;ve got
-            you covered.
-          </p>
-        </div>
-        <ReviewCard />
-      </section>
-      <section className="grow">{children}</section>
-    </main>
-  );
-}
+// Main Component
+const AuthLayout: FC<PropsWithChildren> = ({ children }) => (
+  <main className="flex items-center">
+    <section className="h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
+      <Link href="/">
+        <AppLogo className="" />
+      </Link>
+      <div className="mt-20">
+        <h1 className="text-4xl leading-12 font-semibold tracking-wider">Track, analyze, and control your money effortlessly.</h1>
+        <p className="mt-6 font-thin">
+          From daily expenses to income insights, borrowing and lending to category-based analytics — manage your entire financial life from
+          one powerful dashboard. Whether you&apos;re budgeting smarter or just trying to see where your money goes, we&apos;ve got you
+          covered.
+        </p>
+      </div>
+      <ReviewCard />
+    </section>
+    <section className="grow">{children}</section>
+  </main>
+);
 
+// Helper Component
 const review = {
   userName: "Faisal Ahmed",
   rating: 4.9,
@@ -48,3 +48,6 @@ const ReviewCard = () => (
     </div>
   </div>
 );
+
+// Exports
+export default AuthLayout;

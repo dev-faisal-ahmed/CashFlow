@@ -5,6 +5,9 @@ import { IoWallet } from "react-icons/io5";
 // Font
 const font = Poppins({ subsets: ["latin"], weight: "600" });
 
+// Main Component
+type AppLogoProps = { className?: string; size?: "SM" | "MD" | "LG" };
+
 // Config
 const CONFIG = {
   SM: { iconClassName: "size-5", textClassName: "text-lg" },
@@ -12,11 +15,9 @@ const CONFIG = {
   LG: { iconClassName: "size-12", textClassName: "text-2xl" },
 };
 
-// Main Component
-type AppLogoProps = { className?: string; size?: "SM" | "MD" | "LG" };
-
 export const AppLogo = ({ className, size = "MD" }: AppLogoProps) => {
   const config = CONFIG[size];
+
   return (
     <div className={cn("flex items-center gap-2 antialiased", font.className, className)}>
       <IoWallet className={config.iconClassName} />

@@ -1,20 +1,27 @@
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-const CONFIG = {
-  SM: { avatarClassNae: "size-8" },
-  MD: { avatarClassNae: "size-10" },
-  LG: { avatarClassNae: "size-12" },
-};
-
 type CommonAvatarProps = { name: string; src?: string; size?: "SM" | "MD" | "LG" };
 
-export const CommonAvatar = ({ name, src, size = "MD" }: CommonAvatarProps) => {
+const CONFIG = {
+  SM: { avatarClassNae: "size-10" },
+  MD: { avatarClassNae: "size-12" },
+  LG: { avatarClassNae: "size-16" },
+};
+
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0))
+    .join("");
+};
+
+export const CommonAvatar = ({ name = "", src, size = "MD" }: CommonAvatarProps) => {
   const config = CONFIG[size];
 
   return (
     <Avatar className={config.avatarClassNae}>
       {src && <AvatarImage src={src} />}
-      <AvatarFallback className="text-xl font-bold">{name.charAt(0)}</AvatarFallback>
+      <AvatarFallback className="text-lg font-bold">{getInitials(name)}</AvatarFallback>
     </Avatar>
   );
 };

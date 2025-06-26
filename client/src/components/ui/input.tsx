@@ -1,8 +1,7 @@
-import * as React from "react";
-
+import { ComponentProps, FC } from "react";
 import { cn } from "@/lib/utils";
 
-const Input = ({ className, type, ...props }: React.ComponentProps<"input">) => {
+export const Input: FC<ComponentProps<"input">> = ({ className, type, ...props }) => {
   return (
     <input
       type={type}
@@ -17,5 +16,3 @@ const Input = ({ className, type, ...props }: React.ComponentProps<"input">) => 
     />
   );
 };
-
-export { Input };
