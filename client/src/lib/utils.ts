@@ -10,7 +10,7 @@ export const capitalize = (value: string) => {
     .toLowerCase()
     .split(" ")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join("");
+    .join(" ");
 };
 
 export const errorMessageGen = (error: unknown, defaultMessage: string = "Something went wrong") => {

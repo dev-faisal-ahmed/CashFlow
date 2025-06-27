@@ -68,8 +68,8 @@ const AppSidebarFooter = () => (
   <SidebarFooter>
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton className="h-16 border-t pt-4" asChild>
-          <div className="flex items-center gap-2">
+        <SidebarMenuButton className="" asChild>
+          <div className="flex h-16 items-center justify-center rounded-none border-t py-4 hover:bg-transparent">
             <CommonAvatar name="Faisal" fallbackClassName="bg-primary text-white" size="SM" />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">John Doe</span>

@@ -1,10 +1,15 @@
 import { FC, PropsWithChildren } from "react";
-import { SidebarProvider } from "../ui/sidebar";
+import { SidebarInset, SidebarProvider } from "../ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
+import { AppTopbar } from "./app-topbar";
+import { ScrollArea } from "../ui/scroll-area";
 
 export const MainLayout: FC<PropsWithChildren> = ({ children }) => (
   <SidebarProvider>
     <AppSidebar />
-    {children}
+    <SidebarInset className="flex h-[calc(100dvh-16px)] flex-col">
+      <AppTopbar />
+      <ScrollArea>{children}</ScrollArea>
+    </SidebarInset>
   </SidebarProvider>
 );
