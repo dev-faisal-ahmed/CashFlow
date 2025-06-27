@@ -1,9 +1,9 @@
 import * as bcrypt from 'bcrypt';
 
-import { ChangePasswordDto, LoginWithCredentialsDto, LoginWithGoogleDto, loginWithGoogleSchema, RegisterWithCredentialsDto } from './auth.dto';
+import { ChangePasswordDto, LoginWithCredentialsDto, LoginWithGoogleDto, RegisterWithCredentialsDto } from './auth.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ResponseDto } from 'src/common/dto/response.dto';
-import { UserType, UserProvider } from 'src/schemas/user.schema';
+import { UserType, UserProvider } from 'src/modules/user/user.schema';
 import { UserService } from '../user/user.service';
 import { appConfig } from 'src/config';
 import { LoggedUser } from 'src/common/types';
@@ -35,21 +35,11 @@ export class AuthService {
   }
 
   async loginWithGoogle(dto: LoginWithGoogleDto) {
-    const result = loginWithGoogleSchema.safeParse(dto);
-
-    if (!result.success) throw new BadRequestException('Invalid user data');
-    const validatedUser = result.data;
-
-    const isUserExist = await this.userService.findByEmail(validatedUser.email);
-    // when user already exist
+    const isUserExist = await this.userService.findByEmail(dto.email);
     if (isUserExist) return this.generateToken(isUserExist);
 
     // creating new user
-    const user = await this.userService.createUser({
-      ...validatedUser,
-      provider: UserProvider.GOOGLE,
-    });
-
+    const user = await this.userService.createUser({ ...dto, provider: UserProvider.GOOGLE });
     if (!user) throw new BadRequestException('Failed create user');
 
     return this.generateToken(user);

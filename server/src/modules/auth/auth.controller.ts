@@ -5,7 +5,7 @@ import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs
 import { ChangePasswordDto, LoginWithCredentialsDto, RegisterWithCredentialsDto } from './auth.dto';
 import { LoggedUser } from 'src/common/types';
 import { User } from 'src/common/decorators/user.decorator';
-import { UserType } from 'src/schemas/user.schema';
+import { UserType } from 'src/modules/user/user.schema';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 
 @Controller('auth')
