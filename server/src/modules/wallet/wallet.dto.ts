@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { capitalize } from 'src/utils';
 
 export class CreateWalletDto {
@@ -11,9 +11,6 @@ export class CreateWalletDto {
   @IsString()
   @IsNotEmpty()
   icon: string;
-
-  @IsMongoId()
-  ownerId: string;
 
   @IsOptional()
   @IsBoolean()

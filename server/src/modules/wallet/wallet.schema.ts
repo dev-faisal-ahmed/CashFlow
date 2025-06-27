@@ -47,4 +47,5 @@ export class Wallet {
 }
 
 export const WalletSchema = SchemaFactory.createForClass(Wallet);
-export type WalletType = Pick<HydratedDocument<Wallet>, '_id' | 'name' | 'icon' | 'ownerId' | 'members' | 'isSaving'>;
+export type WalletDocument = HydratedDocument<Wallet>;
+export type WalletType = Pick<WalletDocument, '_id' | 'name' | 'icon' | 'ownerId' | 'members' | 'isSaving'>;
