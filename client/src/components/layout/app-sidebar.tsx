@@ -51,7 +51,7 @@ const AppSidebarNavItems = () => {
       <SidebarMenu>
         {navItems.map(({ url, isActive, icon: Icon, title }) => (
           <SidebarMenuItem key={url}>
-            <SidebarMenuButton asChild isActive={isActive}>
+            <SidebarMenuButton asChild isActive={isActive} size="lg">
               <Link className="text-muted-foreground" href={url}>
                 <Icon />
                 <span>{title}</span>
