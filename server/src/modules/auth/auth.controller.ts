@@ -1,13 +1,12 @@
-import { ChangePasswordDto, LoginWithCredentialsDto, loginWithCredentialsSchema, RegisterWithCredentialsDto } from './auth.dto';
-import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
+import { Response } from 'express';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
-import { AuthGuard } from 'src/common/guard/auth.guard';
+import { AuthService } from './auth.service';
+import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ChangePasswordDto, LoginWithCredentialsDto, RegisterWithCredentialsDto } from './auth.dto';
+import { LoggedUser } from 'src/common/types';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserType } from 'src/schemas/user.schema';
-import { AuthService } from './auth.service';
-import { LoggedUser } from 'src/common/types';
-import { Response } from 'express';
+import { AuthGuard } from 'src/common/guard/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -19,10 +18,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async loginWithCredentials(
-    @Body(new ZodValidationPipe(loginWithCredentialsSchema))
-    dto: LoginWithCredentialsDto,
-  ) {
+  async loginWithCredentials(@Body() dto: LoginWithCredentialsDto) {
     return this.authService.loginWithCredentials(dto);
   }
 

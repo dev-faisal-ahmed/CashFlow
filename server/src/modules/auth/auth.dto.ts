@@ -1,28 +1,50 @@
-import { z } from 'zod';
+import { Transform } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { capitalize } from 'src/utils';
 
-export const registerWithCredentialsSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid Email'),
-  password: z.string().min(1, 'Password is required'),
-});
+export class RegisterWithCredentialsDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  @Transform(({ value }) => capitalize(value as string))
+  name: string;
 
-export const loginWithGoogleSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid Email'),
-  image: z.string().optional(),
-});
+  @IsEmail({}, { message: 'Invalid email' })
+  email: string;
 
-export const loginWithCredentialsSchema = z.object({
-  email: z.string().email('Invalid Email'),
-  password: z.string().min(1, 'Password is required'),
-});
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+}
 
-export const changePasswordSchema = z.object({
-  oldPassword: z.string().min(1, 'Please provide old password'),
-  newPassword: z.string().min(1, 'Please provide new password'),
-});
+export class LoginWithGoogleDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  @Transform(({ value }) => capitalize(value as string))
+  name: string;
 
-export type RegisterWithCredentialsDto = z.infer<typeof registerWithCredentialsSchema>;
-export type LoginWithGoogleDto = z.infer<typeof loginWithGoogleSchema>;
-export type LoginWithCredentialsDto = z.infer<typeof loginWithCredentialsSchema>;
-export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;
+  @IsEmail({}, { message: 'Invalid email' })
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  image?: string;
+}
+
+export class LoginWithCredentialsDto {
+  @IsEmail({}, { message: 'Invalid email' })
+  email: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  oldPassword: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  newPassword: string;
+}

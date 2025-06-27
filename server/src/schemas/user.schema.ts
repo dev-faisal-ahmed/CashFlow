@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Document } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export enum UserProvider {
   GOOGLE = 'GOOGLE',
