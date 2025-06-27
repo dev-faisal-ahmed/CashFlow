@@ -3,9 +3,9 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -14,40 +14,71 @@ import {
 
 import { AppLogo } from "../shared/app-logo";
 import { useNavItems } from "./main-layout-hook";
+import { CommonAvatar } from "../shared/common-avatar";
+import { SettingsIcon } from "lucide-react";
 
 import Link from "next/link";
 
-export const AppSidebar = () => {
+export const AppSidebar = () => (
+  <Sidebar variant="inset">
+    <AppSidebarHeader />
+
+    <SidebarContent className="mt-2">
+      <SidebarGroup>
+        <AppSidebarNavItems />
+      </SidebarGroup>
+    </SidebarContent>
+
+    <AppSidebarFooter />
+  </Sidebar>
+);
+
+const AppSidebarHeader = () => (
+  <SidebarHeader>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <AppLogo className="text-primary" />
+      </SidebarMenuItem>
+    </SidebarMenu>
+  </SidebarHeader>
+);
+
+const AppSidebarNavItems = () => {
   const { navItems } = useNavItems();
 
   return (
-    <Sidebar variant="inset">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <AppLogo />
+    <SidebarGroupContent>
+      <SidebarMenu>
+        {navItems.map(({ url, isActive, icon: Icon, title }) => (
+          <SidebarMenuItem key={url}>
+            <SidebarMenuButton asChild isActive={isActive}>
+              <Link className="text-muted-foreground" href={url}>
+                <Icon />
+                <span>{title}</span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map(({ url, isActive, icon: Icon, title }) => (
-                <SidebarMenuItem key={url}>
-                  <SidebarMenuButton asChild isActive={isActive}>
-                    <Link href={url}>
-                      <Icon />
-                      <span>{title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+        ))}
+      </SidebarMenu>
+    </SidebarGroupContent>
   );
 };
+
+const AppSidebarFooter = () => (
+  <SidebarFooter>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton className="h-16 border-t pt-4" asChild>
+          <div className="flex items-center gap-2">
+            <CommonAvatar name="Faisal" fallbackClassName="bg-primary text-white" size="SM" />
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">John Doe</span>
+              <span className="text-muted-foreground truncate text-xs">john@example.com</span>
+            </div>
+            <SettingsIcon className="size-4" />
+          </div>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  </SidebarFooter>
+);
