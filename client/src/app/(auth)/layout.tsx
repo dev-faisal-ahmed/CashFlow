@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { IoIosStar } from "react-icons/io";
 import { FC, PropsWithChildren } from "react";
-import { AppLogo, CommonAvatar } from "@/components/shared/";
+import { AppLogo, CommonAvatar } from "@/components/shared";
 import { getLoggedUser } from "@/lib/server-action";
 import { redirect } from "next/navigation";
 

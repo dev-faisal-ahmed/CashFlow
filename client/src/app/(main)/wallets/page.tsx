@@ -1,8 +1,8 @@
 "use client";
 
-import { TopbarContent } from "@/components/layout/app-topbar";
-import { Header } from "@/components/shared/header";
-import { AddWallet } from "@/features/wallet/components/add-wallet";
+import { TopbarContent } from "@/components/layout";
+import { Header } from "@/components/shared";
+import { AddWallet } from "@/wallet/components";
 
 const Page = () => (
   <>

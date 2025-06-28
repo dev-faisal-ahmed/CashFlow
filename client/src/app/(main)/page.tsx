@@ -1,5 +1,5 @@
-import { TopbarContent } from "@/components/layout/app-topbar";
-import { Header } from "@/components/shared/header";
+import { TopbarContent } from "@/components/layout";
+import { Header } from "@/components/shared";
 
 const Page = async () => {
   return (

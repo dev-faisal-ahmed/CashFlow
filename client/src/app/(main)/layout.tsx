@@ -1,8 +1,8 @@
-import { MainLayout } from "@/components/layout/main-layout";
-import { AuthProvider } from "@/features/auth/components/auth-provider";
+import { MainLayout } from "@/components/layout";
+import { AuthProvider } from "@/features/auth/components";
 import { getLoggedUser } from "@/lib/server-action";
-import { redirect } from "next/navigation";
 import { FC, PropsWithChildren } from "react";
+import { redirect } from "next/navigation";
 
 const Layout: FC<PropsWithChildren> = async ({ children }) => {
   const user = await getLoggedUser();

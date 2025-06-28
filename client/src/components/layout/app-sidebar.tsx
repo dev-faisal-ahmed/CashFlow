@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,8 +17,6 @@ import {
 import { AppLogo } from "../shared/app-logo";
 import { useNavItems } from "./main-layout-hook";
 import { CommonAvatar } from "../shared/common-avatar";
-
-import Link from "next/link";
 import { useAuthStore } from "@/stores/auth-store";
 import { Logout } from "@/features/auth/components/logout";
 import { usePopupState } from "@/lib/hooks";
@@ -95,20 +95,18 @@ const ActionMenu = () => {
   const { open, onOpenChange } = usePopupState();
 
   return (
-    <>
-      <DropdownMenu open={open} onOpenChange={onOpenChange} modal>
-        <DropdownMenuTrigger asChild>
-          <button className="hover:bg-background cursor-pointer rounded-md p-2" onClick={() => onOpenChange(true)}>
-            <EllipsisVerticalIcon className="size-4" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-48 p-2">
-          <Button variant="ghost" className="w-full cursor-pointer justify-start px-4 py-2">
-            <LockIcon /> Change Password
-          </Button>
-          <Logout />
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+    <DropdownMenu open={open} onOpenChange={onOpenChange} modal>
+      <DropdownMenuTrigger asChild>
+        <button className="hover:bg-background cursor-pointer rounded-md p-2" onClick={() => onOpenChange(true)}>
+          <EllipsisVerticalIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48 p-2">
+        <Button variant="ghost" className="w-full cursor-pointer justify-start px-4 py-2">
+          <LockIcon /> Change Password
+        </Button>
+        <Logout />
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

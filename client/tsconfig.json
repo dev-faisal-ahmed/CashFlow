@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/auth/*": ["./src/features/auth/*"]
+      "@/auth/*": ["./src/features/auth/*"],
+      "@/wallet/*": ["./src/features/wallet/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
