@@ -25,3 +25,14 @@ export const usePopupState = () => {
 
   return { open, onOpenChange };
 };
+
+export const useDebounce = <TValue>(value: TValue, delay = 300): TValue => {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debounced;
+};
