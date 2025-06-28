@@ -15,9 +15,14 @@ import {
 import { AppLogo } from "../shared/app-logo";
 import { useNavItems } from "./main-layout-hook";
 import { CommonAvatar } from "../shared/common-avatar";
-import { SettingsIcon } from "lucide-react";
 
 import Link from "next/link";
+import { useAuthStore } from "@/stores/auth-store";
+import { Logout } from "@/features/auth/components/logout";
+import { usePopupState } from "@/lib/hooks";
+import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 export const AppSidebar = () => (
   <Sidebar variant="inset">
@@ -37,7 +42,7 @@ const AppSidebarHeader = () => (
   <SidebarHeader>
     <SidebarMenu>
       <SidebarMenuItem>
-        <AppLogo className="text-primary" />
+        <AppLogo />
       </SidebarMenuItem>
     </SidebarMenu>
   </SidebarHeader>
@@ -51,7 +56,7 @@ const AppSidebarNavItems = () => {
       <SidebarMenu>
         {navItems.map(({ url, isActive, icon: Icon, title }) => (
           <SidebarMenuItem key={url}>
-            <SidebarMenuButton asChild isActive={isActive} size="lg">
+            <SidebarMenuButton asChild isActive={isActive}>
               <Link className="text-muted-foreground" href={url}>
                 <Icon />
                 <span>{title}</span>
@@ -64,21 +69,46 @@ const AppSidebarNavItems = () => {
   );
 };
 
-const AppSidebarFooter = () => (
-  <SidebarFooter>
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton className="" asChild>
-          <div className="flex h-16 items-center justify-center rounded-none border-t py-4 hover:bg-transparent">
-            <CommonAvatar name="Faisal" fallbackClassName="bg-primary text-white" size="SM" />
+const AppSidebarFooter = () => {
+  const user = useAuthStore((s) => s.user);
+  if (!user) return null;
+
+  return (
+    <SidebarFooter>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="flex h-16 items-center justify-center gap-2 rounded-none border-t py-4 hover:bg-transparent">
+            <CommonAvatar name={user.name} fallbackClassName="bg-primary text-white" size="SM" />
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">John Doe</span>
-              <span className="text-muted-foreground truncate text-xs">john@example.com</span>
+              <span className="truncate font-semibold">{user.name}</span>
+              <span className="text-muted-foreground truncate text-xs">{user.email}</span>
             </div>
-            <SettingsIcon className="size-4" />
+            <ActionMenu />
           </div>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  </SidebarFooter>
-);
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarFooter>
+  );
+};
+
+const ActionMenu = () => {
+  const { open, onOpenChange } = usePopupState();
+
+  return (
+    <>
+      <DropdownMenu open={open} onOpenChange={onOpenChange} modal>
+        <DropdownMenuTrigger asChild>
+          <button className="cursor-pointer rounded-md p-2 hover:bg-white" onClick={() => onOpenChange(true)}>
+            <EllipsisVerticalIcon className="size-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-48 p-2">
+          <Button variant="ghost" className="w-full cursor-pointer justify-start px-4 py-2">
+            <LockIcon /> Change Password
+          </Button>
+          <Logout />
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+};

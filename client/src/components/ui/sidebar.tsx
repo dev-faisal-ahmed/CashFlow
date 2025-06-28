@@ -238,16 +238,16 @@ export const SidebarTrigger: FC<ComponentProps<typeof Button>> = ({ className, o
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      variant="ghost"
+      variant="outline"
       size="icon"
-      className={cn("size-7", className)}
+      className={cn(className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <PanelLeftIcon className="size-4" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
@@ -401,7 +401,7 @@ export const SidebarMenuButton: FC<SidebarMenuButtonProps> = ({
   asChild = false,
   isActive = false,
   variant = "default",
-  size = "default",
+  size = "lg",
   tooltip,
   className,
   ...props

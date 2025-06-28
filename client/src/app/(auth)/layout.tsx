@@ -16,7 +16,7 @@ const Layout: FC<PropsWithChildren> = async ({ children }) => {
     <main className="flex h-dvh items-center md:h-screen">
       <section className="hidden h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
         <Link href="/">
-          <AppLogo className="" />
+          <AppLogo descriptionClassName="text-white/70" />
         </Link>
         <div className="mt-20">
           <h1 className="text-4xl leading-12 font-semibold tracking-wider">Track, analyze, and control your money effortlessly.</h1>

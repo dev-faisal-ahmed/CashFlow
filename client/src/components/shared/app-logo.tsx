@@ -1,27 +1,22 @@
 import { cn } from "@/lib/utils";
 import { Poppins } from "next/font/google";
+import { FC } from "react";
 import { IoWallet } from "react-icons/io5";
 
 // Font
 const font = Poppins({ subsets: ["latin"], weight: "600" });
 
 // Main Component
-type AppLogoProps = { className?: string; size?: "SM" | "MD" | "LG" };
+type AppLogoProps = { containerClassname?: string; descriptionClassName?: string };
 
-// Config
-const CONFIG = {
-  SM: { iconClassName: "size-5", textClassName: "text-lg" },
-  MD: { iconClassName: "size-8", textClassName: "text-2xl" },
-  LG: { iconClassName: "size-12", textClassName: "text-2xl" },
-};
-
-export const AppLogo = ({ className, size = "MD" }: AppLogoProps) => {
-  const config = CONFIG[size];
-
-  return (
-    <div className={cn("flex items-center gap-2 antialiased", font.className, className)}>
-      <IoWallet className={config.iconClassName} />
-      <h1 className={cn("font-bold tracking-tight", config.textClassName)}>Cash Flow</h1>
+export const AppLogo: FC<AppLogoProps> = ({ containerClassname, descriptionClassName }) => (
+  <div className={cn("flex h-16 items-center gap-2 antialiased", font.className, containerClassname)}>
+    <span className="bg-primary flex size-10 items-center justify-center rounded-md text-white">
+      <IoWallet className="size-6" />
+    </span>
+    <div>
+      <h1 className={cn("font-bold tracking-tight")}>Cash Flow</h1>
+      <p className={cn("text-muted-foreground text-xs", descriptionClassName)}>Smart Finance</p>
     </div>
-  );
-};
+  </div>
+);

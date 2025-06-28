@@ -24,3 +24,8 @@ export const getLoggedUser = async () => {
   const user = jwtDecode(token);
   return user as LoggedUser;
 };
+
+export const removeToken = async () => {
+  const cookie = await cookies();
+  cookie.delete(cookiesKey.token);
+};

@@ -9,7 +9,7 @@ export const useNavItems = () => {
     const isActive = (url: string) => pathname.startsWith(url);
 
     return [
-      { title: "Dashboard", url: "/", icon: Grid3x3Icon, isActive: isActive("/") },
+      { title: "Dashboard", url: "/", icon: Grid3x3Icon, isActive: pathname === "/" },
       { title: "Wallets", url: "/wallets", icon: Wallet, isActive: isActive("/wallets") },
       { title: "Transactions", url: "/transactions", icon: ArrowUpDown, isActive: isActive("/transactions") },
     ];

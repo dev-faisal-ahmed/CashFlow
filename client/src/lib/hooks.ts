@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // Is Mobile
 const MOBILE_BREAKPOINT = 768;
@@ -17,4 +17,11 @@ export const useIsMobile = () => {
   }, []);
 
   return !!isMobile;
+};
+
+export const usePopupState = () => {
+  const [open, setOpen] = useState(false);
+  const onOpenChange = useCallback((open: boolean) => setOpen(open), []);
+
+  return { open, onOpenChange };
 };

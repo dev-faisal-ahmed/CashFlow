@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 type CommonAvatarProps = { name: string; src?: string; size?: "SM" | "MD" | "LG"; fallbackClassName?: string };
 
 const CONFIG = {
-  SM: { avatarClassNae: "size-10" },
-  MD: { avatarClassNae: "size-12" },
-  LG: { avatarClassNae: "size-16" },
+  SM: { avatarClassName: "size-10" },
+  MD: { avatarClassName: "size-12" },
+  LG: { avatarClassName: "size-16" },
 };
 
 const getInitials = (name: string) => {
@@ -21,9 +21,9 @@ export const CommonAvatar: FC<CommonAvatarProps> = ({ name = "", src, size = "MD
   const config = CONFIG[size];
 
   return (
-    <Avatar className={config.avatarClassNae}>
+    <Avatar className={cn("rounded-md", config.avatarClassName)}>
       {src && <AvatarImage src={src} />}
-      <AvatarFallback className={cn("text-lg font-bold", fallbackClassName)}>{getInitials(name)}</AvatarFallback>
+      <AvatarFallback className={cn("rounded-md text-lg font-bold", fallbackClassName)}>{getInitials(name)}</AvatarFallback>
     </Avatar>
   );
 };
