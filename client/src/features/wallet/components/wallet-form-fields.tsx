@@ -11,6 +11,11 @@ export const WalletFormFields = () => {
       <FieldForm control={control} name="name" label="Wallet Name">
         {({ field }) => <Input {...field} placeholder="@: BKash" />}
       </FieldForm>
+      <FieldForm control={control} name="initialBalance" label="Initial Balance">
+        {({ field: { value, onChange } }) => (
+          <Input value={value || ""} onChange={(e) => onChange(Number(e.target.value))} placeholder="@: 100" />
+        )}
+      </FieldForm>
     </>
   );
 };
