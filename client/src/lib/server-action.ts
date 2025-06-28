@@ -5,10 +5,11 @@ import { cookies } from "next/headers";
 import { LoggedUser } from "./types";
 
 const cookiesKey = { token: "token" };
+const maxAge = 7 * 24 * 60 * 60;
 
 export const storeToken = async (token: string) => {
   const cookie = await cookies();
-  cookie.set(cookiesKey.token, token);
+  cookie.set({ name: cookiesKey.token, value: token, maxAge });
 };
 
 export const getToken = async () => {

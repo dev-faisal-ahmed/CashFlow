@@ -1,18 +1,24 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { UserService } from 'src/modules/user/user.service';
-import { LoggedUser } from '../types';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { LoggedUser } from '../types';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext) {
     try {
+      const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
+      if (isPublic) return true;
+
       const req = context.switchToHttp().getRequest<Request>();
       const authHeader = req.headers.authorization;
 
@@ -29,7 +35,7 @@ export class AuthGuard implements CanActivate {
       req.user = user;
       return true;
     } catch {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException('Authentication failed');
     }
   }
 }
