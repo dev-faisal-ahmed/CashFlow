@@ -43,7 +43,7 @@ export const AuthEntryCard: FC<AuthEntryCardProps> = ({ children, formType }) =>
           <Separator className="w-full" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-gray-500">Or continue with Email</span>
+          <span className="bg-background px-2 text-gray-500">Or continue with Email</span>
         </div>
       </section>
 

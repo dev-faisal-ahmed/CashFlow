@@ -98,7 +98,7 @@ const ActionMenu = () => {
     <>
       <DropdownMenu open={open} onOpenChange={onOpenChange} modal>
         <DropdownMenuTrigger asChild>
-          <button className="cursor-pointer rounded-md p-2 hover:bg-white" onClick={() => onOpenChange(true)}>
+          <button className="hover:bg-background cursor-pointer rounded-md p-2" onClick={() => onOpenChange(true)}>
             <EllipsisVerticalIcon className="size-4" />
           </button>
         </DropdownMenuTrigger>
