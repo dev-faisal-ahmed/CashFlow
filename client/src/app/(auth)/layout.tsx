@@ -4,27 +4,34 @@ import { AppLogo } from "@/components/shared/app-logo";
 import { CommonAvatar } from "@/components/shared/common-avatar";
 import { IoIosStar } from "react-icons/io";
 import { FC, PropsWithChildren } from "react";
+import { getLoggedUser } from "@/lib/server-action";
+import { redirect } from "next/navigation";
 
 // Main Component
-const Layout: FC<PropsWithChildren> = ({ children }) => (
-  <main className="flex h-dvh items-center md:h-screen">
-    <section className="hidden h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
-      <Link href="/">
-        <AppLogo className="" />
-      </Link>
-      <div className="mt-20">
-        <h1 className="text-4xl leading-12 font-semibold tracking-wider">Track, analyze, and control your money effortlessly.</h1>
-        <p className="mt-6 font-thin">
-          From daily expenses to income insights, borrowing and lending to category-based analytics — manage your entire financial life from
-          one powerful dashboard. Whether you&apos;re budgeting smarter or just trying to see where your money goes, we&apos;ve got you
-          covered.
-        </p>
-      </div>
-      <ReviewCard />
-    </section>
-    <section className="grow">{children}</section>
-  </main>
-);
+const Layout: FC<PropsWithChildren> = async ({ children }) => {
+  const user = await getLoggedUser();
+  if (user) redirect("/");
+
+  return (
+    <main className="flex h-dvh items-center md:h-screen">
+      <section className="hidden h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
+        <Link href="/">
+          <AppLogo className="" />
+        </Link>
+        <div className="mt-20">
+          <h1 className="text-4xl leading-12 font-semibold tracking-wider">Track, analyze, and control your money effortlessly.</h1>
+          <p className="mt-6 font-thin">
+            From daily expenses to income insights, borrowing and lending to category-based analytics — manage your entire financial life
+            from one powerful dashboard. Whether you&apos;re budgeting smarter or just trying to see where your money goes, we&apos;ve got
+            you covered.
+          </p>
+        </div>
+        <ReviewCard />
+      </section>
+      <section className="grow">{children}</section>
+    </main>
+  );
+};
 
 // Helper Component
 const review = {
