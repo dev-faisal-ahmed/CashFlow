@@ -1,9 +1,8 @@
 import Link from "next/link";
 
-import { AppLogo } from "@/components/shared/app-logo";
-import { CommonAvatar } from "@/components/shared/common-avatar";
 import { IoIosStar } from "react-icons/io";
 import { FC, PropsWithChildren } from "react";
+import { AppLogo, CommonAvatar } from "@/components/shared/";
 import { getLoggedUser } from "@/lib/server-action";
 import { redirect } from "next/navigation";
 

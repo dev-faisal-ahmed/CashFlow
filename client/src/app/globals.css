@@ -41,11 +41,12 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --height-input: var(--input-height);
+  --height-input: var(--height-input);
 }
 
 :root {
-  --radius: 0.65rem;
+  --radius: 0.5rem;
+  --height-input: 3rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
