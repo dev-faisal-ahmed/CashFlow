@@ -9,7 +9,7 @@ export const useAddWallet = () => {
 
   const form = useForm<TWalletForm>({
     resolver: zodResolver(walletFormSchema),
-    defaultValues: { name: "", icon: "", initialBalance: 0, isSaving: false },
+    defaultValues: { name: "", initialBalance: 0, isSaving: false },
   });
 
   const handleAddWallet = form.handleSubmit((formData) => {

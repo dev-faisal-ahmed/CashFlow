@@ -23,9 +23,6 @@ export class Wallet {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ unique: true })
-  icon: string;
-
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   ownerId: Types.ObjectId;
 
@@ -48,4 +45,4 @@ export class Wallet {
 
 export const WalletSchema = SchemaFactory.createForClass(Wallet);
 export type WalletDocument = HydratedDocument<Wallet>;
-export type WalletType = Pick<WalletDocument, '_id' | 'name' | 'icon' | 'ownerId' | 'members' | 'isSaving'>;
+export type WalletType = Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'members' | 'isSaving'>;

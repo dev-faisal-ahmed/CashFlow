@@ -28,7 +28,7 @@ export const AddWallet = () => {
         description="Fill up the form to create a wallet"
       >
         <Form {...form}>
-          <form id={formId} onSubmit={handleAddWallet} className="flex flex-col gap-4">
+          <form id={formId} onSubmit={handleAddWallet} className="mt-2 flex flex-col gap-4">
             <WalletFormFields />
           </form>
         </Form>

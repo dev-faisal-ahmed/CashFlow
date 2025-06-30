@@ -36,3 +36,18 @@ export const useDebounce = <TValue>(value: TValue, delay = 300): TValue => {
 
   return debounced;
 };
+
+export const useDebouncedSearch = () => {
+  const [value, setValue] = useState("");
+  const onSearchChange = useCallback((value: string) => setValue(value), []);
+  const searchTerm = useDebounce(value);
+
+  return { value, searchTerm, onSearchChange };
+};
+
+export const useSearch = () => {
+  const [value, setValue] = useState("");
+  const onSearchChange = useCallback((value: string) => setValue(value), []);
+
+  return { value, onSearchChange };
+};

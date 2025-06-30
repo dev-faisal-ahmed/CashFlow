@@ -8,10 +8,6 @@ export class CreateWalletDto {
   @Transform(({ value }) => capitalize(value as string))
   name: string;
 
-  @IsString()
-  @IsNotEmpty()
-  icon: string;
-
   @IsOptional()
   @IsBoolean()
   isSaving?: boolean;
