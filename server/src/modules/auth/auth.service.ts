@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { ChangePasswordDto, LoginWithCredentialsDto, LoginWithGoogleDto, RegisterWithCredentialsDto } from './auth.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ResponseDto } from 'src/common/dto/response.dto';
-import { UserType, UserProvider } from 'src/modules/user/user.schema';
+import { UserType, UserProvider } from 'src/schema/user.schema';
 import { UserService } from '../user/user.service';
 import { appConfig } from 'src/config';
 import { LoggedUser } from 'src/common/types';

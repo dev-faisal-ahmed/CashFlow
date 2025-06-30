@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { UserProvider } from 'src/modules/user/user.schema';
+import { UserProvider } from 'src/schema/user.schema';
 
 export type LoggedUser = {
   _id: Types.ObjectId;
