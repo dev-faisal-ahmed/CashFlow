@@ -23,10 +23,14 @@ export const getMeta = ({ page, limit, total }: Pick<TMeta, 'page' | 'limit' | '
   return { page, limit, total, totalPages: Math.ceil(total / limit) };
 };
 
-export const selectFields = (fields: string) => {
+export const selectFields = (fields = '', allowedFields: string[]) => {
   if (!fields) return null;
-  return fields.split(',').reduce((acc, value) => {
-    acc[value] = 1;
+
+  const requestedFields = fields.split(',').map((f) => f.trim());
+  const safeFields = requestedFields.filter((f) => allowedFields.includes(f));
+
+  return safeFields.reduce((acc, value) => {
+    acc[value.trim()] = 1;
     return acc;
   }, {});
 };

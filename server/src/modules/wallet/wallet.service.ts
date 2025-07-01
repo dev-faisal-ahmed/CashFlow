@@ -2,11 +2,12 @@ import { Model } from 'mongoose';
 import { Wallet, WalletDocument } from '../../schema/wallet.schema';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
+import { getMeta, getPaginationInfo, selectFields } from 'src/utils';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { CreateWalletDto } from './wallet.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { TQueryParams } from 'src/common/types';
-import { getMeta, getPaginationInfo, selectFields } from 'src/utils';
+import { TransactionNature } from 'src/schema/transaction.schema';
 
 @Injectable()
 export class WalletService {
@@ -31,6 +32,7 @@ export class WalletService {
             walletId: wallet._id,
             amount: dto.initialBalance,
             description: `Added ${dto.initialBalance} tk as initial balance`,
+            nature: TransactionNature.INCOME,
           },
           session,
         );
@@ -41,7 +43,7 @@ export class WalletService {
       return new ResponseDto('Wallet created successfully');
     } catch {
       await session.abortTransaction();
-      throw new InternalServerErrorException('Failed to create wallet with');
+      throw new InternalServerErrorException('Failed to create wallet');
     } finally {
       await session.endSession();
     }
@@ -52,12 +54,12 @@ export class WalletService {
     const { getAll, limit, page, skip } = getPaginationInfo(query);
 
     const dbQuery = { ownerId: userId, ...(search && { name: { $regex: search, $options: 'i' } }) };
-    const fields = selectFields(query.fields);
+    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'members']);
 
     const wallets = await this.walletModel.aggregate([
       { $match: dbQuery },
-      ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
       ...(fields ? [{ $project: fields }] : []),
+      ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);
 
     const total = await this.walletModel.countDocuments(dbQuery);
