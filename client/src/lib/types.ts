@@ -1,12 +1,12 @@
 // Common
-export type PromiseResponse<TData = null> = Promise<{ ok: boolean; message: string; data: TData; error: unknown }>;
+export type TPromiseResponse<TData = null> = Promise<{ ok: boolean; message: string; data: TData; error: unknown }>;
 
 // User Type
-export type LoggedUser = {
+export type TLoggedUser = {
   _id: string;
   name: string;
   email: string;
-  provider: UserProvider;
+  provider: TUserProvider;
 };
 
-export type UserProvider = "CREDENTIALS" | "GOOGLE";
+export type TUserProvider = "CREDENTIALS" | "GOOGLE";

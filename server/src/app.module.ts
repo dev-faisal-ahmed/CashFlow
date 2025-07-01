@@ -7,6 +7,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
 import { AuthGuard } from './common/guard/auth.guard';
 import { UserModule } from './modules/user/user.module';
 import { JwtSharedModule } from './shared/jwt/jwt.module';
+import { TransactionModule } from './modules/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { JwtSharedModule } from './shared/jwt/jwt.module';
     // routes
     AuthModule,
     WalletModule,
+    TransactionModule,
   ],
   providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }],
 })

@@ -3,10 +3,10 @@ import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChangePasswordDto, LoginWithCredentialsDto, RegisterWithCredentialsDto } from './auth.dto';
-import { LoggedUser } from 'src/common/types';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserType } from 'src/schema/user.schema';
 import { Public } from 'src/common/decorators/public.decorator';
+import { LoggedUser } from 'src/common/types';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +27,7 @@ export class AuthController {
   @Get('login/google')
   @Public()
   @UseGuards(PassportAuthGuard('google'))
-  async loginWithGoogle() {}
+  loginWithGoogle() {}
 
   @Get('google/redirect')
   @Public()
@@ -41,7 +41,7 @@ export class AuthController {
   }
 
   @Patch('change-password')
-  async forgetPassword(@Body() dto: ChangePasswordDto, @User() user: UserType) {
+  async changePassword(@Body() dto: ChangePasswordDto, @User() user: UserType) {
     return this.authService.changePassword(dto, user);
   }
 }

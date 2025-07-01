@@ -5,4 +5,8 @@ export const apiUrl = {
     loginWithGoogle: "/auth/login/google",
     changePassword: "/auth/change-password",
   },
+
+  wallet: {
+    addWallet: "/wallets",
+  },
 };

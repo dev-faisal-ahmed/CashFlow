@@ -7,7 +7,7 @@ import { WalletService } from './wallet.service';
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
-  @Post('/')
+  @Post()
   async createWallet(@Body() dto: CreateWalletDto, @User('_id') userId: string) {
     return this.walletService.createWallet(dto, userId);
   }

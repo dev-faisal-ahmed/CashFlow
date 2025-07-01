@@ -8,6 +8,6 @@ export const walletFormSchema = z.object({
     .nonempty("Wallet name can not be empty")
     .transform((value) => capitalize(value)),
 
-  initialBalance: z.number().nonnegative("Initial balance can not be empty"),
-  isSaving: z.boolean(),
+  initialBalance: z.number().nonnegative("Initial balance can not be empty").optional(),
+  isSaving: z.boolean().optional(),
 });
