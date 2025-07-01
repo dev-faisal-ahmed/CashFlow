@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
@@ -6,7 +6,7 @@ import { ChangePasswordDto, LoginWithCredentialsDto, RegisterWithCredentialsDto 
 import { User } from 'src/common/decorators/user.decorator';
 import { UserType } from 'src/schema/user.schema';
 import { Public } from 'src/common/decorators/public.decorator';
-import { LoggedUser } from 'src/common/types';
+import { TLoggedUser } from 'src/common/types';
 
 @Controller('auth')
 export class AuthController {
@@ -32,9 +32,9 @@ export class AuthController {
   @Get('google/redirect')
   @Public()
   @UseGuards(PassportAuthGuard('google'))
-  async googleRedirect(@Req() req: any, @Res() res: Response) {
-    const callbackUrl = req.query.callbackUrl || 'http://localhost:3000';
-    const token = await this.authService.loginWithGoogle(req.user as LoggedUser);
+  async googleRedirect(@Req() req: Request, @Res() res: Response) {
+    const callbackUrl = (req.query.callbackUrl || 'http://localhost:3000') as string;
+    const token = await this.authService.loginWithGoogle(req.user as TLoggedUser);
 
     res.cookie('token', token, { httpOnly: true });
     res.redirect(`${callbackUrl}`);

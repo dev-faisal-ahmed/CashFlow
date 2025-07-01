@@ -1,3 +1,5 @@
+"use client";
+
 import { FormDialog } from "@/components/shared/form/form-dialog";
 import { Button } from "@/components/ui/button";
 import { QK } from "@/lib/query-keys";

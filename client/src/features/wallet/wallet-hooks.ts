@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { TWalletForm } from "./wallet-type";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,8 +22,7 @@ export const useAddWallet = () => {
 
   const handleAddWallet = form.handleSubmit((formData) => {
     mutate(formData, {
-      onSuccess: (res) => {
-        toast.success(res.message);
+      onSuccess: () => {
         qc.invalidateQueries({ queryKey: [QK.WALLET] });
         onOpenChange(false);
       },

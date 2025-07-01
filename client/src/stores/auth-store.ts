@@ -1,8 +1,8 @@
-import { LoggedUser } from "@/lib/types";
+import { TLoggedUser } from "@/lib/types";
 import { create } from "zustand";
 
-type AuthState = { user: LoggedUser | null };
-type AuthAction = { update: (user: LoggedUser) => void; logout: () => void };
+type AuthState = { user: TLoggedUser | null };
+type AuthAction = { update: (user: TLoggedUser) => void; logout: () => void };
 
 type AuthStore = AuthState & AuthAction;
 

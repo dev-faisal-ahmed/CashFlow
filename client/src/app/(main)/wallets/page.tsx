@@ -1,19 +1,23 @@
-"use client";
-
 import { TopbarContent } from "@/components/layout";
 import { Header } from "@/components/shared";
+import { getToken } from "@/lib/server-action";
 import { AddWallet } from "@/wallet/components";
 
-const Page = () => (
-  <>
-    <TopbarContent position="left">
-      <Header title="My Wallets" />
-    </TopbarContent>
+const Page = async () => {
+  const token = await getToken();
+  console.log(token);
 
-    <TopbarContent position="right">
-      <AddWallet />
-    </TopbarContent>
-  </>
-);
+  return (
+    <>
+      <TopbarContent position="left">
+        <Header title="My Wallets" />
+      </TopbarContent>
+
+      <TopbarContent position="right">
+        <AddWallet />
+      </TopbarContent>
+    </>
+  );
+};
 
 export default Page;

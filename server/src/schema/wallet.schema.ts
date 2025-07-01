@@ -43,6 +43,6 @@ export class Wallet {
   isSaving: boolean;
 }
 
-export const WalletSchema = SchemaFactory.createForClass(Wallet);
+export const WalletSchema = SchemaFactory.createForClass<Wallet>(Wallet);
 export type WalletDocument = HydratedDocument<Wallet>;
 export type WalletType = Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'members' | 'isSaving'>;

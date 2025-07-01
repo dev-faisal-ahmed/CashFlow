@@ -2,7 +2,7 @@
 
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
-import { LoggedUser } from "./types";
+import { TLoggedUser } from "./types";
 
 const cookiesKey = { token: "token" };
 const maxAge = 7 * 24 * 60 * 60;
@@ -22,7 +22,7 @@ export const getLoggedUser = async () => {
   if (!token) return null;
 
   const user = jwtDecode(token);
-  return user as LoggedUser;
+  return user as TLoggedUser;
 };
 
 export const removeToken = async () => {

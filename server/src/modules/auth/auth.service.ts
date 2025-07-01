@@ -6,7 +6,7 @@ import { ResponseDto } from 'src/common/dto/response.dto';
 import { UserType, UserProvider } from 'src/schema/user.schema';
 import { UserService } from '../user/user.service';
 import { appConfig } from 'src/config';
-import { LoggedUser } from 'src/common/types';
+import { TLoggedUser } from 'src/common/types';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -75,7 +75,7 @@ export class AuthService {
     return bcrypt.compare(givenPassword, encryptedPassword);
   }
 
-  private generateToken(payload: LoggedUser) {
+  private generateToken(payload: TLoggedUser) {
     const { _id, name, email, image, provider } = payload;
     return this.jwtService.sign({ _id, name, email, image, provider });
   }

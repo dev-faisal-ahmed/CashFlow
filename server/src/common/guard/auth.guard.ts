@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { UserService } from 'src/modules/user/user.service';
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoggedUser } from '../types';
+import { TLoggedUser } from '../types';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
       const [_, token] = authHeader.split(' ');
       if (!token) throw new UnauthorizedException('No token provided');
 
-      const decoded: LoggedUser = this.jwtService.verify(token);
+      const decoded: TLoggedUser = this.jwtService.verify(token);
       const user = await this.userService.findByEmail(decoded?.email);
       if (!user) throw new UnauthorizedException('You are not authorized');
 
