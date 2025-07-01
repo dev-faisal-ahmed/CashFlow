@@ -51,13 +51,35 @@ export class WalletService {
 
   async getWallets(query: TQueryParams, userId: string) {
     const search = query.search;
+    const requestedFields = query.fields;
     const { getAll, limit, page, skip } = getPaginationInfo(query);
 
     const dbQuery = { ownerId: userId, ...(search && { name: { $regex: search, $options: 'i' } }) };
-    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'members']);
+    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'members', 'balance']);
 
     const wallets = await this.walletModel.aggregate([
       { $match: dbQuery },
+
+      // only apply look up and sum when user wanted balance
+      ...(requestedFields.includes('balance')
+        ? [
+            { $lookup: { from: 'transactions', localField: '_id', foreignField: 'walletId', as: 'transactions' } },
+            {
+              $addFields: {
+                balance: {
+                  $sum: {
+                    $map: {
+                      input: '$transactions',
+                      as: 'tx',
+                      in: { $cond: [{ $eq: ['$$tx.nature', 'INCOME'] }, '$$tx.amount', { $multiply: ['$$tx.amount', -1] }] },
+                    },
+                  },
+                },
+              },
+            },
+          ]
+        : []),
+
       ...(fields ? [{ $project: fields }] : []),
       ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);

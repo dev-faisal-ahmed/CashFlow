@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export enum TransactionNature {
   INCOME = 'INCOME',
@@ -14,8 +14,8 @@ export class Transaction {
   @Prop({ enum: TransactionNature, required: true })
   nature: TransactionNature;
 
-  @Prop({ type: String, required: true })
-  walletId: string;
+  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
+  walletId: Types.ObjectId;
 
   @Prop({ required: false })
   description?: string;
