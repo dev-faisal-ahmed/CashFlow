@@ -55,7 +55,7 @@ export class WalletService {
     const { getAll, limit, page, skip } = getPaginationInfo(query);
 
     const dbQuery = { ownerId, ...(search && { name: { $regex: search, $options: 'i' } }) };
-    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'members', 'balance']);
+    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'members', 'balance', 'membersCount']);
 
     const wallets = await this.walletModel.aggregate([
       { $match: dbQuery },
@@ -80,6 +80,7 @@ export class WalletService {
           ]
         : []),
 
+      ...(requestedFields.includes('membersCount') ? [{ $addFields: { membersCount: { $size: '$members' } } }] : []),
       ...(fields ? [{ $project: fields }] : []),
       ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);
