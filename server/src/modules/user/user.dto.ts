@@ -1,4 +1,4 @@
-import { UserProvider } from 'src/schema/user.schema';
+import { UserProvider } from '@/schema/user.schema';
 import { z } from 'zod';
 
 export const createUserSchema = z.object({

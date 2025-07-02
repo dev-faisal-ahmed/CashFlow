@@ -1,6 +1,6 @@
 import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
+import { TransactionNature } from '@/schema/transaction.schema';
 import { Types } from 'mongoose';
-import { TransactionNature } from 'src/schema/transaction.schema';
 
 export class CreateInitialTransactionDto {
   @IsNotEmpty()

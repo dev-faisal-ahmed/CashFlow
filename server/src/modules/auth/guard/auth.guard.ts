@@ -1,24 +1,18 @@
-import { Request } from 'express';
-import { UserService } from 'src/modules/user/user.service';
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { TLoggedUser } from '@/common/types';
+import { UserService } from '@/modules/user/user.service';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { TLoggedUser } from '../types';
-import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext) {
     try {
-      const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
-      if (isPublic) return true;
-
       const req = context.switchToHttp().getRequest<Request>();
       const authHeader = req.headers.authorization;
 

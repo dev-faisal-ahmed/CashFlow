@@ -1,13 +1,13 @@
 import { Model } from 'mongoose';
-import { Wallet, WalletDocument } from '../../schema/wallet.schema';
+import { Wallet, WalletDocument } from '@/schema/wallet.schema';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
-import { getMeta, getPaginationInfo, selectFields } from 'src/utils';
-import { ResponseDto } from 'src/common/dto/response.dto';
+import { getMeta, getPaginationInfo, selectFields } from '@/utils';
+import { ResponseDto } from '@/common/dto/response.dto';
 import { CreateWalletDto } from './wallet.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { TQueryParams } from 'src/common/types';
-import { TransactionNature } from 'src/schema/transaction.schema';
+import { TQueryParams } from '@/common/types';
+import { TransactionNature } from '@/schema/transaction.schema';
 
 @Injectable()
 export class WalletService {

@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { appConfig, googleConfig, mongoConfig } from './config';
-import { WalletModule } from './modules/wallet/wallet.module';
-import { AuthGuard } from './common/guard/auth.guard';
-import { UserModule } from './modules/user/user.module';
+import { MongooseModule } from '@nestjs/mongoose';
 import { JwtSharedModule } from './shared/jwt/jwt.module';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { WalletModule } from './modules/wallet/wallet.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 
 @Module({
@@ -21,6 +20,5 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     WalletModule,
     TransactionModule,
   ],
-  providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }],
 })
 export class AppModule {}

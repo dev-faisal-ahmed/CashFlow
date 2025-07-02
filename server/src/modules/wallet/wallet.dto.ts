@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
-import { capitalize } from 'src/utils';
+import { capitalize } from '@/utils';
 
 export class CreateWalletDto {
   @IsString()

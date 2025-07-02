@@ -1,36 +1,32 @@
-import { Request, Response } from 'express';
-import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth.service';
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth.service';
 import { ChangePasswordDto, LoginWithCredentialsDto, RegisterWithCredentialsDto } from './auth.dto';
-import { User } from 'src/common/decorators/user.decorator';
-import { UserType } from 'src/schema/user.schema';
-import { Public } from 'src/common/decorators/public.decorator';
-import { TLoggedUser } from 'src/common/types';
+import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
+import { TLoggedUser } from '@/common/types';
+import { AuthGuard } from './guard/auth.guard';
+import { User } from '@/common/decorators/user.decorator';
+import { Types } from 'mongoose';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @Public()
   async registerWithCredentials(@Body() dto: RegisterWithCredentialsDto) {
     return this.authService.registerWithCredentials(dto);
   }
 
   @Post('login')
-  @Public()
   async loginWithCredentials(@Body() dto: LoginWithCredentialsDto) {
     return this.authService.loginWithCredentials(dto);
   }
 
   @Get('login/google')
-  @Public()
   @UseGuards(PassportAuthGuard('google'))
   loginWithGoogle() {}
 
   @Get('google/redirect')
-  @Public()
   @UseGuards(PassportAuthGuard('google'))
   async googleRedirect(@Req() req: Request, @Res() res: Response) {
     const callbackUrl = (req.query.callbackUrl || 'http://localhost:3000') as string;
@@ -41,7 +37,8 @@ export class AuthController {
   }
 
   @Patch('change-password')
-  async changePassword(@Body() dto: ChangePasswordDto, @User() user: UserType) {
-    return this.authService.changePassword(dto, user);
+  @UseGuards(AuthGuard)
+  async changePassword(@Body() dto: ChangePasswordDto, @User('_id') id: Types.ObjectId, @User('password') password: string) {
+    return this.authService.changePassword(dto, id, password);
   }
 }

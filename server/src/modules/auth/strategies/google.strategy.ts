@@ -1,6 +1,6 @@
-import { googleConfig } from 'src/config';
-import { ConfigType } from '@nestjs/config';
+import { googleConfig } from '@/config';
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 
@@ -8,7 +8,7 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     @Inject(googleConfig.KEY)
-    private envConfig: ConfigType<typeof googleConfig>,
+    private readonly envConfig: ConfigType<typeof googleConfig>,
   ) {
     super({
       clientID: envConfig.GOOGLE_CLIENT_ID,

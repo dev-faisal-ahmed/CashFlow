@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { capitalize } from 'src/utils';
+import { capitalize } from '@/utils';
 
 export class RegisterWithCredentialsDto {
   @IsString()

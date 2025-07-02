@@ -2,13 +2,14 @@ import * as bcrypt from 'bcrypt';
 
 import { ChangePasswordDto, LoginWithCredentialsDto, LoginWithGoogleDto, RegisterWithCredentialsDto } from './auth.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { ResponseDto } from 'src/common/dto/response.dto';
-import { UserType, UserProvider } from 'src/schema/user.schema';
-import { UserService } from '../user/user.service';
-import { appConfig } from 'src/config';
-import { TLoggedUser } from 'src/common/types';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
+import { appConfig } from '@/config';
+import { UserProvider } from '@/schema/user.schema';
+import { ResponseDto } from '@/common/dto/response.dto';
+import { Types } from 'mongoose';
+import { TLoggedUser } from '@/common/types';
 
 @Injectable()
 export class AuthService {
@@ -56,12 +57,12 @@ export class AuthService {
     return new ResponseDto('Successfully logged in', this.generateToken(isUserExist));
   }
 
-  async changePassword(dto: ChangePasswordDto, user: UserType) {
-    const isPasswordMatched = await this.comparePassword(dto.oldPassword, user.password);
+  async changePassword(dto: ChangePasswordDto, userId: Types.ObjectId, password: string) {
+    const isPasswordMatched = await this.comparePassword(dto.oldPassword, password);
     if (!isPasswordMatched) throw new BadRequestException('Password does not match');
 
     const hashedPassword = await this.hashPassword(dto.newPassword);
-    await this.userService.updateUserById(user._id, { password: hashedPassword });
+    await this.userService.updateUserById(userId, { password: hashedPassword });
 
     return new ResponseDto('Password changed successfully');
   }

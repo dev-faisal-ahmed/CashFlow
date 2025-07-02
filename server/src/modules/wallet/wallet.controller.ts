@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CreateWalletDto } from './wallet.dto';
-import { User } from 'src/common/decorators/user.decorator';
+import { User } from '@/common/decorators/user.decorator';
 import { WalletService } from './wallet.service';
-import { TQueryParams } from 'src/common/types';
+import { TQueryParams } from '@/common/types';
 
 @Controller('/wallets')
 export class WalletController {
