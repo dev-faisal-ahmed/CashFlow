@@ -6,7 +6,7 @@ import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { CreateWalletDto } from './wallet.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { TQueryParams } from '@/common/types';
+import { TQueryParams } from '@/types';
 import { TransactionNature } from '@/schema/transaction.schema';
 
 @Injectable()
@@ -49,12 +49,12 @@ export class WalletService {
     }
   }
 
-  async getWallets(query: TQueryParams, userId: string) {
+  async getWallets(query: TQueryParams, ownerId: string) {
     const search = query.search;
     const requestedFields = query.fields;
     const { getAll, limit, page, skip } = getPaginationInfo(query);
 
-    const dbQuery = { ownerId: userId, ...(search && { name: { $regex: search, $options: 'i' } }) };
+    const dbQuery = { ownerId, ...(search && { name: { $regex: search, $options: 'i' } }) };
     const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'members', 'balance']);
 
     const wallets = await this.walletModel.aggregate([

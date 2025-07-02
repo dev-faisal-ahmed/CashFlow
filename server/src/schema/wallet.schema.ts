@@ -45,4 +45,4 @@ export class Wallet {
 
 export const WalletSchema = SchemaFactory.createForClass<Wallet>(Wallet);
 export type WalletDocument = HydratedDocument<Wallet>;
-export type WalletType = Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'members' | 'isSaving'>;
+export type TWallet = Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'members' | 'isSaving'>;

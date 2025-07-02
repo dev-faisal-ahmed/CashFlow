@@ -1,4 +1,4 @@
-import { TLoggedUser } from '@/common/types';
+import { TLoggedUser } from '@/types';
 import { UserService } from '@/modules/user/user.service';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

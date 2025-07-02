@@ -1,5 +1,5 @@
 import { TMeta } from './common/dto/response.dto';
-import { TQueryParams } from './common/types';
+import { TQueryParams } from './types';
 
 export const capitalize = (value: string) => {
   return value

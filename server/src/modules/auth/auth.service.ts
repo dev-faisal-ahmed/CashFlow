@@ -9,7 +9,7 @@ import { appConfig } from '@/config';
 import { UserProvider } from '@/schema/user.schema';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { Types } from 'mongoose';
-import { TLoggedUser } from '@/common/types';
+import { TLoggedUser } from '@/types';
 
 @Injectable()
 export class AuthService {

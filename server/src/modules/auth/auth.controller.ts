@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { ChangePasswordDto, LoginWithCredentialsDto, RegisterWithCredentialsDto } from './auth.dto';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-import { TLoggedUser } from '@/common/types';
+import { TLoggedUser } from '@/types';
 import { AuthGuard } from './guard/auth.guard';
 import { User } from '@/common/decorators/user.decorator';
 import { Types } from 'mongoose';
