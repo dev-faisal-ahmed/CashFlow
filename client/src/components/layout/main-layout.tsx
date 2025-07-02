@@ -9,7 +9,9 @@ export const MainLayout: FC<PropsWithChildren> = ({ children }) => (
     <AppSidebar />
     <SidebarInset className="flex h-[calc(100dvh-16px)] flex-col">
       <AppTopbar />
-      <ScrollArea>{children}</ScrollArea>
+      <ScrollArea>
+        <section className="m-4">{children}</section>
+      </ScrollArea>
     </SidebarInset>
   </SidebarProvider>
 );

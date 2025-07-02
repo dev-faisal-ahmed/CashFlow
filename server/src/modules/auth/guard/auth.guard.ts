@@ -1,5 +1,5 @@
-import { TLoggedUser } from '@/types';
 import { UserService } from '@/modules/user/user.service';
+import { TLoggedUser } from '@/types';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';

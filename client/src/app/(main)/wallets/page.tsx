@@ -1,5 +1,6 @@
 import { TopbarContent } from "@/components/layout";
 import { Header } from "@/components/shared";
+import { WalletList } from "@/features/wallet/components/wallet-list";
 import { getToken } from "@/lib/server-action";
 import { AddWallet } from "@/wallet/components";
 
@@ -16,6 +17,8 @@ const Page = async () => {
       <TopbarContent position="right">
         <AddWallet />
       </TopbarContent>
+
+      <WalletList />
     </>
   );
 };

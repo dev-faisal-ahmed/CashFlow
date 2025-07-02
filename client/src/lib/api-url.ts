@@ -8,5 +8,6 @@ export const apiUrl = {
 
   wallet: {
     addWallet: "/wallets",
+    getWallets: (searchParams: string) => `/wallets${searchParams}`,
   },
 };

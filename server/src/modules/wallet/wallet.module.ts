@@ -4,9 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Wallet, WalletSchema } from '@/schema/wallet.schema';
 import { WalletController } from './wallet.controller';
 import { TransactionModule } from '../transaction/transaction.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]), TransactionModule],
+  imports: [MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]), TransactionModule, AuthModule],
   providers: [WalletService],
   exports: [MongooseModule],
   controllers: [WalletController],
