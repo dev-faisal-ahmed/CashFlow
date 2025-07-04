@@ -1,10 +1,10 @@
 import { Model } from 'mongoose';
 import { Wallet, WalletDocument } from '@/schema/wallet.schema';
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
-import { CreateWalletDto } from './wallet.dto';
+import { CreateWalletDto, UpdateWalletDto } from './wallet.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { TQueryParams } from '@/types';
 import { TransactionNature } from '@/schema/transaction.schema';
@@ -89,5 +89,18 @@ export class WalletService {
     const meta = getMeta({ page, limit, total });
 
     return new ResponseDto('Wallets fetched successfully', wallets, meta);
+  }
+
+  async updateWallet(dto: UpdateWalletDto, walletId: string, userId: string) {
+    const isWalletExist = await this.walletModel.findById(walletId, '_id ownerId').lean();
+    if (!isWalletExist) throw new NotFoundException('Wallet not found!');
+
+    const walletOwnerId = isWalletExist.ownerId.toString();
+    if (userId !== walletOwnerId) throw new UnauthorizedException('You are not authorized to update this wallet');
+
+    const result = await this.walletModel.updateOne({ _id: walletId, $set: dto });
+    if (!result.modifiedCount) throw new InternalServerErrorException('Wallet was not updated');
+
+    return new ResponseDto('Wallet updated successfully');
   }
 }

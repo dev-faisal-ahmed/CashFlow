@@ -9,7 +9,7 @@ export enum WalletAccessPermission {
 
 // Wallet Access
 @Schema({ _id: false })
-class WalletMember {
+export class WalletMember {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
@@ -35,6 +35,7 @@ export class Wallet {
         const idsSet = new Set(ids);
         return idsSet.size === ids.length;
       },
+      message: 'Can not add same member twice',
     },
   })
   members: WalletMember[];
