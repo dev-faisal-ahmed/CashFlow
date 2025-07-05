@@ -8,12 +8,7 @@ import { WalletFormFields } from "./wallet-form-fields";
 import { Form } from "@/components/ui/form";
 
 export const AddWallet = () => {
-  const {
-    form,
-    handleAddWallet,
-    popup: { open, onOpenChange },
-    mutationKey,
-  } = useAddWallet();
+  const { form, handleAddWallet, open, onOpenChange, mutationKey } = useAddWallet();
 
   return (
     <>

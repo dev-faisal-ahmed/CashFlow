@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addWalletFormSchema, updateWalletFormSchema } from "./wallet-schema";
 import { usePopupState } from "@/lib/hooks";
 import { QK } from "@/lib/query-keys";
-import { addWallet, updateWallet } from "./wallet-api";
+import { addWallet, deleteWallet, updateWallet } from "./wallet-api";
 
 // Add Wallet
 export const useAddWallet = () => {
@@ -30,7 +30,7 @@ export const useAddWallet = () => {
     });
   });
 
-  return { form, handleAddWallet, popup: { open, onOpenChange }, mutationKey };
+  return { form, handleAddWallet, open, onOpenChange, mutationKey };
 };
 
 // Update Wallet
@@ -57,5 +57,25 @@ export const useUpdateWallet = ({ walletId, name, isSaving, onSuccess }: TUseUpd
     );
   });
 
-  return { form, handleUpdateWallet, popup: { open, onOpenChange }, mutationKey };
+  return { form, handleUpdateWallet, open, onOpenChange, mutationKey };
+};
+
+// Delete Wallet
+export const useDeleteWallet = (walletId: string) => {
+  const mutationKey = `DELETE_${QK.WALLET}_${walletId}`;
+  const qc = useQueryClient();
+  const { open, onOpenChange } = usePopupState();
+
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteWallet });
+
+  const handleDeleteWallet = () => {
+    mutate(walletId, {
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: [QK.WALLET] });
+        onOpenChange(false);
+      },
+    });
+  };
+
+  return { open, onOpenChange, handleDeleteWallet, mutationKey };
 };

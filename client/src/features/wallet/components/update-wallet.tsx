@@ -8,12 +8,7 @@ import { WalletFormFields } from "./wallet-form-fields";
 
 type UpdateWalletProps = TUseUpdateWalletArgs;
 export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, onSuccess }) => {
-  const {
-    form,
-    handleUpdateWallet,
-    popup: { open, onOpenChange },
-    mutationKey,
-  } = useUpdateWallet({ walletId, name, isSaving, onSuccess });
+  const { form, handleUpdateWallet, open, onOpenChange, mutationKey } = useUpdateWallet({ walletId, name, isSaving, onSuccess });
 
   return (
     <>

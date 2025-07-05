@@ -1,26 +1,30 @@
 import { TPromiseResponse, TQuery, TWallet } from "@/lib/types";
 import { TUpdateWalletForm, TWalletForm } from "./wallet-type";
 import { apiUrl } from "@/lib/api-url";
-import { api } from "@/lib/api";
 import { buildQueryString } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export const addWallet = async (payload: TAddWalletPayload): TPromiseResponse => {
-  const { data } = await api.post(apiUrl.wallet.addWallet, payload);
+  const { data } = await api.post(apiUrl.wallet.add, payload);
   return data;
 };
 
 export const getWalletList = async (args: TQuery = {}): TPromiseResponse<TGetWalletListResponse> => {
   const queryString = buildQueryString({ ...args, fields: "_id,name,isSaving,members,balance,membersCount" });
-  const url = apiUrl.wallet.getWallets(queryString);
-
+  const url = apiUrl.wallet.getAll(queryString);
   const { data } = await api.get(url);
   return data;
 };
 
 export const updateWallet = async ({ walletId, ...payload }: TUpdateWalletPayload): TPromiseResponse => {
-  const url = apiUrl.wallet.updateWallet(walletId);
-
+  const url = apiUrl.wallet.update(walletId);
   const { data } = await api.patch(url, payload);
+  return data;
+};
+
+export const deleteWallet = async (walletId: string): TPromiseResponse => {
+  const url = apiUrl.wallet.delete(walletId);
+  const { data } = await api.delete(url);
   return data;
 };
 

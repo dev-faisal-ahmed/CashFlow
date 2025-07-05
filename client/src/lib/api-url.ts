@@ -7,8 +7,9 @@ export const apiUrl = {
   },
 
   wallet: {
-    addWallet: "/wallets",
-    getWallets: (searchParams: string) => `/wallets${searchParams}`,
-    updateWallet: (walletId: string) => `/wallets/${walletId}`,
+    add: "/wallets",
+    getAll: (searchParams: string) => `/wallets${searchParams}`,
+    update: (walletId: string) => `/wallets/${walletId}`,
+    delete: (walletId: string) => `/wallets/${walletId}`,
   },
 };

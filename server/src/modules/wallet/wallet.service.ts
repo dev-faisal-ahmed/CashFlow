@@ -1,6 +1,5 @@
-import { Model, Types } from 'mongoose';
-import { Wallet, WalletDocument } from '@/schema/wallet.schema';
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { TWalletModel, Wallet } from '@/schema/wallet.schema';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
@@ -12,7 +11,7 @@ import { TransactionNature } from '@/schema/transaction.schema';
 @Injectable()
 export class WalletService {
   constructor(
-    @InjectModel(Wallet.name) private walletModel: Model<WalletDocument>,
+    @InjectModel(Wallet.name) private walletModel: TWalletModel,
     private readonly transactionService: TransactionService,
   ) {}
 
@@ -91,15 +90,22 @@ export class WalletService {
   }
 
   async updateWallet(dto: UpdateWalletDto, walletId: string, userId: string) {
-    const isWalletExist = await this.walletModel.findById(walletId, '_id ownerId').lean();
-    if (!isWalletExist) throw new NotFoundException('Wallet not found!');
-
-    const isOwner = isWalletExist.ownerId.equals(new Types.ObjectId(userId));
+    const isOwner = await this.walletModel.isOwner(walletId, userId);
     if (!isOwner) throw new UnauthorizedException('You are not authorized to update this wallet');
 
-    const result = await this.walletModel.updateOne({ _id: walletId, $set: dto });
+    const result = await this.walletModel.updateOne({ _id: walletId }, { $set: dto });
     if (!result.modifiedCount) throw new InternalServerErrorException('Wallet was not updated');
 
     return new ResponseDto('Wallet updated successfully');
+  }
+
+  async deleteWallet(walletId: string, userId: string) {
+    const isOwner = await this.walletModel.isOwner(walletId, userId);
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to delete this wallet');
+
+    const result = await this.walletModel.updateOne({ _id: walletId }, { $set: { isDeleted: true } });
+    if (!result.modifiedCount) throw new InternalServerErrorException('Could not delete the wallet');
+
+    return new ResponseDto('Wallet Delete Successfully');
   }
 }

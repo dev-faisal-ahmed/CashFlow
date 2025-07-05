@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { CreateWalletDto, UpdateWalletDto } from './wallet.dto';
 import { User } from '@/common/decorators/user.decorator';
 import { WalletService } from './wallet.service';
@@ -26,5 +26,11 @@ export class WalletController {
   @UseGuards(AuthGuard)
   async updateWallet(@Body() dto: UpdateWalletDto, @Param('walletId', ParseObjectIdPipe) walletId: string, @User('_id') userId: string) {
     return this.walletService.updateWallet(dto, walletId, userId);
+  }
+
+  @Delete(':walletId')
+  @UseGuards(AuthGuard)
+  async deleteWallet(@Param('walletId', ParseObjectIdPipe) walletId: string, @User('_id') userId: string) {
+    return this.walletService.deleteWallet(walletId, userId);
   }
 }
