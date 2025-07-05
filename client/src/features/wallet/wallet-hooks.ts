@@ -1,20 +1,20 @@
 import { useForm } from "react-hook-form";
-import { TWalletForm } from "./wallet-type";
+import { TAddWalletForm, TUpdateWalletForm } from "./wallet-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { walletFormSchema } from "./wallet-schema";
+import { addWalletFormSchema, updateWalletFormSchema } from "./wallet-schema";
 import { usePopupState } from "@/lib/hooks";
 import { QK } from "@/lib/query-keys";
-import { addWallet } from "./wallet-api";
+import { addWallet, updateWallet } from "./wallet-api";
 
+// Add Wallet
 export const useAddWallet = () => {
   const mutationKey = `ADD_${QK.WALLET}`;
   const qc = useQueryClient();
-
   const { open, onOpenChange } = usePopupState();
 
-  const form = useForm<TWalletForm>({
-    resolver: zodResolver(walletFormSchema),
+  const form = useForm<TAddWalletForm>({
+    resolver: zodResolver(addWalletFormSchema),
     defaultValues: { name: "", isSaving: false },
   });
 
@@ -25,9 +25,37 @@ export const useAddWallet = () => {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: [QK.WALLET] });
         onOpenChange(false);
+        form.reset();
       },
     });
   });
 
-  return { form, handleAddWallet, states: { open, onOpenChange } };
+  return { form, handleAddWallet, popup: { open, onOpenChange }, mutationKey };
+};
+
+// Update Wallet
+export type TUseUpdateWalletArgs = { walletId: string; name: string; isSaving: boolean; onSuccess: () => void };
+export const useUpdateWallet = ({ walletId, name, isSaving, onSuccess }: TUseUpdateWalletArgs) => {
+  const mutationKey = `UPDATE_${QK.WALLET}_${walletId}`;
+  const qc = useQueryClient();
+  const { open, onOpenChange } = usePopupState();
+
+  const form = useForm<TUpdateWalletForm>({ defaultValues: { name, isSaving }, resolver: zodResolver(updateWalletFormSchema) });
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateWallet });
+
+  const handleUpdateWallet = form.handleSubmit((formData) => {
+    mutate(
+      { ...formData, walletId },
+      {
+        onSuccess: () => {
+          qc.invalidateQueries({ queryKey: [QK.WALLET] });
+          onOpenChange(false);
+          form.reset();
+          onSuccess();
+        },
+      },
+    );
+  });
+
+  return { form, handleUpdateWallet, popup: { open, onOpenChange }, mutationKey };
 };

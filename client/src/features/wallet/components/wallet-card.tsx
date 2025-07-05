@@ -1,53 +1,52 @@
+import { FC } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TWallet } from "@/lib/types";
-import { FC } from "react";
 import { RiWalletFill } from "react-icons/ri";
 import { FaPiggyBank } from "react-icons/fa";
-import { HiUsers } from "react-icons/hi";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
+import { ActionMenu } from "@/components/shared/action-menu";
+import { usePopupState } from "@/lib/hooks";
+import { UpdateWallet } from "./update-wallet";
 
-type WalletCardProps = Pick<TWallet, "_id" | "name" | "isSaving"> & { balance: number; membersCount: number };
-export const WalletCard: FC<WalletCardProps> = ({ name, isSaving, membersCount, balance }) => (
-  <Card>
-    <CardHeader>
-      <div className="flex items-center gap-4">
-        <div className="from-primary/80 to-primary flex size-10 items-center justify-center rounded-md bg-gradient-to-bl">
-          <RiWalletFill className="size-6 text-white/80" />
-        </div>
+type WalletCardProps = Pick<TWallet, "_id" | "name" | "isSaving"> & { balance: number };
+export const WalletCard: FC<WalletCardProps> = ({ _id, name, isSaving, balance }) => {
+  const { open, onOpenChange } = usePopupState();
 
-        <div className="space-y-3">
-          <CardTitle>{name}</CardTitle>
-          <div className="flex items-center gap-2">
-            {isSaving && <SavingBadge />}
-            {membersCount + 1 && <MembersBadge count={membersCount + 2} />}
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-4">
+          <div className="from-primary/80 to-primary flex size-14 items-center justify-center rounded-md bg-gradient-to-bl">
+            <RiWalletFill className="size-8 text-white/80" />
           </div>
-        </div>
-      </div>
-    </CardHeader>
 
-    <CardContent>
-      <div className="dark:bg-background bg-background-gray flex items-center justify-between gap-6 rounded-md p-4">
-        <div className="space-y-1">
-          <p className="text-muted-foreground text-sm">Current Balance</p>
-          <h3 className="text-3xl font-semibold">$ {balance}</h3>
+          <div className="flex flex-col gap-2">
+            <CardTitle>{name}</CardTitle>
+            {isSaving && <SavingBadge />}
+          </div>
+          <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
+            <UpdateWallet name={name} isSaving={isSaving} walletId={_id} onSuccess={() => onOpenChange(false)} />
+          </ActionMenu>
         </div>
+      </CardHeader>
 
-        <FaMoneyBillTrendUp className="size-5" />
-      </div>
-    </CardContent>
-  </Card>
-);
+      <CardContent>
+        <div className="dark:bg-background bg-background-gray flex items-center justify-between gap-6 rounded-md p-4">
+          <div className="space-y-1">
+            <p className="text-muted-foreground text-sm">Current Balance</p>
+            <h3 className="text-3xl font-semibold">$ {balance}</h3>
+          </div>
+
+          <FaMoneyBillTrendUp className="size-5" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const SavingBadge = () => (
-  <Badge className="text-primary bg-primary/20 gap-2 font-semibold">
+  <Badge className="text-primary bg-primary/20 gap-2 text-xs font-semibold">
     <FaPiggyBank /> Saving
-  </Badge>
-);
-const MembersBadge: FC<{ count: number }> = ({ count }) => (
-  <Badge variant="outline">
-    <HiUsers />
-    {count}
-    <span>{count > 1 ? "members" : "member"}</span>
   </Badge>
 );

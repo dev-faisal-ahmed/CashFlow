@@ -2,18 +2,17 @@
 
 import { FormDialog } from "@/components/shared/form/form-dialog";
 import { Button } from "@/components/ui/button";
-import { QK } from "@/lib/query-keys";
 import { PlusIcon } from "lucide-react";
 import { useAddWallet } from "../wallet-hooks";
 import { WalletFormFields } from "./wallet-form-fields";
 import { Form } from "@/components/ui/form";
 
-const formId = `ADD_${QK.WALLET}`;
 export const AddWallet = () => {
   const {
     form,
     handleAddWallet,
-    states: { open, onOpenChange },
+    popup: { open, onOpenChange },
+    mutationKey,
   } = useAddWallet();
 
   return (
@@ -25,12 +24,12 @@ export const AddWallet = () => {
       <FormDialog
         open={open}
         onOpenChange={onOpenChange}
-        formId={formId}
+        formId={mutationKey}
         title="Add New Wallet"
         description="Fill up the form to create a wallet"
       >
         <Form {...form}>
-          <form id={formId} onSubmit={handleAddWallet} className="mt-2 flex flex-col gap-4">
+          <form id={mutationKey} onSubmit={handleAddWallet} className="mt-2 flex flex-col gap-4">
             <WalletFormFields mode="add" />
           </form>
         </Form>
