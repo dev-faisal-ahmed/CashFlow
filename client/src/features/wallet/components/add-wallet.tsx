@@ -6,7 +6,12 @@ import { QK } from "@/lib/query-keys";
 import { PlusIcon } from "lucide-react";
 import { useAddWallet } from "../wallet-hooks";
 import { Form } from "@/components/ui/form";
-import { WalletFormFields } from "./wallet-form-fields";
+import { useFormContext } from "react-hook-form";
+import { TAddWalletForm } from "../wallet-type";
+import { FieldForm } from "@/components/shared/form";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const formId = `ADD_${QK.WALLET}`;
 export const AddWallet = () => {
@@ -35,6 +40,35 @@ export const AddWallet = () => {
           </form>
         </Form>
       </FormDialog>
+    </>
+  );
+};
+
+const WalletFormFields = () => {
+  const { control } = useFormContext<TAddWalletForm>();
+
+  return (
+    <>
+      <FieldForm control={control} name="name" label="Wallet Name">
+        {({ field }) => <Input {...field} placeholder="@: BKash" />}
+      </FieldForm>
+
+      <FieldForm control={control} name="initialBalance" label="Initial Balance">
+        {({ field: { value, onChange } }) => (
+          <Input value={value || ""} onChange={(e) => onChange(Number(e.target.value))} placeholder="@: 100" />
+        )}
+      </FieldForm>
+
+      <FieldForm control={control} name="isSaving">
+        {({ field: { value, onChange } }) => (
+          <div className="flex items-center gap-2">
+            <Checkbox id="isSaving" checked={!!value} onCheckedChange={onChange} className="cursor-pointer" />
+            <Label htmlFor="isSaving" className="text-muted-foreground cursor-pointer">
+              Saving Wallet?
+            </Label>
+          </div>
+        )}
+      </FieldForm>
     </>
   );
 };

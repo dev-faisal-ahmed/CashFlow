@@ -1,7 +1,7 @@
 import { capitalize } from "@/lib/utils";
 import { z } from "zod";
 
-export const walletFormSchema = z.object({
+export const addWalletFormSchema = z.object({
   name: z
     .string()
     .trim()
