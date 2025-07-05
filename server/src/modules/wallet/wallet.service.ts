@@ -53,7 +53,7 @@ export class WalletService {
     const requestedFields = query.fields;
     const { getAll, limit, page, skip } = getPaginationInfo(query);
 
-    const dbQuery = { ownerId, ...(search && { name: { $regex: search, $options: 'i' } }) };
+    const dbQuery = { isDeleted: false, ownerId, ...(search && { name: { $regex: search, $options: 'i' } }) };
     const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'balance', 'membersCount']);
 
     const wallets = await this.walletModel.aggregate([
