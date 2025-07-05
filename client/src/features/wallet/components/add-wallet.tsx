@@ -1,6 +1,6 @@
 "use client";
 
-import { FormDialog } from "@/components/shared/form/form-dialog";
+import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useAddWallet } from "../wallet-hooks";

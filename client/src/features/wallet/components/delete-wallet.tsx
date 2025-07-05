@@ -2,7 +2,7 @@ import { FC } from "react";
 import { useDeleteWallet } from "../wallet-hooks";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
-import { DeleteDialog } from "@/components/shared/delete-dialog";
+import { DeleteDialog } from "@/components/shared";
 
 export const DeleteWallet: FC<{ walletId: string }> = ({ walletId }) => {
   const { open, onOpenChange, handleDeleteWallet, mutationKey } = useDeleteWallet(walletId);

@@ -5,7 +5,7 @@ import { TWallet } from "@/lib/types";
 import { RiWalletFill } from "react-icons/ri";
 import { FaPiggyBank } from "react-icons/fa";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
-import { ActionMenu } from "@/components/shared/action-menu";
+import { ActionMenu } from "@/components/shared";
 import { usePopupState } from "@/lib/hooks";
 import { UpdateWallet } from "./update-wallet";
 import { DeleteWallet } from "./delete-wallet";

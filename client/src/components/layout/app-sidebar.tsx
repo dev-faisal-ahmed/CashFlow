@@ -14,14 +14,14 @@ import {
   SidebarMenuItem,
 } from "../ui/sidebar";
 
+import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { AppLogo } from "../shared/app-logo";
 import { useNavItems } from "./main-layout-hook";
 import { CommonAvatar } from "../shared/common-avatar";
 import { useAuthStore } from "@/stores/auth-store";
-import { Logout } from "@/features/auth/components/logout";
+import { Logout } from "@/features/auth/components";
 import { usePopupState } from "@/lib/hooks";
-import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 
 export const AppSidebar = () => (

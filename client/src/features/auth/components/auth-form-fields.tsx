@@ -1,10 +1,9 @@
 import { FC } from "react";
 import { useFormContext } from "react-hook-form";
 import { TAuthForm } from "../auth-types";
-import { FieldForm } from "@/components/shared/form/field-form";
 import { Input } from "@/components/ui/input";
+import { FieldForm, PasswordInput } from "@/components/shared/form";
 import { LockIcon, MailIcon, UserIcon } from "lucide-react";
-import { PasswordInput } from "@/components/shared/form/password-input";
 
 type AuthFormFieldsProps = { formType: "signup" | "login" };
 
