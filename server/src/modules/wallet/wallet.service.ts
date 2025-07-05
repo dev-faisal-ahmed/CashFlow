@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Wallet, WalletDocument } from '@/schema/wallet.schema';
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
@@ -94,8 +94,8 @@ export class WalletService {
     const isWalletExist = await this.walletModel.findById(walletId, '_id ownerId').lean();
     if (!isWalletExist) throw new NotFoundException('Wallet not found!');
 
-    const walletOwnerId = isWalletExist.ownerId.toString();
-    if (userId !== walletOwnerId) throw new UnauthorizedException('You are not authorized to update this wallet');
+    const isOwner = isWalletExist.ownerId.equals(new Types.ObjectId(userId));
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to update this wallet');
 
     const result = await this.walletModel.updateOne({ _id: walletId, $set: dto });
     if (!result.modifiedCount) throw new InternalServerErrorException('Wallet was not updated');
