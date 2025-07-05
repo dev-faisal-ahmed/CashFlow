@@ -1,4 +1,4 @@
 import { z } from "zod";
-import { addWalletFormSchema } from "./wallet-schema";
+import { walletFormSchema } from "./wallet-schema";
 
-export type TAddWalletForm = z.infer<typeof addWalletFormSchema>;
+export type TWalletForm = z.infer<typeof walletFormSchema>;

@@ -1,7 +1,7 @@
 import { capitalize } from "@/lib/utils";
 import { z } from "zod";
 
-export const addWalletFormSchema = z.object({
+export const walletFormSchema = z.object({
   name: z
     .string()
     .trim()
@@ -9,5 +9,5 @@ export const addWalletFormSchema = z.object({
     .transform((value) => capitalize(value)),
 
   initialBalance: z.number().nonnegative("Initial balance can not be empty").optional(),
-  isSaving: z.boolean().optional(),
+  isSaving: z.boolean(),
 });
