@@ -28,7 +28,7 @@ export class WalletService {
       const [wallet] = await this.walletModel.create([{ ...dto, ownerId }], { session });
 
       if (dto.initialBalance) {
-        const transaction = await this.transactionService.createInitial(
+        const transaction = await this.transactionService.createInitialTransaction(
           {
             walletId: wallet._id,
             amount: dto.initialBalance,
@@ -88,7 +88,7 @@ export class WalletService {
     const total = await this.walletModel.countDocuments(dbQuery);
     const meta = getMeta({ page, limit, total });
 
-    return new ResponseDto('Wallets fetched successfully', wallets, meta);
+    return new ResponseDto({ message: 'Wallets fetched successfully', data: wallets, meta });
   }
 
   async updateOne(dto: UpdateWalletDto, walletId: string, userId: string) {

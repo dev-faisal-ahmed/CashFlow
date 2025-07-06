@@ -54,7 +54,7 @@ export class AuthService {
 
     if (!isPasswordMatch) throw new BadRequestException('Password did not match');
 
-    return new ResponseDto('Successfully logged in', this.generateToken(isUserExist));
+    return new ResponseDto({ message: 'Successfully logged in', data: this.generateToken(isUserExist) });
   }
 
   async changePassword(dto: ChangePasswordDto, userId: Types.ObjectId, password: string) {

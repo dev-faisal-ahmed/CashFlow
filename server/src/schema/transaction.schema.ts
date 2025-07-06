@@ -1,29 +1,81 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
+export enum TransactionType {
+  INITIAL = 'INITIAL',
+  REGULAR = 'REGULAR',
+  TRANSFER = 'TRANSFER',
+  BORROW_LEND = 'BORROW_LEND',
+}
+
 export enum TransactionNature {
   INCOME = 'INCOME',
   EXPENSE = 'EXPENSE',
 }
 
+// Discriminator
 @Schema({ collection: 'transactions', discriminatorKey: 'type', timestamps: true })
 export class Transaction {
   @Prop({ type: Number, min: 0, required: true })
   amount: number;
 
+  type: TransactionType;
+
   @Prop({ enum: TransactionNature, required: true })
   nature: TransactionNature;
-
-  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
-  walletId: Types.ObjectId;
 
   @Prop({ required: false })
   description?: string;
 }
 
-// Discriminators
-export const TransactionSchema = SchemaFactory.createForClass(Transaction);
-// to do : add more discriminator schemas
+// Initial Schema
+@Schema()
+export class InitialTransaction extends Transaction {
+  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
+  walletId: Types.ObjectId;
+}
 
-export type TransactionDocument = HydratedDocument<Transaction>;
-export type TTransaction = Pick<TransactionDocument, '_id' | 'walletId' | 'description'>;
+@Schema()
+export class RegularTransaction extends Transaction {
+  @Prop({ type: Types.ObjectId, ref: 'Source', required: true })
+  sourceId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
+  walletId: Types.ObjectId;
+}
+
+@Schema()
+export class TransferTransaction extends Transaction {
+  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
+  sourceWalletId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
+  destinationWalletId: Types.ObjectId;
+}
+
+@Schema()
+export class BorrowLendTransaction extends Transaction {
+  @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
+  walletId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Contact', required: true })
+  contactId: Types.ObjectId;
+}
+
+export const TransactionSchema = SchemaFactory.createForClass(Transaction);
+export const InitialTransactionSchema = SchemaFactory.createForClass(InitialTransaction);
+export const RegularTransactionSchema = SchemaFactory.createForClass(RegularTransaction);
+export const TransferTransactionSchema = SchemaFactory.createForClass(TransferTransaction);
+export const BorrowLendTransactionSchema = SchemaFactory.createForClass(BorrowLendTransaction);
+
+export type InitialTransactionDocument = HydratedDocument<InitialTransaction>;
+export type RegularTransactionDocument = HydratedDocument<RegularTransaction>;
+export type TransferTransactionDocument = HydratedDocument<TransferTransaction>;
+export type BorrowLendTransactionDocument = HydratedDocument<BorrowLendTransaction>;
+export type TransactionDocument = InitialTransactionDocument | RegularTransactionDocument | TransferTransactionDocument | BorrowLendTransactionDocument;
+
+export type TTransaction = Pick<TransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
+export type TInitialTransaction = Pick<InitialTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
+export type TRegularTransaction = Pick<RegularTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
+export type TTransferTransaction = Pick<TransferTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
+export type TBorrowLendTransaction = Pick<BorrowLendTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;

@@ -1,6 +1,15 @@
+import {
+  BorrowLendTransactionSchema,
+  InitialTransactionSchema,
+  RegularTransactionSchema,
+  Transaction,
+  TransactionSchema,
+  TransactionType,
+  TransferTransactionSchema,
+} from '@/schema/transaction.schema';
+
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Transaction, TransactionSchema } from '@/schema/transaction.schema';
 import { TransactionService } from './transaction.service';
 
 @Module({
@@ -10,7 +19,11 @@ import { TransactionService } from './transaction.service';
         name: Transaction.name,
         useFactory: () => {
           const schema = TransactionSchema;
-          // to do : add discriminator schemas
+          schema.discriminator(TransactionType.INITIAL, InitialTransactionSchema);
+          schema.discriminator(TransactionType.REGULAR, RegularTransactionSchema);
+          schema.discriminator(TransactionType.TRANSFER, TransferTransactionSchema);
+          schema.discriminator(TransactionType.BORROW_LEND, BorrowLendTransactionSchema);
+
           return schema;
         },
       },
