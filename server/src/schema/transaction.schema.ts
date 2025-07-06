@@ -13,7 +13,7 @@ export enum TransactionNature {
   EXPENSE = 'EXPENSE',
 }
 
-// Discriminator
+// Base Schema
 @Schema({ collection: 'transactions', discriminatorKey: 'type', timestamps: true })
 export class Transaction {
   @Prop({ type: Number, min: 0, required: true })
@@ -28,7 +28,7 @@ export class Transaction {
   date: Date;
 }
 
-// Initial Schema
+// Initial Transaction Schema
 @Schema()
 export class InitialTransaction extends Transaction {
   @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
@@ -38,6 +38,7 @@ export class InitialTransaction extends Transaction {
   nature: TransactionNature;
 }
 
+// Regular Transaction Schema
 @Schema()
 export class RegularTransaction extends Transaction {
   @Prop({ type: Types.ObjectId, ref: 'Source', required: true })
@@ -50,6 +51,7 @@ export class RegularTransaction extends Transaction {
   nature: TransactionNature;
 }
 
+// Transfer Transaction Schema
 @Schema()
 export class TransferTransaction extends Transaction {
   @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
@@ -59,6 +61,7 @@ export class TransferTransaction extends Transaction {
   destinationWalletId: Types.ObjectId;
 }
 
+// Borrow Lend Transaction Schema
 @Schema()
 export class BorrowLendTransaction extends Transaction {
   @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })

@@ -6,7 +6,7 @@ import { TSourceForm } from "./source-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sourceSchema } from "./source-schema";
 import { addSource } from "./source-api";
-import { TSourceType } from "@/lib/types";
+import { TBudget, TSourceType } from "@/lib/types";
 
 export const useAddSource = () => {
   const mutationKey = `ADD_${QK.SOURCE}`;
@@ -18,7 +18,7 @@ export const useAddSource = () => {
 
   const handleAddSource = form.handleSubmit((formData) => {
     const { name, type, addBudget, budget } = formData;
-    const payload = { name, type: type as TSourceType, ...(type === "EXPENSE" && addBudget && budget) };
+    const payload = { name, type: type as TSourceType, ...(type === "EXPENSE" && addBudget && { budget: budget as TBudget }) };
 
     mutate(payload, {
       onSuccess: () => {
