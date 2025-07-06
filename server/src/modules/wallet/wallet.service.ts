@@ -4,14 +4,16 @@ import { TransactionService } from '../transaction/transaction.service';
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { CreateWalletDto, UpdateWalletDto } from './wallet.dto';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { TQueryParams } from '@/types';
 import { TransactionNature } from '@/schema/transaction.schema';
+import { Connection } from 'mongoose';
 
 @Injectable()
 export class WalletService {
   constructor(
     @InjectModel(Wallet.name) private walletModel: TWalletModel,
+    @InjectConnection() private readonly connection: Connection,
     private readonly transactionService: TransactionService,
   ) {}
 
@@ -20,7 +22,7 @@ export class WalletService {
     const isWalletExist = await this.walletModel.findOne({ name: dto.name, ownerId: ownerId }).select('_id').lean();
     if (isWalletExist) throw new BadRequestException('A wallet with same name already exist!');
 
-    const session = await this.walletModel.db.startSession();
+    const session = await this.connection.startSession();
     session.startTransaction();
     try {
       const [wallet] = await this.walletModel.create([{ ...dto, ownerId }], { session });

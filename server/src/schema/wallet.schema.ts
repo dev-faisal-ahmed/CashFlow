@@ -3,7 +3,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
 
 // Wallet
-@Schema({ collection: 'wallets', statics: { async isOwner() {} } })
+@Schema({ collection: 'wallets', timestamps: true })
 export class Wallet {
   @Prop({ required: true })
   name: string;
