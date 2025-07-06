@@ -2,7 +2,7 @@ import { capitalize } from "@/lib/utils";
 import { z } from "zod";
 
 const budgetSchema = z.object({
-  budget: z.number().nonnegative("Budget can not be empty"),
+  amount: z.number().nonnegative("Budget can not be empty"),
   interval: z.string(),
 });
 
@@ -13,6 +13,10 @@ export const sourceSchema = z.object({
     .nonempty("Source name can not be empty")
     .transform((value) => capitalize(value)),
 
-  addBudget: z.boolean().optional(),
+  addBudget: z.boolean(),
   budget: budgetSchema.optional(),
+}).superRefine((value, ctx)=>{
+  if(value.addBudget && !value.budget?.amount)
+    ctx.addIssue({code: "custom", message: "Amount is required", path: ["budget.amount"]})
+  
 });

@@ -12,4 +12,8 @@ export const apiUrl = {
     update: (walletId: string) => `/wallets/${walletId}`,
     delete: (walletId: string) => `/wallets/${walletId}`,
   },
+
+  source:{
+    add:"/sources"
+  }
 };

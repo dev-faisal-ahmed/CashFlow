@@ -28,7 +28,7 @@ export const SourceFormFields = () => {
       {/* Budget Fields (conditionally shown) */}
       {addBudget && (
         <>
-          <FieldForm control={control} name="budget.budget" label="Budget Amount">
+          <FieldForm control={control} name="budget.amount" label="Budget Amount">
             {({ field: { value, onChange } }) => (
               <Input value={value ?? ""} onChange={(e) => onChange(Number(e.target.value))} placeholder="@: 5000" />
             )}
