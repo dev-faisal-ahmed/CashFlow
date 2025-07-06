@@ -1,18 +1,18 @@
-import { Wallet } from '@/schema/wallet.schema';
+import { Wallet, WalletDocument } from '@/schema/wallet.schema';
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { CreateWalletDto, UpdateWalletDto } from './wallet.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { TQueryParams } from '@/types';
 import { TransactionNature } from '@/schema/transaction.schema';
 import { Connection, Model, Types } from 'mongoose';
+import { TQueryParams } from '@/types';
 
 @Injectable()
 export class WalletService {
   constructor(
-    @InjectModel(Wallet.name) private walletModel: Model<Wallet>,
+    @InjectModel(Wallet.name) private walletModel: Model<WalletDocument>,
     @InjectConnection() private readonly connection: Connection,
     private readonly transactionService: TransactionService,
   ) {}
@@ -64,13 +64,52 @@ export class WalletService {
       // only apply look up and sum when user wanted balance
       ...(requestedFields.includes('balance')
         ? [
-            { $lookup: { from: 'transactions', localField: '_id', foreignField: 'walletId', as: 'transactions' } },
+            // Basic transactions
+            {
+              $lookup: {
+                from: 'transactions',
+                let: { walletId: '$_id' },
+                pipeline: [
+                  { $match: { $expr: { $and: [{ $eq: ['$walletId', '$$walletId'] }, { $in: ['$type', ['INITIAL', 'REGULAR', 'BORROW_LEND']] }] } } },
+                  { $project: { amount: 1, nature: 1 } },
+                ],
+                as: 'basicTransactions',
+              },
+            },
+
+            // Transfer IN
+            {
+              $lookup: {
+                from: 'transactions',
+                let: { walletId: '$_id' },
+                pipeline: [
+                  { $match: { $expr: { $and: [{ $eq: ['$destinationWalletId', '$$walletId'] }, { $eq: ['$type', 'TRANSFER'] }] } } },
+                  { $project: { amount: 1, nature: { $literal: 'INCOME' } } },
+                ],
+                as: 'incomeTransfers',
+              },
+            },
+
+            // Transfer Out
+            {
+              $lookup: {
+                from: 'transactions',
+                let: { walletId: '$_id' },
+                pipeline: [
+                  { $match: { $expr: { $and: [{ $eq: ['$sourceWalletId', '$$walletId'] }, { $eq: ['$type', 'TRANSFER'] }] } } },
+                  { $project: { amount: 1, nature: { $literal: 'EXPENSE' } } },
+                ],
+                as: 'expenseTransfers',
+              },
+            },
+
+            { $addFields: { allTransactions: { $concatArrays: ['$basicTransactions', '$incomeTransfers', '$expenseTransfers'] } } },
             {
               $addFields: {
                 balance: {
                   $sum: {
                     $map: {
-                      input: '$transactions',
+                      input: '$allTransactions',
                       as: 'tx',
                       in: { $cond: [{ $eq: ['$$tx.nature', 'INCOME'] }, '$$tx.amount', { $multiply: ['$$tx.amount', -1] }] },
                     },
@@ -78,6 +117,7 @@ export class WalletService {
                 },
               },
             },
+            { $project: { basicTransactions: 0, incomeTransfers: 0, expenseTransfers: 0, allTransactions: 0 } },
           ]
         : []),
 
