@@ -16,6 +16,8 @@ export type TUserProvider = "CREDENTIALS" | "GOOGLE";
 export type TWallet = { _id: string; name: string; ownerId: string; isSaving: boolean };
 
 // --------- Source --------- \\
-export type TSource = { _id: string; name: string; ownerId: string; budget?: TBudget };
-type TBudget = { amount: number; interval: TBudgetInterval };
+export type TSource = { _id: string; name: string; type: TSourceType; ownerId: string; budget?: TBudget };
+
+export type TSourceType = "INCOME" | "EXPENSE";
+export type TBudget = { amount: number; interval: TBudgetInterval };
 export type TBudgetInterval = "WEEKLY" | "MONTHLY" | "YEARLY";

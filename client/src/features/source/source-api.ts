@@ -7,4 +7,4 @@ export const addSource = async (payload: TAddSourcePayload): TPromiseResponse =>
   return data;
 };
 
-type TAddSourcePayload = Pick<TSource, "name" | "budget">;
+type TAddSourcePayload = Pick<TSource, "name" | "type" | "budget">;

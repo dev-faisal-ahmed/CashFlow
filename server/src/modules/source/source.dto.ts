@@ -1,28 +1,36 @@
-import { Type } from 'class-transformer';
-import { BudgetInterval } from '@/schema/source.schema';
-import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { BudgetInterval, SourceType } from '@/schema/source.schema';
+import { IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator';
 
 class BudgetDto {
   @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  budget: number;
+  @IsNotEmpty({ message: "Amount is required" })
+  @IsPositive({ message: "Amount must be a positive number" })
+  amount: number;
 
-  @IsEnum(BudgetInterval)
+  @IsEnum(BudgetInterval, { message: "Invalid interval" })
   interval: BudgetInterval;
 }
 
 // Create Source
 export class CreateSourceDto {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Source name is required" })
   name: string;
 
-  @IsMongoId()
-  userId: string;
+  @IsEnum(SourceType, { message: "Invalid source type" })
+  type: SourceType;
 
-  @IsOptional()
+  @Transform(addBudgetIfExpense)
+  @ValidateIf((object) => object.type === SourceType.EXPENSE)
   @ValidateNested()
   @Type(() => BudgetDto)
   budget?: BudgetDto;
+}
+
+// functions
+type AddBudgetIfExpenseArgs = { value: BudgetDto; obj: CreateSourceDto };
+function addBudgetIfExpense({ value, obj }: AddBudgetIfExpenseArgs) {
+  if (obj.type === SourceType.INCOME) return undefined;
+  return value;
 }

@@ -13,7 +13,7 @@ export class SourceService {
     const isSourceExist = await this.sourceModel.findOne({ name: dto.name, userId }, '_id').lean();
     if (isSourceExist) throw new BadRequestException('Source with name already exists!');
 
-    await this.sourceModel.create(dto);
+    await this.sourceModel.create({ ...dto, userId });
     return new ResponseDto('Source created successfully');
   }
 }

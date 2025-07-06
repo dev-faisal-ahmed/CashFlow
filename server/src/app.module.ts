@@ -7,6 +7,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { SourceModule } from './modules/source/source.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     // routes
     AuthModule,
     WalletModule,
+    SourceModule,
     TransactionModule,
   ],
 })

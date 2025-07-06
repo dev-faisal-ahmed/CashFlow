@@ -8,7 +8,7 @@ import { PlusIcon } from "lucide-react";
 import { useAddSource } from "../source-hooks";
 
 export const AddSource = () => {
-  const {form, handleAddSource, open, onOpenChange, mutationKey} = useAddSource()
+  const { form, handleAddSource, open, onOpenChange, mutationKey } = useAddSource();
 
   return (
     <>
@@ -24,7 +24,7 @@ export const AddSource = () => {
         formId={mutationKey}
       >
         <Form {...form}>
-          <form onSubmit={handleAddSource} className="mt-2 flex flex-col gap-4">
+          <form id={mutationKey} onSubmit={handleAddSource} className="mt-2 flex flex-col gap-4">
             <SourceFormFields />
           </form>
         </Form>

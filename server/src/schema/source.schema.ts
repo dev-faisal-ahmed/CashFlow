@@ -7,6 +7,11 @@ export enum BudgetInterval {
   YEARLY = 'YEARLY',
 }
 
+export enum SourceType {
+  INCOME = 'INCOME',
+  EXPENSE = 'EXPENSE',
+}
+
 @Schema({ _id: false })
 class Budget {
   @Prop({ type: Number, required: true })
@@ -21,6 +26,9 @@ export class Source {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true, enum: SourceType })
+  type: SourceType;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
@@ -33,4 +41,4 @@ export class Source {
 
 export const SourceSchema = SchemaFactory.createForClass(Source);
 export type SourceDocument = HydratedDocument<Source>;
-export type TSource = Pick<SourceDocument, '_id' | 'name' | 'userId' | 'budget'>;
+export type TSource = Pick<SourceDocument, '_id' | 'name' | 'userId' | 'budget' | 'type' | 'isDeleted'>;

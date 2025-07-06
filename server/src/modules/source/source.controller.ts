@@ -4,7 +4,7 @@ import { CreateSourceDto } from './source.dto';
 import { User } from '@/common/decorators/user.decorator';
 import { SourceService } from './source.service';
 
-@Controller()
+@Controller("/sources")
 export class SourceController {
   constructor(private readonly sourceService: SourceService) {}
 
