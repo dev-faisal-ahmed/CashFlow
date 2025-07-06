@@ -25,7 +25,7 @@ export class SourceService {
     const { getAll, limit, page, skip } = getPaginationInfo(query);
     const now = new Date();
 
-    const fields = selectFields(requestedFields, ['_id', 'name', 'budget', 'income', 'expense']);
+    const fields = selectFields(requestedFields, ['_id', 'name', 'type', 'budget', 'income', 'expense']);
     const dbQuery = { isDeleted: false, userId, ...(search && { name: { $regex: search, $options: 'i' } }) };
 
     const sources = await this.sourceModel.aggregate([
