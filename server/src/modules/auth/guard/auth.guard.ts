@@ -14,12 +14,9 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     try {
       const req = context.switchToHttp().getRequest<Request>();
-      const authHeader = req.headers.authorization;
+      const cookies = req.cookies;
+      const token = cookies.token as string;
 
-      if (!authHeader) throw new UnauthorizedException('Authorization Header Missing');
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [_, token] = authHeader.split(' ');
       if (!token) throw new UnauthorizedException('No token provided');
 
       const decoded: TLoggedUser = this.jwtService.verify(token);

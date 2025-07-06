@@ -1,3 +1,5 @@
+import * as cookieParser from 'cookie-parser';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -8,6 +10,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('api/v1');
+  app.use(cookieParser());
+
 
   app.enableCors({
     origin: 'http://localhost:3000',
