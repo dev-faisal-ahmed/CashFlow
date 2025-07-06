@@ -51,10 +51,9 @@ export class AuthService {
     if (!isUserExist) throw new NotFoundException('User not found');
 
     const isPasswordMatch = await this.comparePassword(dto.password, isUserExist.password);
-
     if (!isPasswordMatch) throw new BadRequestException('Password did not match');
 
-    return new ResponseDto({ message: 'Successfully logged in', data: this.generateToken(isUserExist) });
+    return this.generateToken(isUserExist);
   }
 
   async changePassword(dto: ChangePasswordDto, userId: Types.ObjectId, password: string) {

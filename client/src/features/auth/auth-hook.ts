@@ -8,16 +8,15 @@ import { login, signup } from "./auth-api";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiUrl } from "@/lib/api-url";
 import { API_URL } from "@/lib/config";
-import { storeToken } from "@/lib/server-action";
 
-const singupKey = `${QK.AUTH}_SIGNUP`;
+const signupKey = `${QK.AUTH}_SIGNUP`;
 export const useSignup = () => {
   const form = useForm<TSigUpForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
-  const { mutate, isPending } = useMutation({ mutationKey: [singupKey], mutationFn: signup });
+  const { mutate, isPending } = useMutation({ mutationKey: [signupKey], mutationFn: signup });
   const router = useRouter();
 
   const handleSignup = form.handleSubmit((formData) => {
@@ -49,9 +48,8 @@ export const useLogin = () => {
 
   const handleLogin = form.handleSubmit((formData) => {
     mutate(formData, {
-      onSuccess: async (res) => {
+      onSuccess: () => {
         form.reset();
-        await storeToken(res.data);
         router.push(callbackUrl);
       },
     });

@@ -3,8 +3,8 @@ type TResponseDtoArgs<TData> = { message: string; data?: TData; meta?: TMeta };
 export class ResponseDto<TData> {
   ok: boolean;
   message: string;
-  data?: TData;
   meta?: TMeta;
+  data?: TData;
 
   constructor(args: TResponseDtoArgs<TData> | string) {
     this.ok = true;

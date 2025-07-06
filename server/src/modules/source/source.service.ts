@@ -138,6 +138,6 @@ export class SourceService {
     const total = await this.sourceModel.countDocuments(dbQuery);
     const meta = getMeta({ page, limit, total });
 
-    return new ResponseDto({ message: 'Sources fetched successfully', data: sources, meta });
+    return new ResponseDto({ message: 'Sources fetched successfully', meta, data: sources });
   }
 }

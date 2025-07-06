@@ -128,7 +128,7 @@ export class WalletService {
     const total = await this.walletModel.countDocuments(dbQuery);
     const meta = getMeta({ page, limit, total });
 
-    return new ResponseDto({ message: 'Wallets fetched successfully', data: wallets, meta });
+    return new ResponseDto({ message: 'Wallets fetched successfully', meta, data: wallets });
   }
 
   async updateOne(dto: UpdateWalletDto, walletId: string, userId: string) {

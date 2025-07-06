@@ -7,4 +7,9 @@ export const addSource = async (payload: TAddSourcePayload): TPromiseResponse =>
   return data;
 };
 
+export const getSourceList = async ():TPromiseResponse => {
+  const { data } = await api.get(apiUrl.source.getAll(""))
+  return data
+}
+
 type TAddSourcePayload = Pick<TSource, "name" | "type" | "budget">;

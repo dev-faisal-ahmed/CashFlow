@@ -14,6 +14,7 @@ export const apiUrl = {
   },
 
   source:{
-    add:"/sources"
+    add:"/sources",
+    getAll: (searchParams: string) => `/sources${searchParams}`,
   }
 };

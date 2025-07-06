@@ -7,6 +7,7 @@ import { AuthGuard } from './guard/auth.guard';
 import { User } from '@/common/decorators/user.decorator';
 import { Types } from 'mongoose';
 import { TLoggedUser } from '@/types';
+import { ResponseDto } from '@/common/dto/response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,8 +19,10 @@ export class AuthController {
   }
 
   @Post('login')
-  async loginWithCredentials(@Body() dto: LoginWithCredentialsDto) {
-    return this.authService.loginWithCredentials(dto);
+  async loginWithCredentials(@Body() dto: LoginWithCredentialsDto, @Res() res: Response) {
+    const token = await this.authService.loginWithCredentials(dto);
+    res.cookie('token', token, { httpOnly: true });
+    return res.json(new ResponseDto('Successfully logged in'));
   }
 
   @Get('login/google')
