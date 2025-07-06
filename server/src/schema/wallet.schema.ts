@@ -1,6 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 // Wallet
 @Schema({ collection: 'wallets', timestamps: true })
@@ -20,16 +19,5 @@ export class Wallet {
 
 export const WalletSchema = SchemaFactory.createForClass<Wallet>(Wallet);
 
-// statics methods
-WalletSchema.statics.isOwner = async function (walletId: string, userId: string) {
-  const wallet = await this.findOne({ _id: walletId }, '_id ownerId');
-  if (!wallet) throw new NotFoundException('Wallet not found!');
-  return wallet.ownerId.equals(new Types.ObjectId(userId));
-};
-
 export type WalletDocument = HydratedDocument<Wallet>;
 export type TWallet = Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'isSaving'>;
-
-export type TWalletModel = Model<Wallet> & {
-  isOwner: (walletId: string, userId: string) => Promise<boolean>;
-};

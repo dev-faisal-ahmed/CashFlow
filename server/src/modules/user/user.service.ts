@@ -12,12 +12,12 @@ export class UserService {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async createUser(payload: CreateUserDto) {
+  async create(payload: CreateUserDto) {
     const user = await this.userModel.create(payload);
     return user;
   }
 
-  async updateUserById(userId: Types.ObjectId, payload: UpdateUserDto) {
+  async updateById(userId: Types.ObjectId, payload: UpdateUserDto) {
     const user = await this.userModel.updateOne({ _id: userId }, { $set: payload });
     return user;
   }

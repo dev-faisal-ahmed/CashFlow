@@ -1,5 +1,5 @@
-import { Prop, Schema } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export enum BudgetInterval {
   WEEKLY = 'WEEKLY',
@@ -30,3 +30,7 @@ export class Source {
   @Prop({ type: Boolean, default: false })
   isDeleted: boolean;
 }
+
+export const SourceSchema = SchemaFactory.createForClass(Source);
+export type SourceDocument = HydratedDocument<Source>;
+export type TSource = Pick<SourceDocument, '_id' | 'name' | 'userId' | 'budget'>;

@@ -13,24 +13,24 @@ export class WalletController {
   @Post()
   @UseGuards(AuthGuard)
   async createWallet(@Body() dto: CreateWalletDto, @User('_id') userId: string) {
-    return this.walletService.createWallet(dto, userId);
+    return this.walletService.create(dto, userId);
   }
 
   @Get()
   @UseGuards(AuthGuard)
   async getWallets(@Query() query: TQueryParams, @User('_id') userId: string) {
-    return this.walletService.getWallets(query, userId);
+    return this.walletService.getAll(query, userId);
   }
 
   @Patch(':walletId')
   @UseGuards(AuthGuard)
   async updateWallet(@Body() dto: UpdateWalletDto, @Param('walletId', ParseObjectIdPipe) walletId: string, @User('_id') userId: string) {
-    return this.walletService.updateWallet(dto, walletId, userId);
+    return this.walletService.updateOne(dto, walletId, userId);
   }
 
   @Delete(':walletId')
   @UseGuards(AuthGuard)
   async deleteWallet(@Param('walletId', ParseObjectIdPipe) walletId: string, @User('_id') userId: string) {
-    return this.walletService.deleteWallet(walletId, userId);
+    return this.walletService.deleteOne(walletId, userId);
   }
 }

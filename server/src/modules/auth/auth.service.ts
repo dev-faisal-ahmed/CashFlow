@@ -24,7 +24,7 @@ export class AuthService {
     if (existingUser) throw new BadRequestException('User already exist');
 
     const password = await this.hashPassword(dto.password);
-    const user = await this.userService.createUser({
+    const user = await this.userService.create({
       ...dto,
       password,
       provider: UserProvider.CREDENTIALS,
@@ -40,7 +40,7 @@ export class AuthService {
     if (isUserExist) return this.generateToken(isUserExist);
 
     // creating new user
-    const user = await this.userService.createUser({ ...dto, provider: UserProvider.GOOGLE });
+    const user = await this.userService.create({ ...dto, provider: UserProvider.GOOGLE });
     if (!user) throw new BadRequestException('Failed create user');
 
     return this.generateToken(user);
@@ -62,7 +62,7 @@ export class AuthService {
     if (!isPasswordMatched) throw new BadRequestException('Password does not match');
 
     const hashedPassword = await this.hashPassword(dto.newPassword);
-    await this.userService.updateUserById(userId, { password: hashedPassword });
+    await this.userService.updateById(userId, { password: hashedPassword });
 
     return new ResponseDto('Password changed successfully');
   }

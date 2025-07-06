@@ -1,5 +1,5 @@
-import { TWalletModel, Wallet } from '@/schema/wallet.schema';
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Wallet } from '@/schema/wallet.schema';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { TransactionService } from '../transaction/transaction.service';
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
@@ -7,17 +7,17 @@ import { CreateWalletDto, UpdateWalletDto } from './wallet.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { TQueryParams } from '@/types';
 import { TransactionNature } from '@/schema/transaction.schema';
-import { Connection } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 
 @Injectable()
 export class WalletService {
   constructor(
-    @InjectModel(Wallet.name) private walletModel: TWalletModel,
+    @InjectModel(Wallet.name) private walletModel: Model<Wallet>,
     @InjectConnection() private readonly connection: Connection,
     private readonly transactionService: TransactionService,
   ) {}
 
-  async createWallet(dto: CreateWalletDto, ownerId: string) {
+  async create(dto: CreateWalletDto, ownerId: string) {
     // checking if user has already anu wallet with the same name
     const isWalletExist = await this.walletModel.findOne({ name: dto.name, ownerId: ownerId }).select('_id').lean();
     if (isWalletExist) throw new BadRequestException('A wallet with same name already exist!');
@@ -28,7 +28,7 @@ export class WalletService {
       const [wallet] = await this.walletModel.create([{ ...dto, ownerId }], { session });
 
       if (dto.initialBalance) {
-        const transaction = await this.transactionService.createInitialTransaction(
+        const transaction = await this.transactionService.createInitial(
           {
             walletId: wallet._id,
             amount: dto.initialBalance,
@@ -50,7 +50,7 @@ export class WalletService {
     }
   }
 
-  async getWallets(query: TQueryParams, ownerId: string) {
+  async getAll(query: TQueryParams, ownerId: string) {
     const search = query.search;
     const requestedFields = query.fields;
     const { getAll, limit, page, skip } = getPaginationInfo(query);
@@ -91,8 +91,8 @@ export class WalletService {
     return new ResponseDto('Wallets fetched successfully', wallets, meta);
   }
 
-  async updateWallet(dto: UpdateWalletDto, walletId: string, userId: string) {
-    const isOwner = await this.walletModel.isOwner(walletId, userId);
+  async updateOne(dto: UpdateWalletDto, walletId: string, userId: string) {
+    const isOwner = await this.isOwner(walletId, userId);
     if (!isOwner) throw new UnauthorizedException('You are not authorized to update this wallet');
 
     const result = await this.walletModel.updateOne({ _id: walletId }, { $set: dto });
@@ -101,13 +101,20 @@ export class WalletService {
     return new ResponseDto('Wallet updated successfully');
   }
 
-  async deleteWallet(walletId: string, userId: string) {
-    const isOwner = await this.walletModel.isOwner(walletId, userId);
+  async deleteOne(walletId: string, userId: string) {
+    const isOwner = await this.isOwner(walletId, userId);
     if (!isOwner) throw new UnauthorizedException('You are not authorized to delete this wallet');
 
     const result = await this.walletModel.updateOne({ _id: walletId }, { $set: { isDeleted: true } });
     if (!result.modifiedCount) throw new InternalServerErrorException('Could not delete the wallet');
 
     return new ResponseDto('Wallet Delete Successfully');
+  }
+
+  // helpers
+  async isOwner(walletId: string, userId: string) {
+    const wallet = await this.walletModel.findOne({ _id: walletId }, '_id ownerId');
+    if (!wallet) throw new NotFoundException('Wallet not found!');
+    return wallet.ownerId.equals(new Types.ObjectId(userId));
   }
 }

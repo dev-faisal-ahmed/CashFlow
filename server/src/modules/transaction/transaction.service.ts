@@ -8,7 +8,7 @@ import { CreateInitialTransactionDto } from './transaction.dto';
 export class TransactionService {
   constructor(@InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>) {}
 
-  async createInitialTransaction(dto: CreateInitialTransactionDto, session: ClientSession) {
+  async createInitial(dto: CreateInitialTransactionDto, session: ClientSession) {
     const [result] = await this.transactionModel.create([dto], { session });
     return result;
   }
