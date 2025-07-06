@@ -1,4 +1,4 @@
-import { MainLayout } from "@/components/layout";
+import { MainLayout } from "@/layout";
 import { AuthProvider } from "@/features/auth/components";
 import { getLoggedUser } from "@/lib/server-action";
 import { FC, PropsWithChildren } from "react";

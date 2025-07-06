@@ -1,4 +1,4 @@
-import { ArrowUpDown, Grid3x3Icon, Wallet } from "lucide-react";
+import { ArrowUpDown, Grid3x3Icon, Plug2Icon, WalletIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
@@ -10,7 +10,8 @@ export const useNavItems = () => {
 
     return [
       { title: "Dashboard", url: "/", icon: Grid3x3Icon, isActive: pathname === "/" },
-      { title: "Wallets", url: "/wallets", icon: Wallet, isActive: isActive("/wallets") },
+      { title: "Wallets", url: "/wallets", icon: WalletIcon, isActive: isActive("/wallets") },
+      { title: "Sources", url: "/sources", icon: Plug2Icon, isActive: isActive("/sources") },
       { title: "Transactions", url: "/transactions", icon: ArrowUpDown, isActive: isActive("/transactions") },
     ];
   }, [pathname]);

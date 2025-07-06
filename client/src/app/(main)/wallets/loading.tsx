@@ -1,4 +1,4 @@
-import { WalletListSkeleton } from "@/features/wallet/components/wallet-loading";
+import { WalletListSkeleton } from "@/features/wallet/components";
 
 const Loading = () => {
   return (

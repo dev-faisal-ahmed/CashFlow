@@ -1,8 +1,8 @@
 import { FC, PropsWithChildren } from "react";
-import { SidebarInset, SidebarProvider } from "../ui/sidebar";
+import { SidebarInset, SidebarProvider } from "../components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { AppTopbar } from "./app-topbar";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea } from "../components/ui/scroll-area";
 
 export const MainLayout: FC<PropsWithChildren> = ({ children }) => (
   <SidebarProvider>

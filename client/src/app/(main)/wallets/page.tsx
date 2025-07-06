@@ -1,8 +1,7 @@
-import { TopbarContent } from "@/components/layout";
+import { TopbarContent } from "@/layout/";
 import { Header } from "@/components/shared";
-import { WalletList } from "@/features/wallet/components/wallet-list";
+import { AddWallet, WalletList } from "@/wallet/components";
 import { getToken } from "@/lib/server-action";
-import { AddWallet } from "@/wallet/components";
 
 const Page = async () => {
   const token = await getToken();

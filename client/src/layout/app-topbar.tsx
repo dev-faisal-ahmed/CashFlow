@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren, useEffect } from "react";
-import { SidebarTrigger } from "../ui/sidebar";
+import { SidebarTrigger } from "../components/ui/sidebar";
 import { ThemeSwitcher } from "./theme-switcher";
 import { useLayoutStore } from "@/stores/layout-store";
 
