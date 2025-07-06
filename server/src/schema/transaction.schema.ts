@@ -21,11 +21,11 @@ export class Transaction {
 
   type: TransactionType;
 
-  @Prop({ enum: TransactionNature, required: true })
-  nature: TransactionNature;
-
-  @Prop({ required: false })
+  @Prop({ type: String, required: false })
   description?: string;
+
+  @Prop({ type: Date, default: new Date(), required: false })
+  date: Date;
 }
 
 // Initial Schema
@@ -33,6 +33,9 @@ export class Transaction {
 export class InitialTransaction extends Transaction {
   @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
   walletId: Types.ObjectId;
+
+  @Prop({ enum: TransactionNature, required: true })
+  nature: TransactionNature;
 }
 
 @Schema()
@@ -42,6 +45,9 @@ export class RegularTransaction extends Transaction {
 
   @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true })
   walletId: Types.ObjectId;
+
+  @Prop({ enum: TransactionNature, required: true })
+  nature: TransactionNature;
 }
 
 @Schema()
@@ -60,6 +66,9 @@ export class BorrowLendTransaction extends Transaction {
 
   @Prop({ type: Types.ObjectId, ref: 'Contact', required: true })
   contactId: Types.ObjectId;
+
+  @Prop({ enum: TransactionNature, required: true })
+  nature: TransactionNature;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
@@ -72,10 +81,15 @@ export type InitialTransactionDocument = HydratedDocument<InitialTransaction>;
 export type RegularTransactionDocument = HydratedDocument<RegularTransaction>;
 export type TransferTransactionDocument = HydratedDocument<TransferTransaction>;
 export type BorrowLendTransactionDocument = HydratedDocument<BorrowLendTransaction>;
-export type TransactionDocument = InitialTransactionDocument | RegularTransactionDocument | TransferTransactionDocument | BorrowLendTransactionDocument;
 
-export type TTransaction = Pick<TransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
-export type TInitialTransaction = Pick<InitialTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
-export type TRegularTransaction = Pick<RegularTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
-export type TTransferTransaction = Pick<TransferTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
-export type TBorrowLendTransaction = Pick<BorrowLendTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'description'>;
+export type TransactionDocument =
+  | InitialTransactionDocument
+  | RegularTransactionDocument
+  | TransferTransactionDocument
+  | BorrowLendTransactionDocument;
+
+export type TTransaction = Pick<TransactionDocument, '_id' | 'amount' | 'type' | 'date' | 'description'>;
+export type TInitialTransaction = Pick<InitialTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'date' | 'description'>;
+export type TRegularTransaction = Pick<RegularTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'date' | 'description'>;
+export type TTransferTransaction = Pick<TransferTransactionDocument, '_id' | 'amount' | 'type' | 'date' | 'description'>;
+export type TBorrowLendTransaction = Pick<BorrowLendTransactionDocument, '_id' | 'amount' | 'type' | 'nature' | 'date' | 'description'>;
