@@ -9,7 +9,6 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]), TransactionModule, AuthModule],
   providers: [WalletService],
-  exports: [MongooseModule],
   controllers: [WalletController],
 })
 export class WalletModule {}
