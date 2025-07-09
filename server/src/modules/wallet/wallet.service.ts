@@ -1,5 +1,5 @@
-import { Wallet, WalletDocument } from '@/schema/wallet.schema';
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Wallet, WalletDocument } from '@/schema/wallet.schema';
 import { TransactionService } from '../transaction/transaction.service';
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { ResponseDto } from '@/common/dto/response.dto';
@@ -8,6 +8,7 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { TransactionNature } from '@/schema/transaction.schema';
 import { Connection, Model, Types } from 'mongoose';
 import { TQueryParams } from '@/types';
+import { WalletHelper } from './wallet.helper';
 
 @Injectable()
 export class WalletService {
@@ -15,6 +16,7 @@ export class WalletService {
     @InjectModel(Wallet.name) private walletModel: Model<WalletDocument>,
     @InjectConnection() private readonly connection: Connection,
     private readonly transactionService: TransactionService,
+    private readonly walletHelper: WalletHelper,
   ) {}
 
   async create(dto: CreateWalletDto, ownerId: string) {
@@ -24,6 +26,7 @@ export class WalletService {
 
     const session = await this.connection.startSession();
     session.startTransaction();
+
     try {
       const [wallet] = await this.walletModel.create([{ ...dto, ownerId }], { session });
 
@@ -60,67 +63,7 @@ export class WalletService {
 
     const wallets = await this.walletModel.aggregate([
       { $match: dbQuery },
-
-      // only apply look up and sum when user wanted balance
-      ...(requestedFields.includes('balance')
-        ? [
-            // Basic transactions
-            {
-              $lookup: {
-                from: 'transactions',
-                let: { walletId: '$_id' },
-                pipeline: [
-                  { $match: { $expr: { $and: [{ $eq: ['$walletId', '$$walletId'] }, { $in: ['$type', ['INITIAL', 'REGULAR', 'BORROW_LEND']] }] } } },
-                  { $project: { amount: 1, nature: 1 } },
-                ],
-                as: 'basicTransactions',
-              },
-            },
-
-            // Transfer IN
-            {
-              $lookup: {
-                from: 'transactions',
-                let: { walletId: '$_id' },
-                pipeline: [
-                  { $match: { $expr: { $and: [{ $eq: ['$destinationWalletId', '$$walletId'] }, { $eq: ['$type', 'TRANSFER'] }] } } },
-                  { $project: { amount: 1, nature: { $literal: 'INCOME' } } },
-                ],
-                as: 'incomeTransfers',
-              },
-            },
-
-            // Transfer Out
-            {
-              $lookup: {
-                from: 'transactions',
-                let: { walletId: '$_id' },
-                pipeline: [
-                  { $match: { $expr: { $and: [{ $eq: ['$sourceWalletId', '$$walletId'] }, { $eq: ['$type', 'TRANSFER'] }] } } },
-                  { $project: { amount: 1, nature: { $literal: 'EXPENSE' } } },
-                ],
-                as: 'expenseTransfers',
-              },
-            },
-
-            { $addFields: { allTransactions: { $concatArrays: ['$basicTransactions', '$incomeTransfers', '$expenseTransfers'] } } },
-            {
-              $addFields: {
-                balance: {
-                  $sum: {
-                    $map: {
-                      input: '$allTransactions',
-                      as: 'tx',
-                      in: { $cond: [{ $eq: ['$$tx.nature', 'INCOME'] }, '$$tx.amount', { $multiply: ['$$tx.amount', -1] }] },
-                    },
-                  },
-                },
-              },
-            },
-            { $project: { basicTransactions: 0, incomeTransfers: 0, expenseTransfers: 0, allTransactions: 0 } },
-          ]
-        : []),
-
+      ...(requestedFields.includes('balance') ? this.walletHelper.buildBalancePipeline() : []),
       ...(fields ? [{ $project: fields }] : []),
       ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);
@@ -151,6 +94,29 @@ export class WalletService {
     return new ResponseDto('Wallet Delete Successfully');
   }
 
+  // shared
+  async getInfoForTransfer(formWalletId: Types.ObjectId, toWalletId: Types.ObjectId): Promise<WalletTransferInfo> {
+    const formId = new Types.ObjectId(formWalletId);
+    const toId = new Types.ObjectId(toWalletId);
+
+    const [wallets] = await this.walletModel.aggregate([
+      { $match: { _id: { $in: [formId, toId] } } },
+      {
+        $facet: {
+          fromWallet: [
+            { $match: { _id: formId } },
+            ...this.walletHelper.buildBalancePipeline(),
+            { $project: { _id: 1, name: 1, ownerId: 1, balance: 1, isDeleted: 1 } },
+          ],
+          toWallet: [{ $match: { _id: toId } }, { $project: { _id: 1, name: 1, ownerId: 1, isDeleted: 1 } }],
+        },
+      },
+      { $project: { formWallet: { $arrayElemAt: ['$fromWallet', 0] }, toWallet: { $arrayElemAt: ['$toWallet', 0] } } },
+    ]);
+
+    return { formWallet: wallets.formWallet, toWallet: wallets.toWallet };
+  }
+
   // helpers
   async isOwner(walletId: string, userId: string) {
     const wallet = await this.walletModel.findOne({ _id: walletId }, '_id ownerId');
@@ -158,3 +124,8 @@ export class WalletService {
     return wallet.ownerId.equals(new Types.ObjectId(userId));
   }
 }
+
+type WalletTransferInfo = {
+  formWallet: Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'isDeleted'> & { balance: number };
+  toWallet: Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'isDeleted'>;
+};
