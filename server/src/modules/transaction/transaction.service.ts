@@ -14,23 +14,23 @@ export class TransactionService {
   ) {}
 
   async createTransferTransaction(dto: CreateTransferTransactionDto, userId: string) {
-    const { formWallet, toWallet } = await this.walletService.getInfoForTransfer(dto.sourceWalletId, dto.destinationWalletId);
+    const { fromWallet, toWallet } = await this.walletService.getInfoForTransfer(dto.sourceWalletId, dto.destinationWalletId);
     const userObjId = new Types.ObjectId(userId);
 
-    const isFormWalletOwner = formWallet.ownerId.equals(userObjId);
-    if (!isFormWalletOwner) throw new UnauthorizedException('You are not authorized to transfer from this wallet');
-
+    const isFromWalletOwner = fromWallet.ownerId.equals(userObjId);
     const isToWalletOwner = toWallet.ownerId.equals(userObjId);
-    if (!isToWalletOwner) throw new UnauthorizedException('You are not authorized to transfer to this wallet');
 
-    if (formWallet.isDeleted) throw new BadRequestException('Source wallet is deleted');
+    if (!isFromWalletOwner) throw new UnauthorizedException('You are not authorized to transfer from this wallet');
+    if (!isToWalletOwner) throw new UnauthorizedException('You are not authorized to transfer to this wallet');
+    if (fromWallet.isDeleted) throw new BadRequestException('Source wallet is deleted');
     if (toWallet.isDeleted) throw new BadRequestException('Destination wallet is deleted');
+    if (dto.amount > fromWallet.balance) throw new BadRequestException('Insufficient balance');
 
     // start the transfer
     await this.transactionModel.create({
       type: TransactionType.TRANSFER,
       amount: dto.amount,
-      description: dto.description || `Transferred ${dto.amount} tk from ${formWallet.name} to ${toWallet.name}`,
+      description: dto.description || `Transferred ${dto.amount} tk from ${fromWallet.name} to ${toWallet.name}`,
       sourceWalletId: dto.sourceWalletId,
       destinationWalletId: dto.destinationWalletId,
     });

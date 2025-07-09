@@ -95,26 +95,27 @@ export class WalletService {
   }
 
   // shared
-  async getInfoForTransfer(formWalletId: Types.ObjectId, toWalletId: Types.ObjectId): Promise<WalletTransferInfo> {
-    const formId = new Types.ObjectId(formWalletId);
+  async getInfoForTransfer(fromWalletId: Types.ObjectId, toWalletId: Types.ObjectId): Promise<WalletTransferInfo> {
+    const fromId = new Types.ObjectId(fromWalletId);
     const toId = new Types.ObjectId(toWalletId);
 
     const [wallets] = await this.walletModel.aggregate([
-      { $match: { _id: { $in: [formId, toId] } } },
+      { $match: { _id: { $in: [fromId, toId] } } },
       {
         $facet: {
           fromWallet: [
-            { $match: { _id: formId } },
+            { $match: { _id: fromId } },
             ...this.walletHelper.buildBalancePipeline(),
             { $project: { _id: 1, name: 1, ownerId: 1, balance: 1, isDeleted: 1 } },
           ],
           toWallet: [{ $match: { _id: toId } }, { $project: { _id: 1, name: 1, ownerId: 1, isDeleted: 1 } }],
         },
       },
-      { $project: { formWallet: { $arrayElemAt: ['$fromWallet', 0] }, toWallet: { $arrayElemAt: ['$toWallet', 0] } } },
+      { $project: { fromWallet: { $arrayElemAt: ['$fromWallet', 0] }, toWallet: { $arrayElemAt: ['$toWallet', 0] } } },
     ]);
 
-    return { formWallet: wallets.formWallet, toWallet: wallets.toWallet };
+    if (!wallets.fromWallet || !wallets.toWallet) throw new NotFoundException('Wallet not found!');
+    return { fromWallet: wallets.fromWallet, toWallet: wallets.toWallet };
   }
 
   // helpers
@@ -126,6 +127,6 @@ export class WalletService {
 }
 
 type WalletTransferInfo = {
-  formWallet: Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'isDeleted'> & { balance: number };
+  fromWallet: Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'isDeleted'> & { balance: number };
   toWallet: Pick<WalletDocument, '_id' | 'name' | 'ownerId' | 'isDeleted'>;
 };
