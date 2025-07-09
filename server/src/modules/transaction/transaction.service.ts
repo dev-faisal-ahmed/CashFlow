@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, Types } from 'mongoose';
 import { Transaction, TransactionDocument, TransactionType } from '@/schema/transaction.schema';
@@ -10,7 +10,7 @@ import { ResponseDto } from '@/common/dto/response.dto';
 export class TransactionService {
   constructor(
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
-    private readonly walletService: WalletService,
+    @Inject(forwardRef(() => WalletService)) private readonly walletService: WalletService,
   ) {}
 
   async createTransferTransaction(dto: CreateTransferTransactionDto, userId: string) {

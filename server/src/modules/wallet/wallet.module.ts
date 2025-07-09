@@ -8,9 +8,9 @@ import { AuthModule } from '../auth/auth.module';
 import { WalletHelper } from './wallet.helper';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]), forwardRef(() => TransactionModule), AuthModule],
+  imports: [MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }]), AuthModule, forwardRef(() => TransactionModule)],
   providers: [WalletService, WalletHelper],
   controllers: [WalletController],
-  exports: [WalletHelper],
+  exports: [WalletService],
 })
 export class WalletModule {}

@@ -8,10 +8,12 @@ import {
   TransferTransactionSchema,
 } from '@/schema/transaction.schema';
 
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
+import { WalletModule } from '../wallet/wallet.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +31,9 @@ import { TransactionController } from './transaction.controller';
         },
       },
     ]),
+
+    AuthModule,
+    forwardRef(() => WalletModule),
   ],
 
   providers: [TransactionService],
