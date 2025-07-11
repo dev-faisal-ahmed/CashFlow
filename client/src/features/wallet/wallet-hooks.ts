@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
-import { TAddWalletForm, TUpdateWalletForm } from "./wallet-type";
+import { TAddWalletForm, TUpdateWalletForm, TWalletTransferForm } from "./wallet-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addWalletFormSchema, updateWalletFormSchema } from "./wallet-schema";
 import { usePopupState } from "@/lib/hooks";
 import { QK } from "@/lib/query-keys";
-import { addWallet, deleteWallet, updateWallet } from "./wallet-api";
+import { addWallet, deleteWallet, updateWallet, walletTransfer } from "./wallet-api";
+import { toast } from "sonner";
 
 // Add Wallet
 export const useAddWallet = () => {
@@ -78,4 +79,30 @@ export const useDeleteWallet = (walletId: string) => {
   };
 
   return { open, onOpenChange, handleDeleteWallet, mutationKey };
+};
+
+// Wallet Transfer
+export const useWalletTransfer = (walletId: string, balance: number) => {
+  const FORM_ID = `TRANSFER_${QK.WALLET}_${walletId}`;
+  const qc = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [FORM_ID], mutationFn: walletTransfer });
+
+  const handleTransferWallet = (formData: TWalletTransferForm, onReset: () => void) => {
+    if (formData.amount > balance) return toast.error("Insufficient balance");
+
+    mutate(
+      { ...formData, sourceWalletId: walletId },
+      {
+        onSuccess: () => {
+          qc.invalidateQueries({ queryKey: [QK.WALLET, QK.TRANSACTION] });
+          onOpenChange(false);
+          onReset();
+        },
+      },
+    );
+  };
+
+  return { open, onOpenChange, handleTransferWallet, FORM_ID };
 };

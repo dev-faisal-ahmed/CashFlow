@@ -27,7 +27,6 @@ export class CreateTransferTransactionDto {
 
   @IsOptional()
   @IsString()
-  @MinLength(1, { message: 'Description can not be empty' })
   description?: string;
 
   @IsMongoId()

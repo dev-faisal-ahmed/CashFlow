@@ -28,13 +28,13 @@ export const deleteWallet = async (walletId: string): TPromiseResponse => {
   return data;
 };
 
-export const transferWallet = async (payload: TTransferWalletPayload): TPromiseResponse => {
+export const walletTransfer = async (payload: TWalletTransferPayload): TPromiseResponse => {
   const { data } = await api.post(apiUrl.transactions.transfer, payload);
   return data;
 };
 
 export const getWalletListForTransfer = async (): TPromiseResponse<TGetWalletListForTransferResponse> => {
-  const queryString = buildQueryString({ isSaving: "false", fields: "_id,name", getAll: "true" });
+  const queryString = buildQueryString({ fields: "_id,name", getAll: "true" });
   const url = apiUrl.wallet.getAll(queryString);
   const { data } = await api.get(url);
   return data;
@@ -43,5 +43,5 @@ export const getWalletListForTransfer = async (): TPromiseResponse<TGetWalletLis
 type TAddWalletPayload = TWalletForm;
 type TGetWalletListResponse = Array<Pick<TWallet, "_id" | "name" | "isSaving"> & { balance: number }>;
 type TUpdateWalletPayload = TUpdateWalletForm & { walletId: string };
-type TTransferWalletPayload = { amount: number; description: string; sourceWalletId: string; destinationWalletId: string };
+type TWalletTransferPayload = { amount: number; description?: string; sourceWalletId: string; destinationWalletId: string };
 type TGetWalletListForTransferResponse = Array<Pick<TWallet, "_id" | "name">>;

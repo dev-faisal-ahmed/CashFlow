@@ -22,7 +22,7 @@ export const updateWalletFormSchema = z.object({
   isSaving: z.boolean(),
 });
 
-export const transferWalletFormSchema = z.object({
+export const walletTransferFormSchema = z.object({
   amount: z.number().nonnegative("Amount can not be empty"),
   description: z.string().optional(),
   sourceWalletId: z.string().nonempty("Source wallet can not be empty"),

@@ -3,33 +3,21 @@ import { QK } from "@/lib/query-keys";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CommonSelect, FieldForm, FormDialog } from "@/components/shared/form";
-import { transferWalletFormSchema } from "../wallet-schema";
-import { TTransferWalletForm } from "../wallet-type";
+import { TWalletTransferForm } from "../wallet-type";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { SendHorizontalIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { usePopupState } from "@/lib/hooks";
-import { toast } from "sonner";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getWalletListForTransfer } from "../wallet-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { walletTransferFormSchema } from "../wallet-schema";
+import { useWalletTransfer } from "../wallet-hooks";
 
-const FORM_ID = QK.WALLET + "_TRANSFER";
-
-type TransferWalletProps = { balance: number; walletId: string };
-
-export const TransferWallet: FC<TransferWalletProps> = ({ balance, walletId }) => {
-  const { open, onOpenChange } = usePopupState();
-
-  const onSubmit = (formData: TTransferWalletForm, reset: () => void) => {
-    if (formData.amount > balance) return toast.error("Insufficient balance");
-
-    console.log(formData);
-    reset();
-    onOpenChange(false);
-  };
+type WalletTransferProps = { balance: number; walletId: string };
+export const WalletTransfer: FC<WalletTransferProps> = ({ balance, walletId }) => {
+  const { open, onOpenChange, handleTransferWallet, FORM_ID } = useWalletTransfer(walletId, balance);
 
   return (
     <>
@@ -44,7 +32,7 @@ export const TransferWallet: FC<TransferWalletProps> = ({ balance, walletId }) =
         title="Transfer Money"
         description="Provide necessary information to transfer money"
       >
-        <TransferWalletForm formId={FORM_ID} sourceWalletId={walletId} onSubmit={onSubmit} />
+        <TransferWalletForm formId={FORM_ID} sourceWalletId={walletId} onSubmit={handleTransferWallet} />
       </FormDialog>
     </>
   );
@@ -53,12 +41,12 @@ export const TransferWallet: FC<TransferWalletProps> = ({ balance, walletId }) =
 type TransferWalletFormProps = {
   formId: string;
   sourceWalletId: string;
-  onSubmit: (formData: TTransferWalletForm, reset: () => void) => void;
+  onSubmit: (formData: TWalletTransferForm, reset: () => void) => void;
 };
 
 const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sourceWalletId }) => {
-  const form = useForm<TTransferWalletForm>({
-    resolver: zodResolver(transferWalletFormSchema),
+  const form = useForm<TWalletTransferForm>({
+    resolver: zodResolver(walletTransferFormSchema),
     defaultValues: { description: "", destinationWalletId: "", sourceWalletId },
   });
 
@@ -75,7 +63,9 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
 
         <Suspense fallback={<WalletSelectionSKeleton />}>
           <FieldForm control={form.control} name="destinationWalletId" label="Destination Wallet">
-            {({ field: { value, onChange } }) => <DestinationWalletSelection value={value} onChange={onChange} />}
+            {({ field: { value, onChange } }) => (
+              <DestinationWalletSelection sourceWalletId={sourceWalletId} value={value} onChange={onChange} />
+            )}
           </FieldForm>
         </Suspense>
 
@@ -87,12 +77,13 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
   );
 };
 
-type DestinationWalletSelectionProps = { value: string; onChange: (value: string) => void };
-const DestinationWalletSelection: FC<DestinationWalletSelectionProps> = ({ value, onChange }) => {
+type DestinationWalletSelectionProps = { sourceWalletId: string; value: string; onChange: (value: string) => void };
+const DestinationWalletSelection: FC<DestinationWalletSelectionProps> = ({ sourceWalletId, value, onChange }) => {
   const { data: walletList } = useSuspenseQuery({
     queryKey: [QK.WALLET, "FOR_TRANSFER"],
     queryFn: getWalletListForTransfer,
-    select: (res) => res.data.map((wallet) => ({ value: wallet._id, label: wallet.name })),
+    select: (res) =>
+      res.data.map((wallet) => ({ value: wallet._id, label: wallet.name })).filter((wallet) => wallet.value !== sourceWalletId),
   });
 
   return <CommonSelect value={value} onChange={onChange} options={walletList} placeholder="Select destination wallet" />;
