@@ -33,9 +33,4 @@ export class WalletController {
   async deleteWallet(@Param('walletId', ParseObjectIdPipe) walletId: string, @User('_id') userId: string) {
     return this.walletService.deleteOne(walletId, userId);
   }
-
-  // @Get('/info-for-transfer')
-  // async getWalletInfoForTransaction(@Query() query: TQueryParams) {
-  //   return this.walletService.walletInfoForTransfer(query.formWalletId, query.toWalletId);
-  // }
 }

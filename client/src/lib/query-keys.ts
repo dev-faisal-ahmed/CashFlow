@@ -2,4 +2,8 @@ export const QK = {
   AUTH: "AUTH",
   WALLET: "WALLET",
   SOURCE: "SOURCE",
+  TRANSACTION: {
+    DEFAULT: "TRANSACTION",
+    TRANSFER: "TRANSFER",
+  },
 };

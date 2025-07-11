@@ -9,6 +9,7 @@ import { ActionMenu } from "@/components/shared";
 import { usePopupState } from "@/lib/hooks";
 import { UpdateWallet } from "./update-wallet";
 import { DeleteWallet } from "./delete-wallet";
+import { TransferWallet } from "./transfer-wallet";
 
 type WalletCardProps = Pick<TWallet, "_id" | "name" | "isSaving"> & { balance: number };
 export const WalletCard: FC<WalletCardProps> = ({ _id, name, isSaving, balance }) => {
@@ -28,6 +29,7 @@ export const WalletCard: FC<WalletCardProps> = ({ _id, name, isSaving, balance }
           </div>
           <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
             <UpdateWallet name={name} isSaving={isSaving} walletId={_id} onSuccess={() => onOpenChange(false)} />
+            <TransferWallet balance={balance} walletId={_id} />
             <DeleteWallet walletId={_id} />
           </ActionMenu>
         </div>

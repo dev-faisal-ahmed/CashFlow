@@ -9,11 +9,7 @@ export const DeleteWallet: FC<{ walletId: string }> = ({ walletId }) => {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        className="text-destructive hover:bg-destructive/20 hover:text-destructive w-full justify-start"
-        onClick={() => onOpenChange(true)}
-      >
+      <Button variant="destructive_ghost" className="w-full justify-start" onClick={() => onOpenChange(true)}>
         <Trash2Icon /> Delete Wallet
       </Button>
 

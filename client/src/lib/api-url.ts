@@ -13,8 +13,12 @@ export const apiUrl = {
     delete: (walletId: string) => `/wallets/${walletId}`,
   },
 
-  source:{
-    add:"/sources",
+  source: {
+    add: "/sources",
     getAll: (searchParams: string) => `/sources${searchParams}`,
-  }
+  },
+
+  transactions: {
+    transfer: "/transactions/transfer",
+  },
 };

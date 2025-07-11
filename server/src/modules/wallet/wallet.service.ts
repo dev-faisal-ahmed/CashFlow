@@ -55,10 +55,17 @@ export class WalletService {
 
   async getAll(query: TQueryParams, ownerId: string) {
     const search = query.search;
+    const isSaving = query.isSaving;
     const requestedFields = query.fields;
     const { getAll, limit, page, skip } = getPaginationInfo(query);
 
-    const dbQuery = { isDeleted: false, ownerId, ...(search && { name: { $regex: search, $options: 'i' } }) };
+    const dbQuery = {
+      isDeleted: false,
+      ownerId,
+      ...(search && { name: { $regex: search, $options: 'i' } }),
+      ...(isSaving === 'true' || isSaving === 'false' ? { isSaving: isSaving === 'true' } : {}),
+    };
+
     const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'balance', 'membersCount']);
 
     const wallets = await this.walletModel.aggregate([
