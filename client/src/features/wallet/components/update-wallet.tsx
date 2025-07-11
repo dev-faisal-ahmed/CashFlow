@@ -3,12 +3,11 @@ import { TUseUpdateWalletArgs, useUpdateWallet } from "../wallet-hooks";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
-import { Form } from "@/components/ui/form";
-import { WalletFormFields } from "./wallet-form-fields";
+import { WalletForm } from "./wallet-form";
 
-type UpdateWalletProps = TUseUpdateWalletArgs;
-export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, onSuccess }) => {
-  const { form, handleUpdateWallet, open, onOpenChange, mutationKey } = useUpdateWallet({ walletId, name, isSaving, onSuccess });
+type UpdateWalletProps = TUseUpdateWalletArgs & { name: string; isSaving: boolean };
+export const UpdateWallet: FC<UpdateWalletProps> = ({ name, isSaving, walletId, onSuccess }) => {
+  const { open, onOpenChange, mutationKey, handleUpdateWallet } = useUpdateWallet({ walletId, onSuccess });
 
   return (
     <>
@@ -20,14 +19,10 @@ export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, 
         open={open}
         onOpenChange={onOpenChange}
         formId={mutationKey}
-        title="Add New Wallet"
-        description="Fill up the form to create a wallet"
+        title="Update Wallet"
+        description="Fill up the form to update a wallet"
       >
-        <Form {...form}>
-          <form id={mutationKey} onSubmit={handleUpdateWallet} className="mt-2 flex flex-col gap-4">
-            <WalletFormFields mode="edit" />
-          </form>
-        </Form>
+        <WalletForm formId={mutationKey} mode="edit" onSubmit={handleUpdateWallet} defaultValues={{ name, isSaving }} />
       </FormDialog>
     </>
   );

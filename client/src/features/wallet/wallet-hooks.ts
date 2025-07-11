@@ -1,64 +1,61 @@
-import { useForm } from "react-hook-form";
-import { TAddWalletForm, TUpdateWalletForm, TWalletTransferForm } from "./wallet-type";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { TAddWalletForm, TUpdateWalletForm, TWalletForm, TWalletTransferForm } from "./wallet-type";
+import { addWallet, deleteWallet, updateWallet, walletTransfer } from "./wallet-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addWalletFormSchema, updateWalletFormSchema } from "./wallet-schema";
 import { usePopupState } from "@/lib/hooks";
 import { QK } from "@/lib/query-keys";
-import { addWallet, deleteWallet, updateWallet, walletTransfer } from "./wallet-api";
 import { toast } from "sonner";
 
 // Add Wallet
 export const useAddWallet = () => {
   const mutationKey = `ADD_${QK.WALLET}`;
   const qc = useQueryClient();
+
   const { open, onOpenChange } = usePopupState();
-
-  const form = useForm<TAddWalletForm>({
-    resolver: zodResolver(addWalletFormSchema),
-    defaultValues: { name: "", isSaving: false },
-  });
-
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: addWallet });
 
-  const handleAddWallet = form.handleSubmit((formData) => {
-    mutate(formData, {
-      onSuccess: () => {
-        qc.invalidateQueries({ queryKey: [QK.WALLET] });
-        onOpenChange(false);
-        form.reset();
-      },
-    });
-  });
+  const handleAddWallet = (formData: TWalletForm, onReset: () => void) => {
+    const { name, isSaving, initialBalance } = formData as TAddWalletForm;
 
-  return { form, handleAddWallet, open, onOpenChange, mutationKey };
+    mutate(
+      { name, isSaving, initialBalance },
+      {
+        onSuccess: () => {
+          qc.invalidateQueries({ queryKey: [QK.WALLET] });
+          onReset();
+          onOpenChange(false);
+        },
+      },
+    );
+  };
+
+  return { handleAddWallet, open, onOpenChange, mutationKey };
 };
 
 // Update Wallet
-export type TUseUpdateWalletArgs = { walletId: string; name: string; isSaving: boolean; onSuccess: () => void };
-export const useUpdateWallet = ({ walletId, name, isSaving, onSuccess }: TUseUpdateWalletArgs) => {
+export type TUseUpdateWalletArgs = { walletId: string; onSuccess: () => void };
+export const useUpdateWallet = ({ walletId, onSuccess }: TUseUpdateWalletArgs) => {
   const mutationKey = `UPDATE_${QK.WALLET}_${walletId}`;
   const qc = useQueryClient();
   const { open, onOpenChange } = usePopupState();
 
-  const form = useForm<TUpdateWalletForm>({ defaultValues: { name, isSaving }, resolver: zodResolver(updateWalletFormSchema) });
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateWallet });
 
-  const handleUpdateWallet = form.handleSubmit((formData) => {
+  const handleUpdateWallet = (formData: TWalletForm, onReset: () => void) => {
+    const data = formData as TUpdateWalletForm;
     mutate(
-      { ...formData, walletId },
+      { ...data, walletId },
       {
         onSuccess: () => {
+          onReset();
           qc.invalidateQueries({ queryKey: [QK.WALLET] });
           onOpenChange(false);
-          form.reset();
           onSuccess();
         },
       },
     );
-  });
+  };
 
-  return { form, handleUpdateWallet, open, onOpenChange, mutationKey };
+  return { handleUpdateWallet, open, onOpenChange, mutationKey };
 };
 
 // Delete Wallet
