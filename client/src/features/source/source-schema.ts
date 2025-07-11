@@ -20,5 +20,6 @@ export const sourceSchema = z
   })
   .superRefine((value, ctx) => {
     if (value.addBudget && !value.budget?.amount) ctx.addIssue({ code: "custom", message: "Amount is required", path: ["budget.amount"] });
-    if (value.addBudget && !value.budget?.interval) ctx.addIssue({ code: "custom", message: "Interval is required", path: ["budget.interval"] });
+    if (value.addBudget && !value.budget?.interval)
+      ctx.addIssue({ code: "custom", message: "Interval is required", path: ["budget.interval"] });
   });

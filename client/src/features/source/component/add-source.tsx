@@ -1,14 +1,13 @@
 "use client";
 
 import { FormDialog } from "@/components/shared/form";
-import { Form } from "@/components/ui/form";
-import { SourceFormFields } from "./source-form-fields";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useAddSource } from "../source-hooks";
+import { SourceForm } from "./source-form";
 
 export const AddSource = () => {
-  const { form, handleAddSource, open, onOpenChange, mutationKey } = useAddSource();
+  const { handleAddSource, open, onOpenChange, mutationKey } = useAddSource();
 
   return (
     <>
@@ -23,11 +22,7 @@ export const AddSource = () => {
         description="Fill up the form to create a source"
         formId={mutationKey}
       >
-        <Form {...form}>
-          <form id={mutationKey} onSubmit={handleAddSource} className="mt-2 flex flex-col gap-4">
-            <SourceFormFields />
-          </form>
-        </Form>
+        <SourceForm mode="add" formId={mutationKey} defaultValues={{ name: "", type: "", addBudget: false }} onSubmit={handleAddSource} />
       </FormDialog>
     </>
   );

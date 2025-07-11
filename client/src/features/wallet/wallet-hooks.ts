@@ -36,12 +36,13 @@ export type TUseUpdateWalletArgs = { walletId: string; onSuccess: () => void };
 export const useUpdateWallet = ({ walletId, onSuccess }: TUseUpdateWalletArgs) => {
   const mutationKey = `UPDATE_${QK.WALLET}_${walletId}`;
   const qc = useQueryClient();
-  const { open, onOpenChange } = usePopupState();
 
+  const { open, onOpenChange } = usePopupState();
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateWallet });
 
   const handleUpdateWallet = (formData: TWalletForm, onReset: () => void) => {
     const data = formData as TUpdateWalletForm;
+
     mutate(
       { ...data, walletId },
       {
@@ -62,8 +63,8 @@ export const useUpdateWallet = ({ walletId, onSuccess }: TUseUpdateWalletArgs) =
 export const useDeleteWallet = (walletId: string) => {
   const mutationKey = `DELETE_${QK.WALLET}_${walletId}`;
   const qc = useQueryClient();
-  const { open, onOpenChange } = usePopupState();
 
+  const { open, onOpenChange } = usePopupState();
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteWallet });
 
   const handleDeleteWallet = () => {
