@@ -1,61 +1,54 @@
 import { QK } from "@/lib/query-keys";
-import { useForm } from "react-hook-form";
-import { TLoginForm, TSigUpForm } from "./auth-types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, signupSchema } from "./auth-schema";
+import { TAuthForm, TLoginForm, TSigUpForm } from "./auth-types";
 import { useMutation } from "@tanstack/react-query";
 import { login, signup } from "./auth-api";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiUrl } from "@/lib/api-url";
 import { API_URL } from "@/lib/config";
 
-const signupKey = `${QK.AUTH}_SIGNUP`;
 export const useSignup = () => {
-  const form = useForm<TSigUpForm>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
-  });
-
-  const { mutate, isPending } = useMutation({ mutationKey: [signupKey], mutationFn: signup });
+  const { mutate, isPending } = useMutation({ mutationFn: signup });
   const router = useRouter();
 
-  const handleSignup = form.handleSubmit((formData) => {
-    const { name, email, password } = formData;
+  const handleSignup = (formData: TAuthForm, onReset: () => void) => {
+    const { name, email, password } = formData as TSigUpForm;
 
     mutate(
       { name, email, password },
       {
         onSuccess: () => {
-          form.reset();
-          router.push("/login");
+          router.push("/dashboard");
+          onReset();
         },
       },
     );
-  });
+  };
 
-  return { form, handleSignup, isPending };
+  return { handleSignup, isPending };
 };
 
 const loginKey = `${QK.AUTH}_LOGIN`;
 export const useLogin = () => {
-  const form = useForm<TLoginForm>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
-
+  const { mutate, isPending } = useMutation({ mutationKey: [loginKey], mutationFn: login });
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callback") || "/";
 
-  const { mutate, isPending } = useMutation({ mutationKey: [loginKey], mutationFn: login });
+  const handleLogin = (formData: TAuthForm, onReset: () => void) => {
+    const { email, password } = formData as TLoginForm;
 
-  const handleLogin = form.handleSubmit((formData) => {
-    mutate(formData, {
-      onSuccess: () => {
-        form.reset();
-        router.push(callbackUrl);
+    mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          onReset();
+          router.push(callbackUrl);
+        },
       },
-    });
-  });
+    );
+  };
 
-  return { form, handleLogin, isPending };
+  return { handleLogin, isPending };
 };
 
 export const useGoogleLogin = () => {

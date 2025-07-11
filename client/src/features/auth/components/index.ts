@@ -1,4 +1,4 @@
-export * from "./login-form";
-export * from "./signup-form";
+export * from "./login";
+export * from "./sign-up";
 export * from "./auth-provider";
 export * from "./logout";

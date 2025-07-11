@@ -1,12 +1,8 @@
 import { TopbarContent } from "@/layout/";
 import { Header } from "@/components/shared";
 import { AddWallet, WalletList } from "@/wallet/components";
-import { getToken } from "@/lib/server-action";
 
 const Page = async () => {
-  const token = await getToken();
-  console.log(token);
-
   return (
     <>
       <TopbarContent position="left">

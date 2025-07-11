@@ -1,8 +1,8 @@
-import { LoginForm } from "@/auth/components";
+import { Login } from "@/auth/components";
 
 const Page = () => (
   <div className="mx-auto flex max-w-150 flex-col">
-    <LoginForm />
+    <Login />
   </div>
 );
 
