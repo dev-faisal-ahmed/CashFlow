@@ -10,15 +10,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     console.log(exception);
 
-    const message = exception.message;
-    const error = undefined;
+    const errorResponse = exception.getResponse() as { message: string[] };
+    const message = errorResponse.message.toString();
 
-    const responseBody = {
-      ok: false,
-      message: message || 'Something went wrong',
-      error,
-    };
-
+    const responseBody = { ok: false, message: message || 'Something went wrong' };
     response.status(status).json(responseBody);
   }
 }

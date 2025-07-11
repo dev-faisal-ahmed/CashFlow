@@ -1,8 +1,8 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { AuthGuard } from '../auth/guard/auth.guard';
-import { CreateTransferTransactionDto } from './transaction.dto';
 import { User } from '@/common/decorators/user.decorator';
+import { CreateTransferTransactionDto } from './transaction.dto';
 
 @Controller('transactions')
 export class TransactionController {
@@ -10,7 +10,8 @@ export class TransactionController {
 
   @Post('transfer')
   @UseGuards(AuthGuard)
-  async createTransfer(@Body() dto: CreateTransferTransactionDto, @User('_id') userId: string) {
+  createTransfer(@Body() dto: CreateTransferTransactionDto, @User('_id') userId: string) {
+    console.log(dto, userId);
     return this.transactionService.createTransferTransaction(dto, userId);
   }
 }

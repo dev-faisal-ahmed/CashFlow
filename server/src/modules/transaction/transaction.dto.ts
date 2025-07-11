@@ -30,8 +30,8 @@ export class CreateTransferTransactionDto {
   description?: string;
 
   @IsMongoId()
-  sourceWalletId: Types.ObjectId;
+  sourceWalletId: string;
 
   @IsMongoId()
-  destinationWalletId: Types.ObjectId;
+  destinationWalletId: string;
 }

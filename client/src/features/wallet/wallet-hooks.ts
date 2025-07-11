@@ -80,7 +80,7 @@ export const useDeleteWallet = (walletId: string) => {
 };
 
 // Wallet Transfer
-export const useWalletTransfer = (walletId: string, balance: number) => {
+export const useWalletTransfer = (walletId: string, balance: number, onSuccess: () => void) => {
   const FORM_ID = `TRANSFER_${QK.WALLET}_${walletId}`;
   const qc = useQueryClient();
 
@@ -94,9 +94,11 @@ export const useWalletTransfer = (walletId: string, balance: number) => {
       { ...formData, sourceWalletId: walletId },
       {
         onSuccess: () => {
-          qc.invalidateQueries({ queryKey: [QK.WALLET, QK.TRANSACTION] });
-          onOpenChange(false);
           onReset();
+          qc.invalidateQueries({ queryKey: [QK.WALLET] });
+          qc.invalidateQueries({ queryKey: [QK.TRANSACTION] });
+          onOpenChange(false);
+          onSuccess();
         },
       },
     );

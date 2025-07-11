@@ -15,9 +15,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { walletTransferFormSchema } from "../wallet-schema";
 import { useWalletTransfer } from "../wallet-hooks";
 
-type WalletTransferProps = { balance: number; walletId: string };
-export const WalletTransfer: FC<WalletTransferProps> = ({ balance, walletId }) => {
-  const { open, onOpenChange, handleTransferWallet, FORM_ID } = useWalletTransfer(walletId, balance);
+type WalletTransferProps = { balance: number; walletId: string; onSuccess: () => void };
+export const WalletTransfer: FC<WalletTransferProps> = ({ balance, walletId, onSuccess }) => {
+  const { open, onOpenChange, handleTransferWallet, FORM_ID } = useWalletTransfer(walletId, balance, onSuccess);
 
   return (
     <>

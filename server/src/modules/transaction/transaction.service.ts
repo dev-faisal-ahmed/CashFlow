@@ -14,7 +14,9 @@ export class TransactionService {
   ) {}
 
   async createTransferTransaction(dto: CreateTransferTransactionDto, userId: string) {
-    const { fromWallet, toWallet } = await this.walletService.getInfoForTransfer(dto.sourceWalletId, dto.destinationWalletId);
+    const sourceWalletId = new Types.ObjectId(dto.sourceWalletId);
+    const destinationWalletId = new Types.ObjectId(dto.destinationWalletId);
+    const { fromWallet, toWallet } = await this.walletService.getInfoForTransfer(sourceWalletId, destinationWalletId);
     const userObjId = new Types.ObjectId(userId);
 
     const isFromWalletOwner = fromWallet.ownerId.equals(userObjId);
@@ -31,8 +33,8 @@ export class TransactionService {
       type: TransactionType.TRANSFER,
       amount: dto.amount,
       description: dto.description || `Transferred ${dto.amount} tk from ${fromWallet.name} to ${toWallet.name}`,
-      sourceWalletId: dto.sourceWalletId,
-      destinationWalletId: dto.destinationWalletId,
+      sourceWalletId: sourceWalletId,
+      destinationWalletId: destinationWalletId,
     });
 
     return new ResponseDto('Transfer has been successful');

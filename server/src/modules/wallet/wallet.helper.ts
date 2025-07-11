@@ -57,7 +57,7 @@ export class WalletHelper {
           },
         },
       },
-      { $project: { basicTransactions: 0, incomeTransfers: 0, expenseTransfers: 0, allTransactions: 0 } },
+      // { $project: { basicTransactions: 0, incomeTransfers: 0, expenseTransfers: 0, allTransactions: 0 } },
     ];
   }
 }

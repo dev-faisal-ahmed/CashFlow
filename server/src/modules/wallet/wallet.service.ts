@@ -66,7 +66,7 @@ export class WalletService {
       ...(isSaving === 'true' || isSaving === 'false' ? { isSaving: isSaving === 'true' } : {}),
     };
 
-    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'balance', 'membersCount']);
+    const fields = selectFields(query.fields, ['_id', 'name', 'ownerId', 'isSaving', 'balance']);
 
     const wallets = await this.walletModel.aggregate([
       { $match: dbQuery },
