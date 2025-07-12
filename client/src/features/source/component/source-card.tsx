@@ -5,12 +5,15 @@ import { Progress } from "@/components/ui/progress";
 import { TSource } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { FC } from "react";
+import { usePopupState } from "@/lib/hooks";
+import { ActionMenu } from "@/components/shared";
+import { UpdateSource } from "./update-source";
 
 // -------- Main -------- \\
 type SourceCardProps = Pick<TSource, "_id" | "name" | "type" | "budget"> & { income: number; expense: number };
-export const SourceCard: FC<SourceCardProps> = ({ name, type, income, expense, budget }) => (
+export const SourceCard: FC<SourceCardProps> = ({ _id, name, type, income, expense, budget }) => (
   <Card>
-    <SourceCardHeader name={name} type={type} />
+    <SourceCardHeader _id={_id} name={name} type={type} budget={budget} />
     <CardContent>
       <SourceCardIncomeExpense type={type} income={income} expense={expense} budget={budget} />
       <Budget budget={budget} expense={expense} />
@@ -19,14 +22,14 @@ export const SourceCard: FC<SourceCardProps> = ({ name, type, income, expense, b
 );
 
 // -------- Header -------- \\
-type SourceCardHeaderProps = Pick<SourceCardProps, "name" | "type">;
+type SourceCardHeaderProps = Pick<SourceCardProps, "_id" | "name" | "type" | "budget">;
 
 const headerConfig = {
   INCOME: { icon: TrendingUpIcon, iconClassName: "bg-emerald-500", text: "Income Source", textClassName: "bg-black/90" },
   EXPENSE: { icon: TrendingDownIcon, iconClassName: "bg-destructive", text: "Expense Category", textClassName: "bg-destructive/90" },
 };
 
-const SourceCardHeader: FC<SourceCardHeaderProps> = ({ name, type }) => {
+const SourceCardHeader: FC<SourceCardHeaderProps> = ({ _id, name, type, budget }) => {
   const config = headerConfig[type];
 
   return (
@@ -43,6 +46,7 @@ const SourceCardHeader: FC<SourceCardHeaderProps> = ({ name, type }) => {
             {config.text}
           </Badge>
         </div>
+        <SourceCardActionMenu _id={_id} name={name} type={type} budget={budget} />
       </div>
     </CardHeader>
   );
@@ -86,5 +90,16 @@ const Budget: FC<BudgetProps> = ({ budget, expense }) => {
       </div>
       <Progress className="h-2" value={usage} />
     </div>
+  );
+};
+
+type SourceCardActionMenuProps = Pick<SourceCardProps, "_id" | "name" | "type" | "budget">;
+const SourceCardActionMenu: FC<SourceCardActionMenuProps> = ({ _id, name, type, budget }) => {
+  const { open, onOpenChange } = usePopupState();
+
+  return (
+    <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
+      <UpdateSource _id={_id} name={name} type={type} budget={budget} onSuccess={() => onOpenChange(false)} />
+    </ActionMenu>
   );
 };

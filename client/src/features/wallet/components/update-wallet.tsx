@@ -22,7 +22,7 @@ export const UpdateWallet: FC<UpdateWalletProps> = ({ name, isSaving, walletId, 
         title="Update Wallet"
         description="Fill up the form to update a wallet"
       >
-        <WalletForm formId={mutationKey} mode="edit" onSubmit={handleUpdateWallet} defaultValues={{ name, isSaving }} />
+        <WalletForm formId={mutationKey} mode="update" onSubmit={handleUpdateWallet} defaultValues={{ name, isSaving }} />
       </FormDialog>
     </>
   );

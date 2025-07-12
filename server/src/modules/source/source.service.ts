@@ -142,11 +142,10 @@ export class SourceService {
   }
 
   async updateOne(dto: UpdateSourceDto, sourceId: string, userId: string) {
-    const source = await this.sourceModel.findOne({ _id: sourceId }, '_id,userId,type').lean();
+    const source = await this.sourceModel.findOne({ _id: sourceId }, '_id userId type').lean();
     if (!source) throw new NotFoundException('Source not found!');
 
     const isOwner = source.userId.equals(new Types.ObjectId(userId));
-
     if (!isOwner) throw new UnauthorizedException('You are not authorized to update this source');
     if (source.type !== SourceType.EXPENSE && dto.budget) throw new BadRequestException('Budget is not allowed for Income source');
 

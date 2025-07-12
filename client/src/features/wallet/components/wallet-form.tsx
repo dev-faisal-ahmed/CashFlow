@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 
 type WalletFormProps = {
   formId: string;
-  mode: "add" | "edit";
+  mode: "add" | "update";
   defaultValues: TWalletForm;
   onSubmit: (formData: TWalletForm, onReset: () => void) => void;
 };

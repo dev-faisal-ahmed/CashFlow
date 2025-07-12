@@ -28,12 +28,14 @@ const typeOptions: { label: string; value: TSourceType }[] = [
   { label: "Expense", value: "EXPENSE" },
 ];
 
-export const SourceForm: FC<SourceFormProps> = ({ formId, defaultValues, onSubmit }) => {
+export const SourceForm: FC<SourceFormProps> = ({ mode, formId, defaultValues, onSubmit }) => {
   const form = useForm<TSourceForm>({ resolver: zodResolver(sourceSchema), defaultValues });
   const addBudget = form.watch("addBudget");
   const type = form.watch("type");
 
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
+
+  console.log(defaultValues);
 
   return (
     <Form {...form}>
@@ -45,7 +47,7 @@ export const SourceForm: FC<SourceFormProps> = ({ formId, defaultValues, onSubmi
 
         {/* Source Type Field */}
         <FieldForm control={form.control} name="type" label="Source Type">
-          {({ field }) => <CommonSelect options={typeOptions} {...field} />}
+          {({ field }) => <CommonSelect disabled={mode === "update"} options={typeOptions} {...field} />}
         </FieldForm>
 
         {/* Budget Fields (conditionally shown) */}

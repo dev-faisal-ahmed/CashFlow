@@ -15,10 +15,18 @@ export const getSourceList = async (): TPromiseResponse<TGetSourceListResponse> 
   return data;
 };
 
-export const updateSourceList = async (sourceId: string, payload: TAddSourcePayload): TPromiseResponse => {
-  const { data } = await api.patch(apiUrl.source.updateOne(sourceId), payload);
+export const updateSource = async ({ _id, ...payload }: TUpdateSourcePayload): TPromiseResponse => {
+  const url = apiUrl.source.updateOne(_id);
+  const { data } = await api.patch(url, payload);
+  return data;
+};
+
+export const deleteSource = async (sourceId: string): TPromiseResponse => {
+  const url = apiUrl.source.deleteOne(sourceId);
+  const { data } = await api.delete(url);
   return data;
 };
 
 type TAddSourcePayload = Pick<TSource, "name" | "type" | "budget">;
 type TGetSourceListResponse = Array<Pick<TSource, "_id" | "name" | "type" | "budget"> & { income: number; expense: number }>;
+type TUpdateSourcePayload = Pick<TSource, "_id" | "name" | "budget">;
