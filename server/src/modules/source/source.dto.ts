@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { BudgetInterval, SourceType } from '@/schema/source.schema';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator';
 
 class BudgetDto {
   @IsNumber()
@@ -33,6 +33,10 @@ export class UpdateSourceDto {
   @IsString()
   @IsNotEmpty({ message: 'Source name is required' })
   name?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  addBudget?: boolean;
 
   @IsOptional()
   @ValidateNested()

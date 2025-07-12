@@ -29,4 +29,4 @@ export const deleteSource = async (sourceId: string): TPromiseResponse => {
 
 type TAddSourcePayload = Pick<TSource, "name" | "type" | "budget">;
 type TGetSourceListResponse = Array<Pick<TSource, "_id" | "name" | "type" | "budget"> & { income: number; expense: number }>;
-type TUpdateSourcePayload = Pick<TSource, "_id" | "name" | "budget">;
+type TUpdateSourcePayload = Pick<TSource, "_id" | "name" | "budget"> & { addBudget?: boolean };

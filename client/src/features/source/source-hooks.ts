@@ -40,7 +40,7 @@ export const useUpdateSource = ({ sourceId, onSuccess }: TUseUpdateSourceArgs) =
 
   const handleUpdateSource = (formData: TSourceForm, onReset: () => void) => {
     const { name, type, addBudget, budget } = formData;
-    const payload = { _id: sourceId, name, ...(type === "EXPENSE" && addBudget && { budget: budget as TBudget }) };
+    const payload = { _id: sourceId, name, ...(type === "EXPENSE" && { addBudget, budget: budget as TBudget }) };
 
     mutate(payload, {
       onSuccess: () => {

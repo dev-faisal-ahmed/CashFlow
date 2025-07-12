@@ -35,8 +35,6 @@ export const SourceForm: FC<SourceFormProps> = ({ mode, formId, defaultValues, o
 
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
-  console.log(defaultValues);
-
   return (
     <Form {...form}>
       <form id={formId} onSubmit={handleSubmit} className="space-y-4">
