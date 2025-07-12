@@ -1,12 +1,12 @@
 import { CreateUserDto, UpdateUserDto } from './user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
-import { User } from '@/schema/user.schema';
+import { User, UserDocument } from '@/schema/user.schema';
 import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async findByEmail(email: string) {
     return this.userModel.findOne({ email }).lean();

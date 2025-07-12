@@ -1,15 +1,15 @@
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
-import { Source } from '@/schema/source.schema';
+import { Source, SourceDocument } from '@/schema/source.schema';
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateSourceDto, UpdateSourceNameDto } from './source.dto';
+import { CreateSourceDto, UpdateSourceDto } from './source.dto';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { TQueryParams } from '@/types';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class SourceService {
-  constructor(@InjectModel(Source.name) private sourceModel: Model<Source>) {}
+  constructor(@InjectModel(Source.name) private sourceModel: Model<SourceDocument>) {}
 
   async create(dto: CreateSourceDto, userId: string) {
     const isSourceExist = await this.sourceModel.findOne({ name: dto.name, userId }, '_id').lean();
@@ -141,14 +141,23 @@ export class SourceService {
     return new ResponseDto({ message: 'Sources fetched successfully', meta, data: sources });
   }
 
-  async updateName(dto: UpdateSourceNameDto, sourceId: string, userId: string) {
+  async updateOne(dto: UpdateSourceDto, sourceId: string, userId: string) {
     const isOwner = await this.isOwner(sourceId, userId);
     if (!isOwner) throw new UnauthorizedException('You are not authorized to update this source');
 
     await this.sourceModel.updateOne({ _id: sourceId }, { $set: dto });
-    return new ResponseDto('Source name updated successfully');
+    return new ResponseDto('Source updated successfully');
   }
 
+  async deleteOne(sourceId: string, userId: string) {
+    const isOwner = await this.isOwner(sourceId, userId);
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to delete this source');
+
+    await this.sourceModel.updateOne({ _id: sourceId }, { $set: { isDeleted: true } });
+    return new ResponseDto('Source deleted successfully');
+  }
+
+  // helper
   async isOwner(sourceId: string, userId: string) {
     const source = await this.sourceModel.findOne({ _id: sourceId }, '_id userId').lean();
     if (!source) throw new NotFoundException('Source not found!');

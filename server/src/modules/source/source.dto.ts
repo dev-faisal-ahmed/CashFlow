@@ -28,11 +28,16 @@ export class CreateSourceDto {
   budget?: BudgetDto;
 }
 
-export class UpdateSourceNameDto {
+export class UpdateSourceDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty({ message: 'Source name is required' })
   name?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => BudgetDto)
+  budget?: BudgetDto;
 }
 
 // functions

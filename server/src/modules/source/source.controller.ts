@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guard/auth.guard';
-import { CreateSourceDto, UpdateSourceNameDto } from './source.dto';
+import { CreateSourceDto, UpdateSourceDto } from './source.dto';
 import { User } from '@/common/decorators/user.decorator';
 import { SourceService } from './source.service';
 import { TQueryParams } from '@/types';
@@ -24,7 +24,7 @@ export class SourceController {
 
   @Patch(':sourceId')
   @UseGuards(AuthGuard)
-  async updateSourceName(@Body() dto: UpdateSourceNameDto, @Param('sourceId', ParseObjectIdPipe) sourceId: string, @User('_id') userId: string) {
-    return this.sourceService.updateName(dto, sourceId, userId);
+  async updateSource(@Body() dto: UpdateSourceDto, @Param('sourceId', ParseObjectIdPipe) sourceId: string, @User('_id') userId: string) {
+    return this.sourceService.updateOne(dto, sourceId, userId);
   }
 }
