@@ -1,10 +1,10 @@
-import { Spinner } from "@/components/ui/spinner";
+import { SourceListSkeleton } from "@/features/source/component";
 
 const Loading = () => {
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col items-center justify-center">
-      <Spinner />
-    </div>
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <SourceListSkeleton size={6} />
+    </section>
   );
 };
 
