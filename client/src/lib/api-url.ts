@@ -16,6 +16,8 @@ export const apiUrl = {
   source: {
     add: "/sources",
     getAll: (searchParams: string) => `/sources${searchParams}`,
+    updateOne: (sourceId: string) => `/sources/${sourceId}`,
+    deleteOne: (sourceId: string) => `/sources/${sourceId}`,
   },
 
   transactions: {

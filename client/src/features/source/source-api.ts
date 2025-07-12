@@ -15,5 +15,10 @@ export const getSourceList = async (): TPromiseResponse<TGetSourceListResponse> 
   return data;
 };
 
+export const updateSourceList = async (sourceId: string, payload: TAddSourcePayload): TPromiseResponse => {
+  const { data } = await api.patch(apiUrl.source.updateOne(sourceId), payload);
+  return data;
+};
+
 type TAddSourcePayload = Pick<TSource, "name" | "type" | "budget">;
 type TGetSourceListResponse = Array<Pick<TSource, "_id" | "name" | "type" | "budget"> & { income: number; expense: number }>;

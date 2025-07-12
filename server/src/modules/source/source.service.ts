@@ -1,11 +1,11 @@
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
-import { Source, SourceDocument } from '@/schema/source.schema';
+import { Source, SourceDocument, SourceType } from '@/schema/source.schema';
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateSourceDto, UpdateSourceDto } from './source.dto';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { TQueryParams } from '@/types';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class SourceService {
@@ -142,8 +142,13 @@ export class SourceService {
   }
 
   async updateOne(dto: UpdateSourceDto, sourceId: string, userId: string) {
-    const isOwner = await this.isOwner(sourceId, userId);
+    const source = await this.sourceModel.findOne({ _id: sourceId }, '_id,userId,type').lean();
+    if (!source) throw new NotFoundException('Source not found!');
+
+    const isOwner = source.userId.equals(new Types.ObjectId(userId));
+
     if (!isOwner) throw new UnauthorizedException('You are not authorized to update this source');
+    if (source.type !== SourceType.EXPENSE && dto.budget) throw new BadRequestException('Budget is not allowed for Income source');
 
     await this.sourceModel.updateOne({ _id: sourceId }, { $set: dto });
     return new ResponseDto('Source updated successfully');
@@ -161,6 +166,6 @@ export class SourceService {
   async isOwner(sourceId: string, userId: string) {
     const source = await this.sourceModel.findOne({ _id: sourceId }, '_id userId').lean();
     if (!source) throw new NotFoundException('Source not found!');
-    return source.userId.equals(userId);
+    return source.userId.equals(new Types.ObjectId(userId));
   }
 }
