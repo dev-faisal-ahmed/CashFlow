@@ -1,6 +1,6 @@
 import { TSource } from "@/lib/types";
 import { FC } from "react";
-import { useUpdateSource } from "../source-hooks";
+import { useUpdateSource } from "../source-hook";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";

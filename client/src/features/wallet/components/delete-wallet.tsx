@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useDeleteWallet } from "../wallet-hooks";
+import { useDeleteWallet } from "../wallet-hook";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { DeleteDialog } from "@/components/shared";

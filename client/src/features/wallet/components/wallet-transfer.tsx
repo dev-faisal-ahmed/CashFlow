@@ -13,7 +13,7 @@ import { getWalletListForTransfer } from "../wallet-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { walletTransferFormSchema } from "../wallet-schema";
-import { useWalletTransfer } from "../wallet-hooks";
+import { useWalletTransfer } from "../wallet-hook";
 
 type WalletTransferProps = { balance: number; walletId: string; onSuccess: () => void };
 export const WalletTransfer: FC<WalletTransferProps> = ({ balance, walletId, onSuccess }) => {

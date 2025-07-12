@@ -1,7 +1,7 @@
 import { DeleteDialog } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
-import { useDeleteSource } from "../source-hooks";
+import { useDeleteSource } from "../source-hook";
 
 type DeleteSourceProps = { sourceId: string };
 export const DeleteSource = ({ sourceId }: DeleteSourceProps) => {

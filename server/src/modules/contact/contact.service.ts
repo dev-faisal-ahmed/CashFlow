@@ -13,7 +13,7 @@ export class ContactService {
     const isContactExist = await this.contactModel.findOne({ phone: dto.phone, userId }, { _id: 1 }).lean();
     if (isContactExist) throw new BadRequestException('Contact with phone already exist!');
 
-    await this.contactModel.create(dto);
+    await this.contactModel.create({ ...dto, userId });
     return new ResponseDto('Contact created successfully');
   }
 }

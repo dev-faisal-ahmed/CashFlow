@@ -1,5 +1,5 @@
 import { TPromiseResponse } from "@/lib/types";
-import { TLoginForm, TSigUpForm } from "./auth-types";
+import { TLoginForm, TSigUpForm } from "./auth-type";
 import { api } from "@/lib/api";
 import { apiUrl } from "@/lib/api-url";
 

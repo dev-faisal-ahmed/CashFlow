@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { SourceModule } from './modules/source/source.module';
+import { ContactModule } from './modules/contact/contact.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SourceModule } from './modules/source/source.module';
     AuthModule,
     WalletModule,
     SourceModule,
+    ContactModule,
     TransactionModule,
   ],
 })

@@ -3,7 +3,7 @@
 import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { useAddSource } from "../source-hooks";
+import { useAddSource } from "../source-hook";
 import { SourceForm } from "./source-form";
 
 export const AddSource = () => {

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useForm } from "react-hook-form";
-import { TAuthForm } from "../auth-types";
+import { TAuthForm } from "../auth-type";
 import { loginSchema, signupSchema } from "../auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";

@@ -21,3 +21,6 @@ export type TSource = { _id: string; name: string; type: TSourceType; ownerId: s
 export type TSourceType = "INCOME" | "EXPENSE";
 export type TBudget = { amount: number; interval: TBudgetInterval };
 export type TBudgetInterval = "WEEKLY" | "MONTHLY" | "YEARLY";
+
+// --------- Contact --------- \\
+export type TContact = { _id: string; name: string; phone: string; address?: string; userId: string };

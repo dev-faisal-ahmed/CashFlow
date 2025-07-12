@@ -20,6 +20,10 @@ export const apiUrl = {
     deleteOne: (sourceId: string) => `/sources/${sourceId}`,
   },
 
+  contact: {
+    add: "/contacts",
+  },
+
   transactions: {
     transfer: "/transactions/transfer",
   },

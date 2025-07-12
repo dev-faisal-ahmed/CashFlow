@@ -26,6 +26,8 @@ export const TopbarContent: FC<PropsWithChildren<{ position: "left" | "right" }>
 
   useEffect(() => {
     updateContent(children);
+
+    return () => updateContent(null);
   }, [children, updateContent]);
 
   return null;

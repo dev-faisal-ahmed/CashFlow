@@ -3,7 +3,7 @@
 import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { useAddWallet } from "../wallet-hooks";
+import { useAddWallet } from "../wallet-hook";
 import { WalletForm } from "./wallet-form";
 
 export const AddWallet = () => {

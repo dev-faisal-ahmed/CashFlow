@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { TUseUpdateWalletArgs, useUpdateWallet } from "../wallet-hooks";
+import { TUseUpdateWalletArgs, useUpdateWallet } from "../wallet-hook";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
