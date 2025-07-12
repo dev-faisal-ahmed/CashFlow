@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { CreateSourceDto, UpdateSourceDto } from './source.dto';
 import { User } from '@/common/decorators/user.decorator';
@@ -26,5 +26,11 @@ export class SourceController {
   @UseGuards(AuthGuard)
   async updateSource(@Body() dto: UpdateSourceDto, @Param('sourceId', ParseObjectIdPipe) sourceId: string, @User('_id') userId: string) {
     return this.sourceService.updateOne(dto, sourceId, userId);
+  }
+
+  @Delete(':sourceId')
+  @UseGuards(AuthGuard)
+  async deleteSource(@Param('sourceId', ParseObjectIdPipe) sourceId: string, @User('_id') userId: string) {
+    return this.sourceService.deleteOne(sourceId, userId);
   }
 }

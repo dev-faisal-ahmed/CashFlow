@@ -2,7 +2,7 @@ import { usePopupState } from "@/lib/hooks";
 import { QK } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { TSourceForm } from "./source-type";
-import { addSource, updateSource } from "./source-api";
+import { addSource, deleteSource, updateSource } from "./source-api";
 import { TBudget, TSourceType } from "@/lib/types";
 
 // Add Source
@@ -53,4 +53,24 @@ export const useUpdateSource = ({ sourceId, onSuccess }: TUseUpdateSourceArgs) =
   };
 
   return { handleUpdateSource, open, onOpenChange, mutationKey };
+};
+
+// Delete Source
+export const useDeleteSource = (sourceId: string) => {
+  const mutationKey = `DELETE_${QK.SOURCE}_${sourceId}`;
+  const qc = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteSource });
+
+  const handleDelete = () => {
+    mutate(sourceId, {
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: [QK.SOURCE] });
+        onOpenChange(false);
+      },
+    });
+  };
+
+  return { handleDelete, open, onOpenChange, mutationKey };
 };

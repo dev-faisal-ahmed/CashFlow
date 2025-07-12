@@ -8,6 +8,7 @@ import { FC } from "react";
 import { usePopupState } from "@/lib/hooks";
 import { ActionMenu } from "@/components/shared";
 import { UpdateSource } from "./update-source";
+import { DeleteSource } from "./delete-source";
 
 // -------- Main -------- \\
 type SourceCardProps = Pick<TSource, "_id" | "name" | "type" | "budget"> & { income: number; expense: number };
@@ -100,6 +101,7 @@ const SourceCardActionMenu: FC<SourceCardActionMenuProps> = ({ _id, name, type, 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateSource _id={_id} name={name} type={type} budget={budget} onSuccess={() => onOpenChange(false)} />
+      <DeleteSource sourceId={_id} />
     </ActionMenu>
   );
 };
