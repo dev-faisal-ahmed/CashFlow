@@ -51,3 +51,10 @@ export const useSearch = () => {
 
   return { value, onSearchChange };
 };
+
+export const usePagination = () => {
+  const [page, setPage] = useState(1);
+  const onPageChange = useCallback((page: number) => setPage(page), []);
+
+  return { page, onPageChange };
+};

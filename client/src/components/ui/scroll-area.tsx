@@ -5,15 +5,20 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { ComponentProps, FC } from "react";
 import { cn } from "@/lib/utils";
 
-export const ScrollArea: FC<ComponentProps<typeof ScrollAreaPrimitive.Root>> = ({ className, children, ...props }) => (
+type ScrollAreaProps = ComponentProps<typeof ScrollAreaPrimitive.Root> & { disableScrollbar?: boolean; fixedLayout?: boolean };
+export const ScrollArea: FC<ScrollAreaProps> = ({ className, children, disableScrollbar, fixedLayout, ...props }) => (
   <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn("relative", className)} {...props}>
     <ScrollAreaPrimitive.Viewport
       data-slot="scroll-area-viewport"
-      className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+      className={cn(
+        "focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1",
+        fixedLayout && "[&>div]:w-full [&>div]:table-fixed",
+      )}
     >
       {children}
     </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
+
+    {disableScrollbar && <ScrollBar />}
     <ScrollAreaPrimitive.Corner />
   </ScrollAreaPrimitive.Root>
 );
