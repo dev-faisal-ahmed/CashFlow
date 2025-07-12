@@ -1,24 +1,24 @@
 import { Transform, Type } from 'class-transformer';
 import { BudgetInterval, SourceType } from '@/schema/source.schema';
-import { IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator';
 
 class BudgetDto {
   @IsNumber()
-  @IsNotEmpty({ message: "Amount is required" })
-  @IsPositive({ message: "Amount must be a positive number" })
+  @IsNotEmpty({ message: 'Amount is required' })
+  @IsPositive({ message: 'Amount must be a positive number' })
   amount: number;
 
-  @IsEnum(BudgetInterval, { message: "Invalid interval" })
+  @IsEnum(BudgetInterval, { message: 'Invalid interval' })
   interval: BudgetInterval;
 }
 
 // Create Source
 export class CreateSourceDto {
   @IsString()
-  @IsNotEmpty({ message: "Source name is required" })
+  @IsNotEmpty({ message: 'Source name is required' })
   name: string;
 
-  @IsEnum(SourceType, { message: "Invalid source type" })
+  @IsEnum(SourceType, { message: 'Invalid source type' })
   type: SourceType;
 
   @Transform(addBudgetIfExpense)
@@ -26,6 +26,13 @@ export class CreateSourceDto {
   @ValidateNested()
   @Type(() => BudgetDto)
   budget?: BudgetDto;
+}
+
+export class UpdateSourceNameDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty({ message: 'Source name is required' })
+  name?: string;
 }
 
 // functions

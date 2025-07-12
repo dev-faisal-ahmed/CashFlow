@@ -1,8 +1,8 @@
 import { getMeta, getPaginationInfo, selectFields } from '@/utils';
 import { Source } from '@/schema/source.schema';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateSourceDto } from './source.dto';
+import { CreateSourceDto, UpdateSourceNameDto } from './source.dto';
 import { ResponseDto } from '@/common/dto/response.dto';
 import { TQueryParams } from '@/types';
 import { Model } from 'mongoose';
@@ -139,5 +139,19 @@ export class SourceService {
     const meta = getMeta({ page, limit, total });
 
     return new ResponseDto({ message: 'Sources fetched successfully', meta, data: sources });
+  }
+
+  async updateName(dto: UpdateSourceNameDto, sourceId: string, userId: string) {
+    const isOwner = await this.isOwner(sourceId, userId);
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to update this source');
+
+    await this.sourceModel.updateOne({ _id: sourceId }, { $set: dto });
+    return new ResponseDto('Source name updated successfully');
+  }
+
+  async isOwner(sourceId: string, userId: string) {
+    const source = await this.sourceModel.findOne({ _id: sourceId }, '_id userId').lean();
+    if (!source) throw new NotFoundException('Source not found!');
+    return source.userId.equals(userId);
   }
 }
