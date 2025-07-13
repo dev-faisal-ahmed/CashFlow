@@ -22,6 +22,9 @@ export const apiUrl = {
 
   contact: {
     add: "/contacts",
+    getAll: (searchParams: string) => `/contacts${searchParams}`,
+    updateOne: (contactId: string) => `/contacts/${contactId}`,
+    deleteOne: (contactId: string) => `/contacts/${contactId}`,
   },
 
   transactions: {

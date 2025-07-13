@@ -1,10 +1,19 @@
 import { api } from "@/lib/api";
 import { apiUrl } from "@/lib/api-url";
-import { TContact, TPromiseResponse } from "@/lib/types";
+import { TContact, TPromiseResponse, TQuery } from "@/lib/types";
+import { buildQueryString } from "@/lib/utils";
 
 export const addContact = async (payload: TAddContactPayload): TPromiseResponse => {
   const { data } = await api.post(apiUrl.contact.add, payload);
   return data;
 };
 
-export type TAddContactPayload = Pick<TContact, "name" | "phone" | "address">;
+export const getAllContacts = async (query: TQuery): TPromiseResponse<TGetAllContactsResponse> => {
+  const queryString = buildQueryString(query);
+  const url = apiUrl.contact.getAll(queryString);
+  const { data } = await api.get(url);
+  return data;
+};
+
+type TAddContactPayload = Pick<TContact, "name" | "phone" | "address">;
+type TGetAllContactsResponse = Array<Pick<TContact, "_id" | "name" | "phone" | "address"> & { given: number; taken: never }>;

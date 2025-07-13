@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 // Is Mobile
 const MOBILE_BREAKPOINT = 768;
@@ -21,9 +21,7 @@ export const useIsMobile = () => {
 
 export const usePopupState = () => {
   const [open, setOpen] = useState(false);
-  const onOpenChange = useCallback((open: boolean) => setOpen(open), []);
-
-  return { open, onOpenChange };
+  return { open, onOpenChange: (open: boolean) => setOpen(open) };
 };
 
 export const useDebounce = <TValue>(value: TValue, delay = 300): TValue => {
@@ -39,22 +37,16 @@ export const useDebounce = <TValue>(value: TValue, delay = 300): TValue => {
 
 export const useDebouncedSearch = () => {
   const [value, setValue] = useState("");
-  const onSearchChange = useCallback((value: string) => setValue(value), []);
   const searchTerm = useDebounce(value);
-
-  return { value, searchTerm, onSearchChange };
+  return { value, searchTerm, onSearchChange: (value: string) => setValue(value) };
 };
 
 export const useSearch = () => {
   const [value, setValue] = useState("");
-  const onSearchChange = useCallback((value: string) => setValue(value), []);
-
-  return { value, onSearchChange };
+  return { value, onSearchChange: (value: string) => setValue(value) };
 };
 
 export const usePagination = () => {
   const [page, setPage] = useState(1);
-  const onPageChange = useCallback((page: number) => setPage(page), []);
-
-  return { page, onPageChange };
+  return { page, onPageChange: (page: number) => setPage(page) };
 };
