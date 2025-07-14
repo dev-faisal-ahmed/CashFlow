@@ -2,7 +2,7 @@ import { FC } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { cn } from "@/lib/utils";
 
-type CommonAvatarProps = { name: string; src?: string; size?: "SM" | "MD" | "LG"; fallbackClassName?: string };
+type CommonAvatarProps = { name: string; src?: string; size?: "SM" | "MD" | "LG"; fallbackClassName?: string; containerClassName?: string };
 
 const CONFIG = {
   SM: { avatarClassName: "size-10" },
@@ -17,11 +17,11 @@ const getInitials = (name: string) => {
     .join("");
 };
 
-export const CommonAvatar: FC<CommonAvatarProps> = ({ name = "", src, size = "MD", fallbackClassName }) => {
+export const CommonAvatar: FC<CommonAvatarProps> = ({ name = "", src, size = "MD", fallbackClassName, containerClassName }) => {
   const config = CONFIG[size];
 
   return (
-    <Avatar className={cn("rounded-md", config.avatarClassName)}>
+    <Avatar className={cn("rounded-md", config.avatarClassName, containerClassName)}>
       {src && <AvatarImage src={src} />}
       <AvatarFallback className={cn("rounded-md text-lg font-bold", fallbackClassName)}>{getInitials(name)}</AvatarFallback>
     </Avatar>
