@@ -9,11 +9,11 @@ export const addContact = async (payload: TAddContactPayload): TPromiseResponse 
 };
 
 export const getAllContacts = async (query: TQuery): TPromiseResponse<TGetAllContactsResponse> => {
-  const queryString = buildQueryString(query);
+  const queryString = buildQueryString({ ...query, fields: "_id,name,phone,address,given,taken" });
   const url = apiUrl.contact.getAll(queryString);
   const { data } = await api.get(url);
   return data;
 };
 
 type TAddContactPayload = Pick<TContact, "name" | "phone" | "address">;
-type TGetAllContactsResponse = Array<Pick<TContact, "_id" | "name" | "phone" | "address"> & { given: number; taken: never }>;
+export type TGetAllContactsResponse = Array<Pick<TContact, "_id" | "name" | "phone" | "address"> & { given: number; taken: number }>;

@@ -21,7 +21,7 @@ export class ContactService {
 
   async getAll(query: TQueryParams, userId: string) {
     const search = query.search;
-    const requestedFields = query.fields;
+    const requestedFields = query.fields || '';
     const { page, limit, skip, getAll } = getPaginationInfo(query);
 
     const fields = selectFields(requestedFields, ['_id', 'name', 'phone', 'address', 'userId', 'given', 'taken']);

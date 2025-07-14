@@ -1,5 +1,6 @@
 // --------- Common --------- \\
-export type TPromiseResponse<TData = null> = Promise<{ ok: boolean; message: string; data: TData; error: unknown }>;
+export type TPromiseResponse<TData = null> = Promise<{ ok: boolean; message: string; meta?: TMeta; data: TData; error: unknown }>;
+export type TMeta = { page: number; limit: number; total: number; totalPages: number };
 export type TQuery = Record<string, string>;
 
 // --------- User --------- \\
