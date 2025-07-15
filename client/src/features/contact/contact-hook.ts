@@ -34,11 +34,11 @@ export const useAddContact = () => {
 
 // Get All Contacts
 export const useGetAllContacts = () => {
-  const limit = "10";
+  const limit = "12";
   const pagination = usePagination();
 
   const query = useQuery({
-    queryKey: [QK.CONTACT],
+    queryKey: [QK.CONTACT, pagination.page],
     queryFn: () => getAllContacts({ page: pagination.page.toString(), limit }),
     select: (res) => ({ contacts: res.data, meta: res.meta }),
   });

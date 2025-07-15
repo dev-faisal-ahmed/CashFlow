@@ -1,41 +1,90 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useGetAllContacts } from "../contact-hook";
 import { DataTable } from "@/components/shared/data-table";
 import { TGetAllContactsResponse } from "../contact-api";
 import { CommonAvatar } from "@/components/shared";
+import { MinusIcon, PlusIcon } from "lucide-react";
 
 type TApiResponse = TGetAllContactsResponse[number];
 
 export const ContactTable = () => {
-  const { data: apiResponse } = useGetAllContacts();
-
+  const { data: apiResponse, pagination } = useGetAllContacts();
   const contacts = apiResponse?.contacts;
 
-  const columns: ColumnDef<TApiResponse>[] = [
+  const { accessor: ca } = createColumnHelper<TApiResponse>();
+
+  const columns = [
     {
       id: "info",
-      header: "Name",
+      header: "Contact Info",
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <CommonAvatar
             containerClassName="rounded-full"
-            fallbackClassName="bg-primary text-white"
-            name={row.getValue("name") as string}
-            size="MD"
+            fallbackClassName="bg-primary text-white text-base"
+            name={row.original.name}
+            size="SM"
           />
-          <div className="spacey-y-2">
-            <h2>{row.getValue("name") as string}</h2>
-            <p className="text-muted-foreground text-sm">{row.getValue("phone") as string}</p>
+          <div className="space-y-1">
+            <h2>{row.original.name}</h2>
+            <p className="text-muted-foreground text-sm">{row.original.phone}</p>
           </div>
         </div>
       ),
     },
-    { accessorKey: "address", header: "Address" },
-    { accessorKey: "given", header: "Given" },
-    { accessorKey: "taken", header: "Taken" },
-  ];
 
-  return <DataTable columns={columns} data={contacts ?? []} />;
+    ca("address", {
+      header: "Address",
+      cell: ({ getValue }) => <span className="text-muted-foreground">{getValue()}</span>,
+    }),
+
+    ca("given", {
+      header: () => <div className="text-center">Lent</div>,
+      cell: ({ getValue }) => (
+        <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
+          <MinusIcon className="size-4" />
+          {getValue()}
+        </div>
+      ),
+    }),
+
+    ca("taken", {
+      header: () => <div className="text-center">Borrowed</div>,
+      cell: ({ getValue }) => (
+        <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
+          <PlusIcon className="size-4" />
+          {getValue()}
+        </div>
+      ),
+    }),
+
+    {
+      id: "net",
+      header: () => <div className="text-center">Net</div>,
+      cell: ({ row }) => {
+        const net = row.original.taken - row.original.given;
+        const status = net > 0 ? "Borrowed" : "Lent";
+
+        return (
+          <div data-status={status} className="flex items-center justify-center gap-2 text-center text-base font-semibold">
+            {net} {!!net && <span className="text-muted-foreground text-sm font-medium">({status})</span>}
+          </div>
+        );
+      },
+    },
+
+    {
+      id: "action",
+      header: () => <div className="text-center">Action</div>,
+      cell: () => <div></div>,
+    },
+  ] as ColumnDef<TApiResponse>[];
+
+  return (
+    <DataTable columns={columns} data={contacts ?? []} pagination={{ ...pagination, totalPages: apiResponse?.meta?.totalPages ?? 0 }} />
+  );
 };
+
+// const ContactTableActionMenu = () => {};

@@ -19,7 +19,7 @@ export const TablePagination = ({ page, totalPages, onPageChange }: TablePaginat
   };
 
   return (
-    <div className="sticky bottom-0 flex h-16 items-center justify-between gap-4 border-t bg-neutral-100 px-4">
+    <div className="dark:bg-card sticky bottom-0 flex h-16 items-center justify-between gap-4 border-t bg-gray-100 px-4">
       <Button onClick={goPrevious} disabled={page === 1} variant="outline">
         <ArrowLeftIcon /> Previous
       </Button>
