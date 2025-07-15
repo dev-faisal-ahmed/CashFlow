@@ -1,18 +1,45 @@
 "use client";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { useGetAllContacts } from "../contact-hook";
 import { DataTable } from "@/components/shared/data-table";
 import { TGetAllContactsResponse } from "../contact-api";
 import { CommonAvatar } from "@/components/shared";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { useGetAllContacts } from "../contact-hook";
+import { usePagination } from "@/lib/hooks";
 
 type TApiResponse = TGetAllContactsResponse[number];
 
 export const ContactTable = () => {
-  const { data: apiResponse, pagination } = useGetAllContacts();
+  const { page, onPageChange } = usePagination();
+  const { data: apiResponse, isLoading } = useGetAllContacts(page, 10);
+
   const contacts = apiResponse?.contacts;
 
+  return (
+    <ContactTableContent
+      contacts={contacts ?? []}
+      page={page}
+      onPageChange={onPageChange}
+      isLoading={isLoading}
+      totalPages={apiResponse?.meta?.totalPages ?? 0}
+    />
+  );
+};
+
+const ContactTableContent = ({
+  contacts,
+  page,
+  onPageChange,
+  isLoading,
+  totalPages,
+}: {
+  contacts: TApiResponse[];
+  page: number;
+  onPageChange: (page: number) => void;
+  isLoading: boolean;
+  totalPages: number;
+}) => {
   const { accessor: ca } = createColumnHelper<TApiResponse>();
 
   const columns = [
@@ -82,9 +109,5 @@ export const ContactTable = () => {
     },
   ] as ColumnDef<TApiResponse>[];
 
-  return (
-    <DataTable columns={columns} data={contacts ?? []} pagination={{ ...pagination, totalPages: apiResponse?.meta?.totalPages ?? 0 }} />
-  );
+  return <DataTable columns={columns} data={contacts ?? []} pagination={{ page, onPageChange, totalPages }} isLoading={isLoading} />;
 };
-
-// const ContactTableActionMenu = () => {};

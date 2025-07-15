@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 type ScrollAreaProps = ComponentProps<typeof ScrollAreaPrimitive.Root> & { disableScrollbar?: boolean; fixedLayout?: boolean };
 export const ScrollArea: FC<ScrollAreaProps> = ({ className, children, disableScrollbar, fixedLayout, ...props }) => (
-  <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn("relative", className)} {...props}>
+  <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn("overflow-hidden", className)} {...props}>
     <ScrollAreaPrimitive.Viewport
       data-slot="scroll-area-viewport"
       className={cn(
@@ -18,7 +18,7 @@ export const ScrollArea: FC<ScrollAreaProps> = ({ className, children, disableSc
       {children}
     </ScrollAreaPrimitive.Viewport>
 
-    {disableScrollbar && <ScrollBar />}
+    {!disableScrollbar && <ScrollBar />}
     <ScrollAreaPrimitive.Corner />
   </ScrollAreaPrimitive.Root>
 );
@@ -34,7 +34,7 @@ export const ScrollBar: FC<ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaS
     className={cn(
       "flex touch-none p-px transition-colors select-none",
       orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent",
-      orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent",
+      orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent bg-transparent",
       className,
     )}
     {...props}

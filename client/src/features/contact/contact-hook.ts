@@ -1,7 +1,7 @@
 import { TContactForm } from "./contact-type";
 import { addContact, getAllContacts } from "./contact-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { usePagination, usePopupState } from "@/lib/hooks";
+import { usePopupState } from "@/lib/hooks";
 import { QK } from "@/lib/query-keys";
 
 // Add Contact
@@ -33,15 +33,10 @@ export const useAddContact = () => {
 };
 
 // Get All Contacts
-export const useGetAllContacts = () => {
-  const limit = "12";
-  const pagination = usePagination();
-
-  const query = useQuery({
-    queryKey: [QK.CONTACT, pagination.page],
-    queryFn: () => getAllContacts({ page: pagination.page.toString(), limit }),
+export const useGetAllContacts = (page: number, limit: number) => {
+  return useQuery({
+    queryKey: [QK.CONTACT, { page, limit }],
+    queryFn: () => getAllContacts({ page: page.toString(), limit: limit.toString() }),
     select: (res) => ({ contacts: res.data, meta: res.meta }),
   });
-
-  return { ...query, pagination };
 };

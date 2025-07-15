@@ -4,30 +4,30 @@ import { cn } from "@/lib/utils";
 import { ColumnDef, flexRender, getCoreRowModel, Row, useReactTable } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { TablePagination, TablePaginationProps } from "./table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "../error-message";
+import { TablePagination, TablePaginationProps } from "./table-pagination";
 
 // type
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  pagination?: TablePaginationProps;
   isLoading?: boolean;
   className?: string;
+  pagination?: TablePaginationProps;
 };
 
-export const DataTable = <TData, TValue>({ columns, data, pagination, isLoading, className }: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({ columns, data, isLoading, className, pagination }: DataTableProps<TData, TValue>) => {
   const tableData = isLoading ? (Array(10).fill({}) as TData[]) : data || [];
   const tableColumns = isLoading ? columns.map((column) => ({ ...column, cell: () => <Skeleton className="h-4" /> })) : columns;
 
   const table = useReactTable({ data: tableData, columns: tableColumns, getCoreRowModel: getCoreRowModel() });
 
   return (
-    <ScrollArea disableScrollbar>
+    <ScrollArea disableScrollbar fixedLayout>
       <div className={cn("w-full overflow-hidden rounded-md border", className)}>
         <Table>
-          <TableHeader className="dark:bg-card sticky top-0 border-b bg-gray-100">
+          <TableHeader className="dark:bg-card border-b bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -43,8 +43,7 @@ export const DataTable = <TData, TValue>({ columns, data, pagination, isLoading,
             <DataTableBody tableRows={table.getRowModel().rows} tableColumns={tableColumns} />
           </TableBody>
         </Table>
-
-        {pagination && pagination.totalPages > 1 && <TablePagination {...pagination} />}
+        {pagination && <TablePagination {...pagination} />}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // Is Mobile
 const MOBILE_BREAKPOINT = 768;
@@ -48,5 +48,7 @@ export const useSearch = () => {
 
 export const usePagination = () => {
   const [page, setPage] = useState(1);
-  return { page, onPageChange: (page: number) => setPage(page) };
+  const onPageChange = useCallback((page: number) => setPage(page), []);
+
+  return { page, onPageChange };
 };

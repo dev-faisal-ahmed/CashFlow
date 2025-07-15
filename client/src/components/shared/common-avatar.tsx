@@ -14,7 +14,8 @@ const getInitials = (name: string) => {
   return name
     .split(" ")
     .map((word) => word.charAt(0))
-    .join("");
+    .join("")
+    .slice(0, 2);
 };
 
 export const CommonAvatar: FC<CommonAvatarProps> = ({ name = "", src, size = "MD", fallbackClassName, containerClassName }) => {

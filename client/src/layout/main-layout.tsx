@@ -7,10 +7,10 @@ import { ScrollArea } from "../components/ui/scroll-area";
 export const MainLayout: FC<PropsWithChildren> = ({ children }) => (
   <SidebarProvider>
     <AppSidebar />
-    <SidebarInset className="flex h-[calc(100dvh-16px)] flex-col">
+    <SidebarInset className="h-[calc(100dvh-2rem)]">
       <AppTopbar />
-      <ScrollArea>
-        <section className="m-4">{children}</section>
+      <ScrollArea fixedLayout className="grow">
+        <section className="p-4">{children}</section>
       </ScrollArea>
     </SidebarInset>
   </SidebarProvider>
