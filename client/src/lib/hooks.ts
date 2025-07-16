@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { PaginationState } from "@tanstack/react-table";
+import { useState, useEffect } from "react";
 
 // Is Mobile
 const MOBILE_BREAKPOINT = 768;
@@ -46,9 +47,7 @@ export const useSearch = () => {
   return { value, onSearchChange: (value: string) => setValue(value) };
 };
 
-export const usePagination = () => {
-  const [page, setPage] = useState(1);
-  const onPageChange = useCallback((page: number) => setPage(page), []);
-
-  return { page, onPageChange };
+export const usePagination = (limit = 10) => {
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: limit });
+  return { pagination, setPagination };
 };

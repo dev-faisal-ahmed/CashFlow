@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ColumnDef, flexRender, getCoreRowModel, Row, useReactTable } from "@tanstack/react-table";
+import { ColumnDef, flexRender, getCoreRowModel, OnChangeFn, PaginationState, Row, useReactTable } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "../error-message";
-import { TablePagination, TablePaginationProps } from "./table-pagination";
+import { TablePagination } from "./table-pagination";
 
 // type
 type DataTableProps<TData, TValue> = {
@@ -14,14 +14,35 @@ type DataTableProps<TData, TValue> = {
   data: TData[];
   isLoading?: boolean;
   className?: string;
-  pagination?: TablePaginationProps;
+  pagination?: PaginationState;
+  pageCount: number;
+  onPaginationChange: OnChangeFn<PaginationState>;
 };
 
-export const DataTable = <TData, TValue>({ columns, data, isLoading, className, pagination }: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({
+  columns,
+  data,
+  isLoading,
+  className,
+  pageCount,
+  pagination,
+  onPaginationChange,
+}: DataTableProps<TData, TValue>) => {
   const tableData = isLoading ? (Array(10).fill({}) as TData[]) : data || [];
   const tableColumns = isLoading ? columns.map((column) => ({ ...column, cell: () => <Skeleton className="h-4" /> })) : columns;
 
-  const table = useReactTable({ data: tableData, columns: tableColumns, getCoreRowModel: getCoreRowModel() });
+  const table = useReactTable({
+    data: tableData,
+    columns: tableColumns,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount,
+    state: {
+      pagination,
+    },
+    onPaginationChange,
+  });
 
   return (
     <ScrollArea disableScrollbar fixedLayout>
@@ -43,7 +64,7 @@ export const DataTable = <TData, TValue>({ columns, data, isLoading, className, 
             <DataTableBody tableRows={table.getRowModel().rows} tableColumns={tableColumns} />
           </TableBody>
         </Table>
-        {pagination && <TablePagination {...pagination} />}
+        {pagination && <TablePagination table={table} />}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

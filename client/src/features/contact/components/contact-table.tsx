@@ -1,48 +1,25 @@
 "use client";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { DataTable } from "@/components/shared/data-table";
 import { TGetAllContactsResponse } from "../contact-api";
 import { CommonAvatar } from "@/components/shared";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { useGetAllContacts } from "../contact-hook";
 import { usePagination } from "@/lib/hooks";
+import { DataTable } from "@/components/shared/data-table/data-table";
 
 type TApiResponse = TGetAllContactsResponse[number];
 
+const LIMIT = 10;
+const { accessor } = createColumnHelper<TApiResponse>();
+
 export const ContactTable = () => {
-  const { page, onPageChange } = usePagination();
-  const { data: apiResponse, isLoading } = useGetAllContacts(page, 10);
+  const { pagination, setPagination } = usePagination();
+  const { data: apiResponse, isLoading } = useGetAllContacts(pagination.pageIndex + 1, LIMIT);
 
   const contacts = apiResponse?.contacts;
 
-  return (
-    <ContactTableContent
-      contacts={contacts ?? []}
-      page={page}
-      onPageChange={onPageChange}
-      isLoading={isLoading}
-      totalPages={apiResponse?.meta?.totalPages ?? 0}
-    />
-  );
-};
-
-const ContactTableContent = ({
-  contacts,
-  page,
-  onPageChange,
-  isLoading,
-  totalPages,
-}: {
-  contacts: TApiResponse[];
-  page: number;
-  onPageChange: (page: number) => void;
-  isLoading: boolean;
-  totalPages: number;
-}) => {
-  const { accessor: ca } = createColumnHelper<TApiResponse>();
-
-  const columns = [
+  const column = [
     {
       id: "info",
       header: "Contact Info",
@@ -62,12 +39,12 @@ const ContactTableContent = ({
       ),
     },
 
-    ca("address", {
+    accessor("address", {
       header: "Address",
       cell: ({ getValue }) => <span className="text-muted-foreground">{getValue()}</span>,
     }),
 
-    ca("given", {
+    accessor("given", {
       header: () => <div className="text-center">Lent</div>,
       cell: ({ getValue }) => (
         <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
@@ -77,7 +54,7 @@ const ContactTableContent = ({
       ),
     }),
 
-    ca("taken", {
+    accessor("taken", {
       header: () => <div className="text-center">Borrowed</div>,
       cell: ({ getValue }) => (
         <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
@@ -109,5 +86,14 @@ const ContactTableContent = ({
     },
   ] as ColumnDef<TApiResponse>[];
 
-  return <DataTable columns={columns} data={contacts ?? []} pagination={{ page, onPageChange, totalPages }} isLoading={isLoading} />;
+  return (
+    <DataTable
+      columns={column}
+      data={contacts ?? []}
+      isLoading={isLoading}
+      pageCount={apiResponse?.meta?.totalPages ?? 0}
+      pagination={pagination}
+      onPaginationChange={setPagination}
+    />
+  );
 };
