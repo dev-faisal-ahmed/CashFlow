@@ -35,3 +35,19 @@ export class CreateTransferTransactionDto {
   @IsMongoId()
   destinationWalletId: string;
 }
+
+export class GiveOrTakeDto {
+  @IsNumber()
+  @IsPositive({ message: 'amount can not be negative' })
+  amount: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsMongoId()
+  contactId: string;
+
+  @IsEnum(TransactionNature, { message: 'Invalid nature' })
+  nature: TransactionNature;
+}

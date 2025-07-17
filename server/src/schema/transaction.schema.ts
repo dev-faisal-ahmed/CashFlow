@@ -72,12 +72,6 @@ export class BorrowLendTransaction extends Transaction {
 
   @Prop({ enum: TransactionNature, required: true })
   nature: TransactionNature;
-
-  @Prop({ type: Boolean, default: false })
-  isRepayment: boolean;
-
-  @Prop({ type: Types.ObjectId, ref: 'Transaction', required: false })
-  repaymentOf?: Types.ObjectId;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
