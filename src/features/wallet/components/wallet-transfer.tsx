@@ -1,5 +1,5 @@
 import { FC, Suspense } from "react";
-import { QK } from "@/lib/query-keys";
+import { QK } from "@/lib/query.keys";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CommonSelect, FieldForm, FormDialog } from "@/components/shared/form";

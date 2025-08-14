@@ -1,4 +1,4 @@
-import { QK } from "@/lib/query-keys";
+import { QK } from "@/lib/query.keys";
 import { TAuthForm, TLoginForm, TSigUpForm } from "./auth-type";
 import { useMutation } from "@tanstack/react-query";
 import { login, signup } from "./auth-api";

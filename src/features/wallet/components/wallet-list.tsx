@@ -1,6 +1,6 @@
 "use client";
 
-import { QK } from "@/lib/query-keys";
+import { QK } from "@/lib/query.keys";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getWalletList } from "../wallet-api";
 import { WalletCard } from "./wallet-card";

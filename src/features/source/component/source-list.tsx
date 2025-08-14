@@ -1,6 +1,6 @@
 "use client";
 
-import { QK } from "@/lib/query-keys";
+import { QK } from "@/lib/query.keys";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSourceList } from "../source-api";
 import { SourceCard } from "./source-card";

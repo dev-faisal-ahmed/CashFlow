@@ -2,7 +2,7 @@ import { TContactForm } from "./contact-type";
 import { addContact, getAllContacts } from "./contact-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePopupState } from "@/lib/hooks";
-import { QK } from "@/lib/query-keys";
+import { QK } from "@/lib/query.keys";
 
 // Add Contact
 export const useAddContact = () => {

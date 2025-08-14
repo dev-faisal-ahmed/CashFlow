@@ -2,7 +2,7 @@ import { TAddWalletForm, TUpdateWalletForm, TWalletForm, TWalletTransferForm } f
 import { addWallet, deleteWallet, updateWallet, walletTransfer } from "./wallet-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePopupState } from "@/lib/hooks";
-import { QK } from "@/lib/query-keys";
+import { QK } from "@/lib/query.keys";
 import { toast } from "sonner";
 
 // Add Wallet
