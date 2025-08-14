@@ -1,13 +1,13 @@
-import { Schema } from "mongoose";
+import { Types } from "mongoose";
 
-export interface IUser {
-  _id: Schema.Types.ObjectId;
+export type TUser = {
+  _id: Types.ObjectId;
   name: string;
   email: string;
   password?: string;
   image?: string;
   provider: EUserProvider;
-}
+};
 
 export enum EUserProvider {
   credentials = "credentials",

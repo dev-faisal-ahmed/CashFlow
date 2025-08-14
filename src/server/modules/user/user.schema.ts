@@ -1,7 +1,7 @@
 import { Model, Schema, model, models } from "mongoose";
-import { EUserProvider, IUser } from "./user.interface";
+import { EUserProvider, TUser } from "./user.interface";
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<TUser>(
   {
     name: String,
     email: { type: String, unique: true, required: true },
@@ -12,4 +12,4 @@ const userSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-export const UserModel: Model<IUser> = (models.user as Model<IUser>) ?? model<IUser>("user", userSchema);
+export const UserModel: Model<TUser> = (models.user as Model<TUser>) ?? model<TUser>("user", userSchema);
