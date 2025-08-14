@@ -1,7 +1,8 @@
+"use client";
+
 import { FC } from "react";
 import { useForm } from "react-hook-form";
-import { TAuthForm } from "../auth-type";
-import { loginSchema, signupSchema } from "../auth-schema";
+import { authSchema, TLoginFormData, TSignupFormData } from "../auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { FieldForm, PasswordInput } from "@/components/shared/form";
@@ -11,18 +12,20 @@ import { Input } from "@/components/ui/input";
 type AuthFormProps = {
   formId: string;
   formType: "signup" | "login";
-  onSubmit: (formData: TAuthForm, onReset: () => void) => void;
+  onSubmit: (formData: TAuthFormData, onReset: () => void) => void;
 };
+
+export type TAuthFormData = TSignupFormData | TLoginFormData;
 
 const loginDefaultValue = { email: "", password: "" };
 const signupDefaultValue = { name: "", email: "", password: "", confirmPassword: "" };
 
 export const AuthForm: FC<AuthFormProps> = ({ formId, formType, onSubmit }) => {
-  const schema = formType === "signup" ? signupSchema : loginSchema;
+  const schema = formType === "signup" ? authSchema.signup : authSchema.login;
   const defaultValues = formType === "signup" ? signupDefaultValue : loginDefaultValue;
-  const form = useForm<TAuthForm>({ resolver: zodResolver(schema), defaultValues });
+  const form = useForm<TAuthFormData>({ resolver: zodResolver(schema), defaultValues });
 
-  const handleSubmit = form.handleSubmit((formData: TAuthForm) => {
+  const handleSubmit = form.handleSubmit((formData: TAuthFormData) => {
     onSubmit(formData, form.reset);
   });
 

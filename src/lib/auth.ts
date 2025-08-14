@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 import { AUTH_SECRET } from "./config";
-import { authClient } from "./hono.client";
+import { authClient } from "./client";
 import { DefaultSession, AuthError } from "next-auth";
 import { DefaultJWT } from "next-auth/jwt";
 
@@ -52,6 +52,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth(() => ({
           const { email, password } = credentials as TCredentials;
           const loginResponse = await authClient.login.$post({ json: { email, password } });
           const responseData = await loginResponse.json();
+
+          console.log({ responseData });
+
           if (!responseData.success) throw new Error(responseData.message);
 
           const userInfo = responseData.data;

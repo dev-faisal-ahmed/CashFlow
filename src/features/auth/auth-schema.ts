@@ -6,7 +6,7 @@ const baseAuthSchema = z.object({
   password: z.string().min(4, { message: "Password is too small" }),
 });
 
-export const signupSchema = baseAuthSchema
+const signupSchema = baseAuthSchema
   .extend({
     name: z
       .string()
@@ -22,4 +22,12 @@ export const signupSchema = baseAuthSchema
     }
   });
 
-export const loginSchema = baseAuthSchema;
+const loginSchema = baseAuthSchema;
+
+export const authSchema = {
+  signup: signupSchema,
+  login: loginSchema,
+};
+
+export type TSignupFormData = z.infer<typeof signupSchema>;
+export type TLoginFormData = z.infer<typeof loginSchema>;

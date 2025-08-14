@@ -1,13 +1,30 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+
 import { Button } from "@/components/ui/button";
 import { AuthEntryCard } from "./auth-entry-card";
-import { useLogin } from "../auth-hook";
-import { AuthForm } from "./auth-form";
+import { AuthForm, TAuthFormData } from "./auth-form";
+import { queryKeys } from "@/lib/query.keys";
+import { TLoginFormData } from "../auth-schema";
+import { loginWithCredentials } from "../auth.action";
 
-const FORM_ID = "LOGIN";
+const FORM_ID = queryKeys.auth.login;
 export const Login = () => {
-  const { handleLogin, isPending } = useLogin();
+  const router = useRouter();
+  const { mutate, isPending } = useMutation({ mutationKey: [FORM_ID], mutationFn: loginHandler });
+
+  const handleLogin = (formData: TAuthFormData, reset: () => void) => {
+    const loginFormData = formData as TLoginFormData;
+
+    mutate(loginFormData, {
+      onSuccess: () => {
+        reset();
+        router.push("/");
+      },
+    });
+  };
 
   return (
     <AuthEntryCard formType="login">
@@ -17,4 +34,10 @@ export const Login = () => {
       </Button>
     </AuthEntryCard>
   );
+};
+
+const loginHandler = async (formData: TLoginFormData) => {
+  const responseData = await loginWithCredentials(formData);
+  if (!responseData.success) throw new Error(responseData.message);
+  return responseData;
 };
