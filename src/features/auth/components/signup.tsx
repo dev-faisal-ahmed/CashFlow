@@ -16,7 +16,9 @@ export const Signup = () => {
   const { mutate, isPending } = useMutation({ mutationKey: [FORM_ID], mutationFn: signup });
 
   const handleSignup = (formData: TAuthFormData, reset: () => void) => {
-    const payload = formData as TSignupFormData;
+    const { name, email, password } = formData as TSignupFormData;
+    const payload = { name, email, password };
+
     mutate(payload, {
       onSuccess: () => {
         reset();

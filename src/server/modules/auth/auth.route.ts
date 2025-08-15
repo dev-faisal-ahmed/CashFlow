@@ -10,6 +10,7 @@ export const authRoute = new Hono()
   // Signup
   .post("/signup", jsonValidator(authValidation.signup), async (ctx) => {
     const dto = ctx.req.valid("json");
+    console.log({ dto });
     await authService.signup(dto);
     return ctx.json(ResponseDto.success("You have been successfully registered"));
   })

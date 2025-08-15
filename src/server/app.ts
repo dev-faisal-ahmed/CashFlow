@@ -3,7 +3,7 @@ import { logger } from "hono/logger";
 import { connectToDB } from "./middlewares/connect-db";
 import { authRoute } from "./modules/auth/auth.route";
 import { ResponseDto } from "./core/response.dto";
-import { errorHandler } from "./core/error.handler";
+import { handleGlobalError } from "./core/global.error.handler";
 
 const app = new Hono().basePath("/api/v1");
 
@@ -18,6 +18,7 @@ app.get("/", (ctx) => {
 app.route("/auth", authRoute);
 
 // Error Handler
-app.onError(errorHandler);
+
+app.onError(handleGlobalError);
 
 export { app };

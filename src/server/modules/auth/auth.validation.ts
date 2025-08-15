@@ -1,7 +1,10 @@
 import { capitalize } from "@/lib/utils";
 import z from "zod";
 
-const loginWithCredentials = z.object({ email: z.email("Invalid Email"), password: z.string().nonempty("Password is required") });
+const loginWithCredentials = z.object({
+  email: z.email("Invalid Email"),
+  password: z.string({ error: "Password is required" }).nonempty("Password is required"),
+});
 
 const signup = z.object({
   name: z
@@ -10,7 +13,7 @@ const signup = z.object({
     .transform((value) => capitalize(value)),
 
   email: z.email("Invalid Email"),
-  password: z.string().min(4, "Password is too short"),
+  password: z.string({ error: "Password is required" }).min(4, "Password is too short"),
 });
 
 export const authValidation = { loginWithCredentials, signup };
