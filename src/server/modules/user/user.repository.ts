@@ -3,7 +3,7 @@ import { CreateUserDto } from "./user.validation";
 
 export class UserRepository {
   async findUserForLogin(email: string) {
-    return UserModel.findOne({ email }, { _id: 1, email: 1, name: 1, image: 1, password: 1, provider: 1 }).exec();
+    return UserModel.findOne({ email }, { _id: 1, email: 1, name: 1, image: 1, password: 1, provider: 1 }).lean();
   }
 
   async createUser(dto: CreateUserDto) {

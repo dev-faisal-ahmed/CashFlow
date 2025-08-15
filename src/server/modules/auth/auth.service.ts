@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 
 import { Types } from "mongoose";
 import { AppError } from "@/server/core/app.error";
-import { LoginWithCredentialsDto, SignupDto } from "./auth.validation";
+import { LoginWithCredentialsDto, LoginWithGoogleDto, SignupDto } from "./auth.validation";
 import { EUserProvider } from "../user/user.interface";
 import { UserService } from "../user/user.service";
 
@@ -29,6 +29,14 @@ export class AuthService {
     if (!isPasswordMatch) throw new AppError("Password did not match!");
 
     return this.mapLoginResponse(user);
+  }
+
+  async loginWithGoogle(dot: LoginWithGoogleDto) {
+    const user = await this.userService.findUserForLogin(dot.email);
+    if (user) return this.mapLoginResponse(user);
+
+    const newUser = await this.userService.createUser({ ...dot, provider: EUserProvider.google });
+    return this.mapLoginResponse(newUser);
   }
 
   // Helper

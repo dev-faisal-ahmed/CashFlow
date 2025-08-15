@@ -1,5 +1,5 @@
-import { jsonValidator } from "@/server/middlewares/validator";
 import { Hono } from "hono";
+import { jsonValidator } from "@/server/middlewares/validator";
 import { authValidation } from "./auth.validation";
 import { AuthService } from "./auth.service";
 import { ResponseDto } from "@/server/core/response.dto";
@@ -19,6 +19,13 @@ export const authRoute = new Hono()
   .post("/login", jsonValidator(authValidation.loginWithCredentials), async (ctx) => {
     const dto = ctx.req.valid("json");
     const user = await authService.loginWithCredentials(dto);
+    return ctx.json(ResponseDto.success({ message: "Login successful", data: user }));
+  })
+
+  // Google Login
+  .post("/login/google", jsonValidator(authValidation.loginWithGoogle), async (ctx) => {
+    const dto = ctx.req.valid("json");
+    const user = await authService.loginWithGoogle(dto);
     return ctx.json(ResponseDto.success({ message: "Login successful", data: user }));
   });
 

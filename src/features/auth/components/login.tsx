@@ -37,7 +37,7 @@ export const Login = () => {
 };
 
 const loginHandler = async (formData: TLoginFormData) => {
-  const responseData = await loginWithCredentials(formData);
-  if (!responseData.success) throw new Error(responseData.message);
-  return responseData;
+  const res = await loginWithCredentials(formData);
+  if (!res.success) throw new Error(res.message);
+  return res;
 };

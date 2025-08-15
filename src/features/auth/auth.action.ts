@@ -5,7 +5,6 @@ import { TLoginFormData } from "./auth-schema";
 
 export const loginWithCredentials = async (payload: TLoginFormData) => {
   try {
-    console.log("hi");
     await signIn("credentials", { ...payload, redirect: false });
     return { success: true, message: "You have been successfully logged in" };
   } catch (error) {
