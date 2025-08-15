@@ -17,6 +17,10 @@ export class UserService {
     return this.userRepository.createUser({ ...dto, ...(dto.password && { password: hashedPassword }) });
   }
 
+  async findUserForLogin(email: string) {
+    return this.userRepository.findUserForLogin(email);
+  }
+
   // helper
   async hashPassword(password: string) {
     return bcrypt.hash(password, SALT);

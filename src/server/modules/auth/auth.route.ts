@@ -7,6 +7,13 @@ import { ResponseDto } from "@/server/core/response.dto";
 const authService = new AuthService();
 
 export const authRoute = new Hono()
+  // Signup
+  .post("/signup", jsonValidator(authValidation.signup), async (ctx) => {
+    const dto = ctx.req.valid("json");
+    await authService.signup(dto);
+    return ctx.json(ResponseDto.success("You have been successfully registered"));
+  })
+
   // Login
   .post("/login", jsonValidator(authValidation.loginWithCredentials), async (ctx) => {
     const dto = ctx.req.valid("json");

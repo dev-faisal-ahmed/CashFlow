@@ -1,23 +1,27 @@
 import bcrypt from "bcrypt";
 
-import { AppError } from "@/server/core/app.error";
-import { UserRepository } from "../user/user.repository";
-import { LoginWithCredentialsDto } from "./auth.validation";
-import { EUserProvider } from "../user/user.interface";
 import { Types } from "mongoose";
+import { AppError } from "@/server/core/app.error";
+import { LoginWithCredentialsDto, SignupDto } from "./auth.validation";
+import { EUserProvider } from "../user/user.interface";
+import { UserService } from "../user/user.service";
 
 // Types
 type TLoginResponse = { _id: Types.ObjectId; name: string; email: string; image?: string };
 
 export class AuthService {
-  private userRepository: UserRepository;
+  private userService: UserService;
 
   constructor() {
-    this.userRepository = new UserRepository();
+    this.userService = new UserService();
+  }
+
+  async signup(dto: SignupDto) {
+    return this.userService.createUser({ ...dto, provider: EUserProvider.credentials });
   }
 
   async loginWithCredentials(dto: LoginWithCredentialsDto) {
-    const user = await this.userRepository.finUserForLogin(dto.email);
+    const user = await this.userService.findUserForLogin(dto.email);
     if (!user) throw new AppError("User not found", 404);
     if (user.provider !== EUserProvider.credentials) throw new AppError("Invalid provider");
 
