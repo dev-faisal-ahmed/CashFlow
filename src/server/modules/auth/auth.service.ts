@@ -2,26 +2,28 @@ import bcrypt from "bcrypt";
 
 import { Types } from "mongoose";
 import { AppError } from "@/server/core/app.error";
+import { SALT } from "@/lib/config";
 import { LoginWithCredentialsDto, LoginWithGoogleDto, SignupDto } from "./auth.validation";
 import { EUserProvider } from "../user/user.interface";
-import { UserService } from "../user/user.service";
+import { UserRepository } from "../user/user.repository";
 
 // Types
 type TLoginResponse = { _id: Types.ObjectId; name: string; email: string; image?: string };
 
 export class AuthService {
-  private userService: UserService;
+  private userRepository: UserRepository;
 
   constructor() {
-    this.userService = new UserService();
+    this.userRepository = new UserRepository();
   }
 
   async signup(dto: SignupDto) {
-    return this.userService.createUser({ ...dto, provider: EUserProvider.credentials });
+    const hashedPassword = await this.hashPassword(dto.password);
+    return this.userRepository.createUser({ ...dto, provider: EUserProvider.credentials, password: hashedPassword });
   }
 
   async loginWithCredentials(dto: LoginWithCredentialsDto) {
-    const user = await this.userService.findUserForLogin(dto.email);
+    const user = await this.userRepository.findUserForLogin(dto.email);
     if (!user) throw new AppError("User not found", 404);
     if (user.provider !== EUserProvider.credentials) throw new AppError("Invalid provider");
 
@@ -31,15 +33,19 @@ export class AuthService {
     return this.mapLoginResponse(user);
   }
 
-  async loginWithGoogle(dot: LoginWithGoogleDto) {
-    const user = await this.userService.findUserForLogin(dot.email);
+  async loginWithGoogle(dto: LoginWithGoogleDto) {
+    const user = await this.userRepository.findUserForLogin(dto.email);
     if (user) return this.mapLoginResponse(user);
 
-    const newUser = await this.userService.createUser({ ...dot, provider: EUserProvider.google });
+    const newUser = await this.userRepository.createUser({ ...dto, provider: EUserProvider.google });
     return this.mapLoginResponse(newUser);
   }
 
   // Helper
+  async hashPassword(password: string) {
+    return bcrypt.hash(password, SALT);
+  }
+
   async comparePassword(givenPassword: string, hashedPassword: string) {
     return bcrypt.compare(givenPassword, hashedPassword);
   }
