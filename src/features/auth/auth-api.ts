@@ -1,22 +1,9 @@
-import { TPromiseResponse } from "@/lib/types";
-import { TLoginForm, TSigUpForm } from "./auth-type";
-import { api } from "@/lib/api";
-import { apiUrl } from "@/lib/api-url";
+import { authClient } from "@/lib/client";
+import { SignupDto } from "@/server/modules/auth/auth.validation";
 
-export const signup = async (payload: TSignupPayload): TPromiseResponse => {
-  const { data } = await api.post(apiUrl.auth.register, payload);
-  return data;
+export const signup = async (payload: SignupDto) => {
+  const res = await authClient.signup.$post({ json: payload });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
 };
-
-export const login = async (payload: TLoginPayload): TPromiseResponse<string> => {
-  const { data } = await api.post(apiUrl.auth.login, payload);
-  return data;
-};
-
-export const googleLogin = async (): TPromiseResponse<string> => {
-  const { data } = await api.get(apiUrl.auth.loginWithGoogle);
-  return data;
-};
-
-type TSignupPayload = Pick<TSigUpForm, "name" | "email" | "password">;
-type TLoginPayload = TLoginForm;
