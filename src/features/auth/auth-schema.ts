@@ -1,12 +1,12 @@
+import z from "zod";
 import { capitalize } from "@/lib/utils";
-import { z } from "zod";
 
 const baseAuthSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email" }),
   password: z.string().min(4, { message: "Password is too small" }),
 });
 
-const signupSchema = baseAuthSchema
+const signup = baseAuthSchema
   .extend({
     name: z
       .string()
@@ -22,12 +22,9 @@ const signupSchema = baseAuthSchema
     }
   });
 
-const loginSchema = baseAuthSchema;
+const login = baseAuthSchema;
 
-export const authSchema = {
-  signup: signupSchema,
-  login: loginSchema,
-};
+export const authSchema = { signup, login };
 
-export type TSignupFormData = z.infer<typeof signupSchema>;
-export type TLoginFormData = z.infer<typeof loginSchema>;
+export type TSignupFormData = z.infer<typeof signup>;
+export type TLoginFormData = z.infer<typeof login>;

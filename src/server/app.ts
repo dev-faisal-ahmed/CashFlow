@@ -4,6 +4,7 @@ import { connectToDB } from "./middlewares/connect-db";
 import { authRoute } from "./modules/auth/auth.route";
 import { ResponseDto } from "./core/response.dto";
 import { handleGlobalError } from "./core/global.error.handler";
+import { walletRouter } from "./modules/wallet/wallet.router";
 
 const app = new Hono().basePath("/api/v1");
 
@@ -16,6 +17,7 @@ app.get("/", (ctx) => {
 
 // routes
 app.route("/auth", authRoute);
+app.route("/wallets", walletRouter);
 
 // Error Handler
 

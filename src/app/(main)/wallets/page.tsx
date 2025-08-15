@@ -13,7 +13,7 @@ const Page = async () => {
         <AddWallet />
       </TopbarContent>
 
-      <WalletList />
+      {/* <WalletList /> */}
     </>
   );
 };
