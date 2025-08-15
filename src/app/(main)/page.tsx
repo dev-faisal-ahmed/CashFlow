@@ -1,17 +1,17 @@
 import { TopbarContent } from "@/layout/index";
 import { Header } from "@/components/shared";
-import { getToken } from "@/lib/server-action";
+import { getAuth } from "@/features/auth/auth.action";
 
 const Page = async () => {
-  const token = await getToken();
+  const user = await getAuth();
 
   return (
     <>
       <TopbarContent position="left">
         <Header title="Dashboard" />
       </TopbarContent>
-      
-      <div className="break-all">{JSON.stringify(token)}</div>
+
+      <div className="break-all">{JSON.stringify(user)}</div>
     </>
   );
 };

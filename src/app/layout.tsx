@@ -2,9 +2,8 @@ import "./globals.css";
 
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { QueryProvider, ThemeProvider } from "@/provider";
+import { Provider } from "@/provider";
 import { FC, PropsWithChildren } from "react";
-import { Toaster } from "sonner";
 
 const font = Inter({ subsets: ["latin"], weight: ["300", "400", "600", "700"] });
 export const metadata: Metadata = { title: "Cash Flow", description: "Manages your cashflow" };
@@ -12,12 +11,7 @@ export const metadata: Metadata = { title: "Cash Flow", description: "Manages yo
 const Layout: FC<PropsWithChildren> = ({ children }) => (
   <html className="dark" lang="en" suppressHydrationWarning>
     <body className={`${font.className} antialiased`}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        <QueryProvider>
-          <Toaster duration={1500} richColors />
-          {children}
-        </QueryProvider>
-      </ThemeProvider>
+      <Provider>{children}</Provider>
     </body>
   </html>
 );

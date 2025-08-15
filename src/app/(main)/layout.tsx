@@ -1,16 +1,15 @@
 import { MainLayout } from "@/layout";
-import { AuthProvider } from "@/features/auth/components";
-import { getLoggedUser } from "@/lib/server-action";
 import { FC, PropsWithChildren } from "react";
 import { redirect } from "next/navigation";
+import { getAuth } from "@/auth/auth.action";
 
 const Layout: FC<PropsWithChildren> = async ({ children }) => {
-  const user = await getLoggedUser();
+  const user = await getAuth();
   if (!user) redirect("/login");
 
   return (
     <MainLayout>
-      <AuthProvider user={user} />
+      {/* <AuthProvider user={user} /> */}
       {children}
     </MainLayout>
   );

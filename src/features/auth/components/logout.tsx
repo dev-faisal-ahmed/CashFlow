@@ -1,10 +1,16 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { removeToken } from "@/lib/server-action";
 import { LogOutIcon } from "lucide-react";
+import { logout } from "../auth.action";
+import { useRouter } from "next/navigation";
 
 export const Logout = () => {
+  const router = useRouter();
+
   const handleLogout = async () => {
-    await removeToken();
+    await logout();
+    router.push("/login");
   };
 
   return (

@@ -19,7 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../compo
 import { AppLogo } from "../components/shared/app-logo";
 import { useNavItems } from "./main-layout-hook";
 import { CommonAvatar } from "../components/shared/common-avatar";
-import { useAuthStore } from "@/stores/auth-store";
+import { useSession } from "next-auth/react";
 import { Logout } from "@/features/auth/components";
 import { usePopupState } from "@/lib/hooks";
 import { Button } from "../components/ui/button";
@@ -70,15 +70,17 @@ const AppSidebarNavItems = () => {
 };
 
 const AppSidebarFooter = () => {
-  const user = useAuthStore((s) => s.user);
-  if (!user) return null;
+  const session = useSession();
+  if (!session.data?.user) return null;
+
+  const user = session.data.user;
 
   return (
     <SidebarFooter>
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex h-16 items-center justify-center gap-2 rounded-none border-t py-4 hover:bg-transparent">
-            <CommonAvatar name={user.name} fallbackClassName="bg-primary text-white" size="SM" />
+            <CommonAvatar name={user.name ?? ""} fallbackClassName="bg-primary text-white" size="SM" />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">{user.name}</span>
               <span className="text-muted-foreground truncate text-xs">{user.email}</span>

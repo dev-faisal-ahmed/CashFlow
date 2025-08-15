@@ -3,12 +3,12 @@ import Link from "next/link";
 import { IoIosStar } from "react-icons/io";
 import { FC, PropsWithChildren } from "react";
 import { AppLogo, CommonAvatar } from "@/components/shared";
-import { getLoggedUser } from "@/lib/server-action";
 import { redirect } from "next/navigation";
+import { getAuth } from "@/auth/auth.action";
 
 // Main Component
 const Layout: FC<PropsWithChildren> = async ({ children }) => {
-  const user = await getLoggedUser();
+  const user = await getAuth();
   if (user) redirect("/");
 
   return (
@@ -33,10 +33,7 @@ const Layout: FC<PropsWithChildren> = async ({ children }) => {
 };
 
 // Helper Component
-const review = {
-  userName: "Faisal Ahmed",
-  rating: 4.9,
-};
+const review = { userName: "Sadia Tasnim", rating: 4.9 };
 
 const ReviewCard = () => (
   <div className="mt-auto rounded-md border border-blue-800 bg-blue-800/50 p-6 shadow-sm">
