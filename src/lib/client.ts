@@ -1,7 +1,7 @@
 import { hc } from "hono/client";
 import { TAuthRoute } from "@/server/modules/auth/auth.route";
 import { SERVER_ADDRESS } from "./config";
-import { TWalletRoute } from "@/server/modules/wallet/wallet.router";
+import { TWalletRoute } from "@/server/modules/wallet/wallet.route";
 
 const serverAddress = SERVER_ADDRESS;
 const baseUrl = `${serverAddress}/api/v1`;

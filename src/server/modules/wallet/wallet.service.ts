@@ -42,8 +42,8 @@ export class WalletService {
     }
   }
 
-  async getAllWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
-    return this.walletRepository.getAllWallets(query, ownerId);
+  async getWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
+    return this.walletRepository.getWallets(query, ownerId);
   }
 
   async updateWallet(dto: UpdateWalletDto, walletId: string, userId: Types.ObjectId) {

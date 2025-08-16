@@ -20,7 +20,7 @@ export class WalletRepository {
     return WalletModel.create([{ ...dto }], { session });
   }
 
-  async getAllWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
+  async getWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
     const { search, isSaving, page } = query;
     const requestedFields = query.fields;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);

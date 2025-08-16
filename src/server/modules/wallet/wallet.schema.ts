@@ -11,4 +11,7 @@ export const walletSchema = new Schema<IWallet>(
   { timestamps: true },
 );
 
+// Applying indexing
+walletSchema.index({ ownerId: 1, isDeleted: 1 });
+
 export const WalletModel: Model<IWallet> = models.wallet ?? model("wallet", walletSchema);

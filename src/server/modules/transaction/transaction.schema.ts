@@ -48,6 +48,9 @@ const peerTransferTransactionSchema = new Schema<IPeerTransferTransaction>({
   nature: { type: String, enum: Object.values(ETransactionNature), required: true },
 });
 
+// applying indexing
+transactionSchema.index({ ownerId: 1, date: -1 });
+
 // Create the base model
 export const TransactionModel: Model<IBaseTransaction> = models.transaction ?? model("transaction", transactionSchema);
 

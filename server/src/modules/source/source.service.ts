@@ -42,19 +42,19 @@ export class SourceService {
                   $switch: {
                     branches: [
                       {
-                        case: { $eq: ['$interval', 'WEEKLY'] },
+                        case: { $eq: ['$interval', 'weekly'] },
                         then: { $dateTrunc: { date: '$now', unit: 'week', binSize: 1 } },
                       },
                       {
-                        case: { $eq: ['$interval', 'MONTHLY'] },
+                        case: { $eq: ['$interval', 'monthly'] },
                         then: { $dateTrunc: { date: '$now', unit: 'month', binSize: 1 } },
                       },
                       {
-                        case: { $eq: ['$interval', 'YEARLY'] },
+                        case: { $eq: ['$interval', 'yearly'] },
                         then: { $dateTrunc: { date: '$now', unit: 'year', binSize: 1 } },
                       },
                       {
-                        case: { $eq: ['$interval', 'YEARLY'] },
+                        case: { $eq: ['$interval', 'yearly'] },
                         then: { $dateTrunc: { date: '$now', unit: 'year', binSize: 1 } },
                       },
                     ],

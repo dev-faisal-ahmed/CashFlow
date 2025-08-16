@@ -7,7 +7,7 @@ import { ResponseDto } from "@/server/core/response.dto";
 
 const walletService = new WalletService();
 
-export const walletRouter = new Hono()
+export const walletRoute = new Hono()
   // Create Wallet
   .post("/", authGuard, jsonValidator(walletValidation.createWallet), async (ctx) => {
     const dto = ctx.req.valid("json");
@@ -15,11 +15,11 @@ export const walletRouter = new Hono()
     await walletService.createWalletWithInitialTransaction(dto, user._id);
     return ctx.json(ResponseDto.success("Wallet created successfully"));
   })
-  // Get All Wallets
+  // Get Wallets
   .get("/", authGuard, queryValidator(walletValidation.getAllWallets), async (ctx) => {
     const query = ctx.req.valid("query");
     const user = ctx.get("user");
-    const { wallets, meta } = await walletService.getAllWallets(query, user._id);
+    const { wallets, meta } = await walletService.getWallets(query, user._id);
     return ctx.json(ResponseDto.success({ message: "Wallets fetched successfully", meta, data: wallets }));
   })
   // Update Wallet
@@ -45,4 +45,4 @@ export const walletRouter = new Hono()
     return ctx.json(ResponseDto.success("Wallet transfer has been successful"));
   });
 
-export type TWalletRoute = typeof walletRouter;
+export type TWalletRoute = typeof walletRoute;
