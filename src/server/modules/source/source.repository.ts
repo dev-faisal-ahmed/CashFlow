@@ -3,6 +3,8 @@ import { CreateSourceDto, GetSourcesArgs } from "./source.validation";
 import { SourceModel } from "./source.schema";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
+import { AppError } from "@/server/core/app.error";
+import { ISource } from "./source.interface";
 
 export class SourceRepository {
   async createSource(dto: CreateSourceDto, ownerId: Types.ObjectId) {
@@ -136,5 +138,16 @@ export class SourceRepository {
     const meta = paginationHelper.getMeta(total);
 
     return { sources, meta };
+  }
+
+  async updateSource(dto: Partial<ISource>, id: string) {
+    return SourceModel.updateOne({ _id: id }, dto);
+  }
+
+  // helper
+  async isOwner(sourceId: string, userId: Types.ObjectId) {
+    const source = await SourceModel.findOne({ _id: sourceId }, { ownerId: 1 }).lean();
+    if (!source) throw new AppError("Source not found!", 404);
+    return source.ownerId.equals(userId);
   }
 }

@@ -1,5 +1,6 @@
+import { AppError } from "@/server/core/app.error";
 import { SourceRepository } from "./source.repository";
-import { CreateSourceDto, GetSourcesArgs } from "./source.validation";
+import { CreateSourceDto, GetSourcesArgs, UpdateSourceDto } from "./source.validation";
 import { Types } from "mongoose";
 
 export class SourceService {
@@ -15,5 +16,13 @@ export class SourceService {
 
   async getSources(query: GetSourcesArgs, ownerId: Types.ObjectId) {
     return this.sourceRepository.getSources(query, ownerId);
+  }
+
+  async updateSource(dto: UpdateSourceDto, sourceId: string, ownerId: Types.ObjectId) {
+    const isOwner = await this.sourceRepository.isOwner(sourceId, ownerId);
+    if (!isOwner) throw new AppError("You are not authorized to update this source", 401);
+
+    const { addBudget, budget, ...rest } = dto;
+    return this.sourceRepository.updateSource({ ...rest, ...(addBudget && { budget }) }, sourceId);
   }
 }

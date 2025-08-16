@@ -21,6 +21,26 @@ const createSource = z.object({
   budget: z.optional(budget),
 });
 
+const updateSource = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .nonempty()
+      .transform((v) => capitalize(v))
+      .optional(),
+
+    addBudget: z.boolean().optional(),
+    budget: z.optional(budget),
+  })
+  .superRefine((value, ctx) => {
+    if (value.addBudget && !value.budget)
+      ctx.addIssue({
+        code: "custom",
+        message: "Budget is required",
+      });
+  });
+
 // Query
 const getSources = commonValidation.queryWithPagination.and(
   z.object({
@@ -31,10 +51,13 @@ const getSources = commonValidation.queryWithPagination.and(
 export const sourceValidation = {
   // Json
   createSource,
+  updateSource,
+
   // Query
   getSources,
 };
 
 export type CreateSourceDto = z.infer<typeof createSource>;
+export type UpdateSourceDto = z.infer<typeof updateSource>;
 
 export type GetSourcesArgs = z.infer<typeof getSources>;

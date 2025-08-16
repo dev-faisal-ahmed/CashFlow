@@ -22,6 +22,15 @@ export const sourceRoute = new Hono()
     const user = ctx.get("user");
     const { sources, meta } = await sourceService.getSources(query, user._id);
     return ctx.json(ResponseDto.success({ message: "Sources fetched successfully", meta, data: sources }));
+  })
+
+  // Update Source
+  .patch("/:id", authGuard, jsonValidator(sourceValidation.updateSource), async (ctx) => {
+    const dto = ctx.req.valid("json");
+    const user = ctx.get("user");
+    const id = ctx.req.param("id");
+    await sourceService.updateSource(dto, id, user._id);
+    return ctx.json(ResponseDto.success("Source updated successfully"));
   });
 
 export type TSourceRoute = typeof sourceRoute;
