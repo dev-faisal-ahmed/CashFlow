@@ -12,7 +12,7 @@ const Page = () => (
       <AddSource />
     </TopbarContent>
 
-    <SourceList />
+    {/* <SourceList /> */}
   </>
 );
 

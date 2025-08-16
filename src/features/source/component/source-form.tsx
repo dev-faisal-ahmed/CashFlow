@@ -1,35 +1,37 @@
+"use client";
+
 import { FC } from "react";
-import { TSourceForm } from "../source-type";
 import { useForm } from "react-hook-form";
-import { sourceSchema } from "../source-schema";
+import { sourceSchema, TSourceFormData } from "../source-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { CommonSelect, FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
-import { TBudgetInterval, TSourceType } from "@/lib/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 
 type SourceFormProps = {
   formId: string;
   mode: "add" | "update";
-  defaultValues: TSourceForm;
-  onSubmit: (formData: TSourceForm, onReset: () => void) => void;
+  defaultValues: TSourceFormData;
+  onSubmit: (formData: TSourceFormData, onReset: () => void) => void;
 };
 
-const intervalOptions: { label: string; value: TBudgetInterval }[] = [
-  { label: "Monthly", value: "MONTHLY" },
-  { label: "Weekly", value: "WEEKLY" },
-  { label: "Yearly", value: "YEARLY" },
+const intervalOptions: { label: string; value: EBudgetInterval }[] = [
+  { label: "Monthly", value: EBudgetInterval.monthly },
+  { label: "Weekly", value: EBudgetInterval.weekly },
+  { label: "Yearly", value: EBudgetInterval.yearly },
 ];
 
-const typeOptions: { label: string; value: TSourceType }[] = [
-  { label: "Income", value: "INCOME" },
-  { label: "Expense", value: "EXPENSE" },
+const typeOptions: { label: string; value: ESourceType }[] = [
+  { label: "Income", value: ESourceType.income },
+  { label: "Expense", value: ESourceType.expense },
+  { label: "Both", value: ESourceType.both },
 ];
 
 export const SourceForm: FC<SourceFormProps> = ({ mode, formId, defaultValues, onSubmit }) => {
-  const form = useForm<TSourceForm>({ resolver: zodResolver(sourceSchema), defaultValues });
+  const form = useForm<TSourceFormData>({ resolver: zodResolver(sourceSchema.source), defaultValues });
   const addBudget = form.watch("addBudget");
   const type = form.watch("type");
 
@@ -64,7 +66,7 @@ export const SourceForm: FC<SourceFormProps> = ({ mode, formId, defaultValues, o
         )}
 
         {/* Add Budget Checkbox */}
-        {type === "EXPENSE" && (
+        {type === ESourceType.expense && (
           <FieldForm control={form.control} name="addBudget">
             {({ field: { value, onChange } }) => (
               <div className="flex items-center gap-2">

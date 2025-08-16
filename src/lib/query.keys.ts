@@ -4,4 +4,5 @@ export const queryKeys = {
     singup: "signup",
   },
   wallet: "wallet",
+  source: "source",
 };

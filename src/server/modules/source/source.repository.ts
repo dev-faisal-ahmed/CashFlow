@@ -5,8 +5,8 @@ import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
 
 export class SourceRepository {
-  async createSource(dto: CreateSourceDto, userId: Types.ObjectId) {
-    return SourceModel.create({ ...dto, userId });
+  async createSource(dto: CreateSourceDto, ownerId: Types.ObjectId) {
+    return SourceModel.create({ ...dto, ownerId });
   }
 
   async getSources(query: GetSourcesArgs, ownerId: Types.ObjectId) {
