@@ -1,3 +1,5 @@
+"use client";
+
 import { FC } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,10 +9,11 @@ import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { ActionMenu } from "@/components/shared";
 import { usePopupState } from "@/lib/hooks";
 import { UpdateWallet } from "./update-wallet";
-// import { DeleteWallet } from "./delete-wallet";
-// import { WalletTransfer } from "./wallet-transfer";
-import { TWalletData } from "../wallet-schema";
 import { DeleteWallet } from "./delete-wallet";
+import { WalletTransfer } from "./wallet-transfer";
+
+// Shared Types
+type TWalletData = { _id: string; name: string; isSaving?: boolean; balance: number };
 
 export const WalletCard: FC<TWalletData> = ({ _id, name, isSaving, balance }) => (
   <Card>
@@ -48,17 +51,14 @@ const SavingBadge = () => (
   </Badge>
 );
 
-const WalletCardActionMenu: FC<TWalletData> = ({ _id, name, isSaving }) => {
+const WalletCardActionMenu: FC<TWalletData> = ({ _id, name, isSaving, balance }) => {
   const { open, onOpenChange } = usePopupState();
 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateWallet name={name} isSaving={!!isSaving} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
-      <DeleteWallet walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
-
-      {/* 
-      <WalletTransfer balance={balance} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
-      */}
+      <WalletTransfer balance={balance} walletId={_id} onSuccess={() => onOpenChange(false)} />
+      <DeleteWallet walletId={_id} onSuccess={() => onOpenChange(false)} />
     </ActionMenu>
   );
 };

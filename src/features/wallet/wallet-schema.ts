@@ -1,6 +1,7 @@
 import z from "zod";
 import { capitalize } from "@/lib/utils";
 
+// Form Validation
 const addWallet = z.object({
   name: z
     .string()
@@ -23,25 +24,44 @@ const updateWallet = z.object({
 });
 
 const walletTransfer = z.object({
-  amount: z.number().nonnegative("Amount can not be empty"),
+  amount: z.number().positive("Amount can not be negative"),
   description: z.string().optional(),
   sourceWalletId: z.string().nonempty("Source wallet can not be empty"),
   destinationWalletId: z.string().nonempty("Destination wallet can not be empty"),
 });
 
 // Api Response Validation
-const walletDataSchema = z.object({
-  _id: z.string(),
-  name: z.string(),
-  isSaving: z.boolean().optional().default(false),
-  balance: z.number(),
-});
+const walletListData = z.array(
+  z.object({
+    _id: z.string(),
+    name: z.string(),
+    isSaving: z.boolean().optional().default(false),
+    balance: z.number(),
+  }),
+);
 
-const getWalletListDataSchema = walletDataSchema.array();
+const walletListDataForTransfer = z.array(
+  z.object({
+    _id: z.string(),
+    name: z.string(),
+    balance: z.number(),
+  }),
+);
 
-export const walletSchema = { addWallet, updateWallet, walletTransfer, getWalletListDataSchema };
+export const walletSchema = {
+  // Form Validation
+  addWallet,
+  updateWallet,
+  walletTransfer,
+
+  // Api Response Validation
+  walletListData,
+  walletListDataForTransfer,
+};
 
 export type TAddWalletFormData = z.infer<typeof addWallet>;
 export type TUpdateWalletFormData = z.infer<typeof updateWallet>;
 export type TWalletTransferFormData = z.infer<typeof walletTransfer>;
-export type TWalletData = z.infer<typeof walletDataSchema>;
+
+// export type TWalletListData = z.infer<typeof walletListData>;
+// export type TWalletListDataForTransfer = z.infer<typeof walletListDataForTransfer>;

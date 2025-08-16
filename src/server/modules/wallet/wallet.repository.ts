@@ -50,6 +50,29 @@ export class WalletRepository {
     return { wallets, meta };
   }
 
+  // get one or multiple wallet balance info
+  async getWalletInfoForTransfer(senderId: string, receiverId: string) {
+    const senderObjectId = new Types.ObjectId(senderId);
+    const receiverObjectId = new Types.ObjectId(receiverId);
+
+    const [walletInfo] = await WalletModel.aggregate([
+      { $match: { _id: { $in: [senderObjectId, receiverObjectId] } } },
+      {
+        $facet: {
+          senderWallet: [
+            { $match: { _id: senderObjectId } },
+            ...this.walletHelper.buildBalancePipeline(),
+            { $project: { _id: 1, name: 1, ownerId: 1, balance: 1, isDeleted: 1 } },
+          ],
+          receiverWallet: [{ $match: { _id: receiverObjectId } }, { $project: { _id: 1, name: 1, ownerId: 1, isDeleted: 1 } }],
+        },
+      },
+      { $project: { senderWallet: { $arrayElemAt: ["$senderWallet", 0] }, receiverWallet: { $arrayElemAt: ["$receiverWallet", 0] } } },
+    ]);
+
+    return { senderWallet: walletInfo.senderWallet, receiverWallet: walletInfo.receiverWallet };
+  }
+
   async updateWallet(dto: UpdateWalletDto, walletId: string) {
     return WalletModel.updateOne({ _id: walletId }, { $set: dto });
   }

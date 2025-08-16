@@ -15,7 +15,7 @@ const mutationKey = `add-${queryKeys.wallet}`;
 
 export const AddWallet = () => {
   const { open, onOpenChange } = usePopupState();
-  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: addWallet });
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: addWalletApi });
 
   const handleAddWallet = (formData: TWalletFormData, onReset: () => void) => {
     const payload = formData as TAddWalletFormData;
@@ -47,7 +47,7 @@ export const AddWallet = () => {
   );
 };
 
-const addWallet = async (dto: CreateWalletDto) => {
+const addWalletApi = async (dto: CreateWalletDto) => {
   const res = await walletClient.index.$post({ json: dto });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);

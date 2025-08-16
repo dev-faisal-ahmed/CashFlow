@@ -2,7 +2,7 @@ import { Types, startSession } from "mongoose";
 import { AppError } from "@/server/core/app.error";
 import { TransactionRepository } from "../transaction/transaction.repository";
 import { WalletRepository } from "./wallet.repository";
-import { CreateWalletDto, GetAllWalletsArgs, UpdateWalletDto } from "./wallet.validation";
+import { CreateWalletDto, GetAllWalletsArgs, UpdateWalletDto, WalletTransferDto } from "./wallet.validation";
 
 export class WalletService {
   private walletRepository: WalletRepository;
@@ -62,6 +62,26 @@ export class WalletService {
 
     const result = await this.walletRepository.deleteWallet(walletId);
     if (!result.modifiedCount) throw new AppError("Wallet was not deleted", 500);
+
+    return result;
+  }
+
+  async walletTransfer(dto: WalletTransferDto, userId: Types.ObjectId) {
+    const { senderWallet, receiverWallet } = await this.walletRepository.getWalletInfoForTransfer(dto.senderWalletId, dto.receiverWalletId);
+
+    if (!senderWallet) throw new AppError("Sender wallet not found", 404);
+    if (!receiverWallet) throw new AppError("Receiver wallet not found", 404);
+    if (!userId.equals(senderWallet.ownerId)) throw new AppError("You are not authorized to transfer money from this wallet", 401);
+    if (!userId.equals(receiverWallet.ownerId)) throw new AppError("You are not authorized to transfer money to this wallet", 401);
+    if (senderWallet.balance < dto.amount) throw new AppError("Insufficient balance", 400);
+
+    const result = await this.transactionRepository.createTransferTransaction({
+      amount: dto.amount,
+      destinationWalletId: new Types.ObjectId(dto.receiverWalletId),
+      ownerId: userId,
+      sourceWalletId: new Types.ObjectId(dto.senderWalletId),
+      description: dto.description ? dto.description : `Transferred ${dto.amount}, from ${senderWallet.name} to ${receiverWallet.name}`,
+    });
 
     return result;
   }

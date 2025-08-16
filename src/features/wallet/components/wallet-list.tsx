@@ -4,9 +4,7 @@ import { FC, PropsWithChildren } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorMessage } from "@/components/shared";
 import { queryKeys } from "@/lib/query.keys";
-import { GetAllWalletsArgs } from "@/server/modules/wallet/wallet.validation";
 import { walletClient } from "@/lib/client";
-import { ToString } from "@/lib/types";
 import { WalletCard } from "./wallet-card";
 import { walletSchema } from "../wallet-schema";
 import { WalletListSkeleton } from "./wallet-loading";
@@ -14,8 +12,7 @@ import { WalletListSkeleton } from "./wallet-loading";
 export const WalletList = () => {
   const { data: walletList, isLoading } = useQuery({
     queryKey: [queryKeys.wallet],
-    queryFn: () => getAllWalletList({ getAll: "true", fields: "_id,name,isSaving,balance" }),
-    select: (res) => res,
+    queryFn: getAllWalletListApi,
   });
 
   if (isLoading) return <LoadingSkeleton />;
@@ -41,10 +38,10 @@ const LoadingSkeleton = () => (
 );
 
 // api calling
-const getAllWalletList = async (args: ToString<GetAllWalletsArgs>) => {
-  const res = await walletClient.index.$get({ query: args });
+const getAllWalletListApi = async () => {
+  const res = await walletClient.index.$get({ query: { getAll: "true", fields: "_id,name,isSaving,balance" } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  const validatedData = await walletSchema.getWalletListDataSchema.parseAsync(resData.data);
+  const validatedData = await walletSchema.walletListData.parseAsync(resData.data);
   return validatedData;
 };
