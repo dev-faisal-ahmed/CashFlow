@@ -1,4 +1,4 @@
-import z from "zod";
-import { sourceSchema } from "./source-schema";
+import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 
-export type TSourceForm = z.infer<typeof sourceSchema>
+export type TSource = { _id: string; name: string; budget?: TBudget; type: ESourceType };
+export type TBudget = { amount: number; interval: EBudgetInterval };

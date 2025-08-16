@@ -7,15 +7,11 @@ import { FC } from "react";
 import { usePopupState } from "@/lib/hooks";
 import { ActionMenu } from "@/components/shared";
 import { UpdateSource } from "./update-source";
-import { DeleteSource } from "./delete-source";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
+import { TSource } from "../source-type";
 
-// -------- Main -------- \\
-type SourceCardProps = {
-  _id: string;
-  name: string;
-  type: ESourceType;
-  budget?: { amount: number; interval: EBudgetInterval };
+// Main
+type SourceCardProps = TSource & {
   income: number;
   expense: number;
 };
@@ -30,7 +26,7 @@ export const SourceCard: FC<SourceCardProps> = ({ _id, name, type, income, expen
   </Card>
 );
 
-// -------- Header -------- \\
+// Header
 type SourceCardHeaderProps = Pick<SourceCardProps, "_id" | "name" | "type" | "budget">;
 
 const headerConfig = {
@@ -72,7 +68,7 @@ const SourceCardHeader: FC<SourceCardHeaderProps> = ({ _id, name, type, budget }
   );
 };
 
-// -------- Income Expense -------- \\
+// Income Expense
 type SourceCardIncomeExpenseProps = Pick<SourceCardProps, "type" | "income" | "expense" | "budget">;
 const SourceCardIncomeExpense: FC<SourceCardIncomeExpenseProps> = ({ type, income, expense, budget }) => {
   const amount = type === ESourceType.income ? income : expense;
@@ -92,7 +88,7 @@ const SourceCardIncomeExpense: FC<SourceCardIncomeExpenseProps> = ({ type, incom
   );
 };
 
-// -------- Budget -------- \\
+// Budget
 type BudgetProps = Pick<SourceCardProps, "budget" | "expense">;
 const Budget: FC<BudgetProps> = ({ budget, expense }) => {
   if (!budget?.amount) return null;
@@ -120,7 +116,7 @@ const SourceCardActionMenu: FC<SourceCardActionMenuProps> = ({ _id, name, type, 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateSource _id={_id} name={name} type={type} budget={budget} onSuccess={() => onOpenChange(false)} />
-      <DeleteSource sourceId={_id} />
+      {/* <DeleteSource sourceId={_id} /> */}
     </ActionMenu>
   );
 };

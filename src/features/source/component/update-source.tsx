@@ -1,15 +1,45 @@
-import { TSource } from "@/lib/types";
+"use client";
+
 import { FC } from "react";
-import { useUpdateSource } from "../source-hook";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
 import { SourceForm } from "./source-form";
+import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
+import { usePopupState } from "@/lib/hooks";
+import { UpdateSourceDto } from "@/server/modules/source/source.validation";
+import { sourceClient } from "@/lib/client";
+import { queryKeys } from "@/lib/query.keys";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type UpdateSourceProps = Pick<TSource, "_id" | "name" | "budget" | "type"> & { onSuccess: () => void };
+interface UpdateSourceProps {
+  _id: string;
+  name: string;
+  budget?: { amount: number; interval: EBudgetInterval };
+  type: ESourceType;
+  onSuccess: () => void;
+}
 
 export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, onSuccess }) => {
-  const { open, onOpenChange, mutationKey, handleUpdateSource } = useUpdateSource({ sourceId: _id, onSuccess });
+  const mutationKey = `update-${queryKeys.source}-${_id}`;
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateSourceApi });
+
+  const handleUpdateSource = async (formData: UpdateSourceDto, onReset: () => void) => {
+    mutate(
+      { id: _id, ...formData },
+      {
+        onSuccess: () => {
+          onReset();
+          queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+          onOpenChange(false);
+          onSuccess();
+        },
+      },
+    );
+  };
 
   return (
     <>
@@ -28,9 +58,16 @@ export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, o
           formId={mutationKey}
           mode="update"
           onSubmit={handleUpdateSource}
-          defaultValues={{ name, type, budget, addBudget: !!budget }}
+          defaultValues={{ name, type, addBudget: !!budget, budget }}
         />
       </FormDialog>
     </>
   );
+};
+
+const updateSourceApi = async ({ id, ...dto }: UpdateSourceDto & { id: string }) => {
+  const res = await sourceClient[":id"].$patch({ param: { id }, json: dto });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
 };
