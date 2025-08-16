@@ -10,9 +10,10 @@ import { SourceListSkeleton } from "./source-loading";
 import { FC, PropsWithChildren } from "react";
 
 export const SourceList = () => {
-  const { data: sourceList, isLoading } = useQuery({ queryKey: [queryKeys.source], queryFn: getSourceListApi });
+  const { data: sourceList, isLoading, isError, error } = useQuery({ queryKey: [queryKeys.source], queryFn: getSourceListApi });
 
   if (isLoading) return <LoadingSkeleton />;
+  if (isError) throw error;
   if (!sourceList?.length) return <ErrorMessage message="No Source Found" className="my-12" />;
 
   return (
@@ -31,12 +32,12 @@ const LoadingSkeleton = () => (
     <SourceListSkeleton size={6} />
   </Grid>
 );
+
 // Api
 const getSourceListApi = async () => {
   const res = await sourceClient.index.$get({ query: { fields: "_id,name,type,budget,income,expense", getAll: "true" } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  console.log(resData.data);
   const validatedData = await sourceSchema.sourceListData.parseAsync(resData.data);
   return validatedData;
 };

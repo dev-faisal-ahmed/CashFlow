@@ -10,12 +10,18 @@ import { walletSchema } from "../wallet-schema";
 import { WalletListSkeleton } from "./wallet-loading";
 
 export const WalletList = () => {
-  const { data: walletList, isLoading } = useQuery({
+  const {
+    data: walletList,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: [queryKeys.wallet],
     queryFn: getAllWalletListApi,
   });
 
   if (isLoading) return <LoadingSkeleton />;
+  if (isError) throw error;
   if (!walletList?.length) return <ErrorMessage message="No Wallet Found" className="my-12" />;
 
   return (
