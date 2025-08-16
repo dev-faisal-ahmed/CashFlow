@@ -23,7 +23,7 @@ export class SourceRepository {
     };
 
     const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
-    const fields = QueryHelper.selectFields(query.fields, ["_id", "name", "ownerId", "isSaving", "balance"]);
+    const fields = QueryHelper.selectFields(requestedFields, ["_id", "name", "type", "ownerId", "budget", "income", "expense"]);
 
     const sources = await SourceModel.aggregate([
       { $match: dbQuery },

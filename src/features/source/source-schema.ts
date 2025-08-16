@@ -2,7 +2,7 @@ import z from "zod";
 import { capitalize } from "@/lib/utils";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 
-// Form Validation
+// Form validation
 const budgetSchema = z.object({
   amount: z.number().nonnegative("Budget can not be empty"),
   interval: z.enum(Object.values(EBudgetInterval)),
@@ -26,6 +26,23 @@ const source = z
       ctx.addIssue({ code: "custom", message: "Interval is required", path: ["budget.interval"] });
   });
 
-export const sourceSchema = { source };
+// API response validation
+const sourceListData = z.array(
+  z.object({
+    _id: z.string(),
+    name: z.string(),
+    type: z.enum(Object.values(ESourceType)),
+    budget: z.object({ amount: z.number(), interval: z.enum(Object.values(EBudgetInterval)) }).optional(),
+    income: z.number().catch(0),
+    expense: z.number().catch(0),
+  }),
+);
+export const sourceSchema = {
+  // Form validation
+  source,
+
+  // API response validation
+  sourceListData,
+};
 
 export type TSourceFormData = z.infer<typeof source>;

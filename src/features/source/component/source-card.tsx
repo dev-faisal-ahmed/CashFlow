@@ -1,17 +1,25 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { ChartNoAxesCombinedIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { TSource } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { FC } from "react";
 import { usePopupState } from "@/lib/hooks";
 import { ActionMenu } from "@/components/shared";
 import { UpdateSource } from "./update-source";
 import { DeleteSource } from "./delete-source";
+import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 
 // -------- Main -------- \\
-type SourceCardProps = Pick<TSource, "_id" | "name" | "type" | "budget"> & { income: number; expense: number };
+type SourceCardProps = {
+  _id: string;
+  name: string;
+  type: ESourceType;
+  budget?: { amount: number; interval: EBudgetInterval };
+  income: number;
+  expense: number;
+};
+
 export const SourceCard: FC<SourceCardProps> = ({ _id, name, type, income, expense, budget }) => (
   <Card>
     <SourceCardHeader _id={_id} name={name} type={type} budget={budget} />
@@ -26,8 +34,19 @@ export const SourceCard: FC<SourceCardProps> = ({ _id, name, type, income, expen
 type SourceCardHeaderProps = Pick<SourceCardProps, "_id" | "name" | "type" | "budget">;
 
 const headerConfig = {
-  INCOME: { icon: TrendingUpIcon, iconClassName: "bg-emerald-500", text: "Income Source", textClassName: "bg-black/90" },
-  EXPENSE: { icon: TrendingDownIcon, iconClassName: "bg-destructive", text: "Expense Category", textClassName: "bg-destructive/90" },
+  [ESourceType.income]: { icon: TrendingUpIcon, iconClassName: "bg-emerald-500", text: "Income Source", textClassName: "bg-black/90" },
+  [ESourceType.expense]: {
+    icon: TrendingDownIcon,
+    iconClassName: "bg-destructive",
+    text: "Expense Category",
+    textClassName: "bg-destructive/90",
+  },
+  [ESourceType.both]: {
+    icon: ChartNoAxesCombinedIcon,
+    iconClassName: "bg-orange-500",
+    text: "Income/Expense",
+    textClassName: "bg-orange-500/90",
+  },
 };
 
 const SourceCardHeader: FC<SourceCardHeaderProps> = ({ _id, name, type, budget }) => {
@@ -56,11 +75,11 @@ const SourceCardHeader: FC<SourceCardHeaderProps> = ({ _id, name, type, budget }
 // -------- Income Expense -------- \\
 type SourceCardIncomeExpenseProps = Pick<SourceCardProps, "type" | "income" | "expense" | "budget">;
 const SourceCardIncomeExpense: FC<SourceCardIncomeExpenseProps> = ({ type, income, expense, budget }) => {
-  const amount = type === "INCOME" ? income : expense;
-  const interval = budget?.interval ?? "MONTHLY";
+  const amount = type === ESourceType.income ? income : expense;
+  const interval = budget?.interval ?? EBudgetInterval.monthly;
 
-  const period = interval === "YEARLY" ? "Yearly" : interval === "WEEKLY" ? "Weekly" : "Monthly";
-  const description = type === "INCOME" ? `${period} Income` : `${period} Expense`;
+  const period = interval === EBudgetInterval.yearly ? "Yearly" : interval === EBudgetInterval.weekly ? "Weekly" : "Monthly";
+  const description = type === ESourceType.income ? `${period} Income` : `${period} Expense`;
 
   return (
     <div
