@@ -1,8 +1,8 @@
 export class PaginationHelper {
   constructor(
-    private page: number,
-    private limit: number,
-    private getAll: boolean,
+    private page: number = 1,
+    private limit: number = 10,
+    private getAll: boolean = false,
   ) {
     this.page = page;
     this.limit = limit;
@@ -10,7 +10,7 @@ export class PaginationHelper {
   }
 
   getPaginationInfo() {
-    return { skip: (this.page - 1) * this.limit, getAll: this.getAll };
+    return { skip: (this.page - 1) * this.limit, getAll: this.getAll, limit: this.limit };
   }
 
   getMeta(count: number) {

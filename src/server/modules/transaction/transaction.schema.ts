@@ -52,7 +52,18 @@ const peerTransferTransactionSchema = new Schema<IPeerTransferTransaction>({
 export const TransactionModel: Model<IBaseTransaction> = models.transaction ?? model("transaction", transactionSchema);
 
 // Create discriminator models
-export const InitialTransaction = TransactionModel.discriminator(ETransactionType.initial, initialTransactionSchema);
-export const RegularTransaction = TransactionModel.discriminator(ETransactionType.regular, regularTransactionSchema);
-export const TransferTransaction = TransactionModel.discriminator(ETransactionType.transfer, transferTransactionSchema);
-export const PeerTransferTransaction = TransactionModel.discriminator(ETransactionType.peerTransfer, peerTransferTransactionSchema);
+export const InitialTransaction =
+  TransactionModel.discriminators?.[ETransactionType.initial] ||
+  TransactionModel.discriminator(ETransactionType.initial, initialTransactionSchema);
+
+export const RegularTransaction =
+  TransactionModel.discriminators?.[ETransactionType.regular] ||
+  TransactionModel.discriminator(ETransactionType.regular, regularTransactionSchema);
+
+export const TransferTransaction =
+  TransactionModel.discriminators?.[ETransactionType.transfer] ||
+  TransactionModel.discriminator(ETransactionType.transfer, transferTransactionSchema);
+
+export const PeerTransferTransaction =
+  TransactionModel.discriminators?.[ETransactionType.peerTransfer] ||
+  TransactionModel.discriminator(ETransactionType.peerTransfer, peerTransferTransactionSchema);

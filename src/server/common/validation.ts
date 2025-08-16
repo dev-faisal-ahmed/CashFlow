@@ -6,9 +6,9 @@ const query = z.object({
 });
 
 const pagination = z.object({
-  page: z.coerce.number().catch(1),
-  limit: z.coerce.number().catch(10),
-  getAll: z.coerce.boolean().catch(false),
+  page: z.coerce.number().optional().catch(1),
+  limit: z.coerce.number().optional().catch(10),
+  getAll: z.coerce.boolean().optional().catch(false),
 });
 
 const queryWithPagination = query.and(pagination);

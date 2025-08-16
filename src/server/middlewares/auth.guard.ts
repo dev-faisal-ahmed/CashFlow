@@ -1,8 +1,8 @@
+import { UserRepository } from "../modules/user/user.repository";
 import { IUser } from "../modules/user/user.interface";
 import { createMiddleware } from "hono/factory";
 import { getToken } from "next-auth/jwt";
 import { AppError } from "../core/app.error";
-import { UserRepository } from "../modules/user/user.repository";
 import { AUTH_SECRET } from "@/lib/config";
 
 const userRepository = new UserRepository();

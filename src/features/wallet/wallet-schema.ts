@@ -1,5 +1,5 @@
+import z from "zod";
 import { capitalize } from "@/lib/utils";
-import { z } from "zod";
 
 const addWallet = z.object({
   name: z
@@ -29,8 +29,19 @@ const walletTransfer = z.object({
   destinationWalletId: z.string().nonempty("Destination wallet can not be empty"),
 });
 
-export const walletSchema = { addWallet, updateWallet, walletTransfer };
+// Api Response Validation
+const walletDataSchema = z.object({
+  _id: z.string(),
+  name: z.string(),
+  isSaving: z.boolean().optional().default(false),
+  balance: z.number(),
+});
+
+const getWalletListDataSchema = walletDataSchema.array();
+
+export const walletSchema = { addWallet, updateWallet, walletTransfer, getWalletListDataSchema };
 
 export type TAddWalletFormData = z.infer<typeof addWallet>;
 export type TUpdateWalletFormData = z.infer<typeof updateWallet>;
 export type TWalletTransferFormData = z.infer<typeof walletTransfer>;
+export type TWalletData = z.infer<typeof walletDataSchema>;

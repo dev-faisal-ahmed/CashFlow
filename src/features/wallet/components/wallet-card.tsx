@@ -1,18 +1,17 @@
 import { FC } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TWallet } from "@/lib/types";
 import { RiWalletFill } from "react-icons/ri";
 import { FaPiggyBank } from "react-icons/fa";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { ActionMenu } from "@/components/shared";
 import { usePopupState } from "@/lib/hooks";
-import { UpdateWallet } from "./update-wallet";
-import { DeleteWallet } from "./delete-wallet";
-import { WalletTransfer } from "./wallet-transfer";
+// import { UpdateWallet } from "./update-wallet";
+// import { DeleteWallet } from "./delete-wallet";
+// import { WalletTransfer } from "./wallet-transfer";
+import { TWalletData } from "../wallet-schema";
 
-type WalletCardProps = Pick<TWallet, "_id" | "name" | "isSaving"> & { balance: number };
-export const WalletCard: FC<WalletCardProps> = ({ _id, name, isSaving, balance }) => (
+export const WalletCard: FC<TWalletData> = ({ _id, name, isSaving, balance }) => (
   <Card>
     <CardHeader>
       <div className="flex items-center gap-4">
@@ -48,15 +47,18 @@ const SavingBadge = () => (
   </Badge>
 );
 
-type WalletCardActionMenuProps = Pick<TWallet, "_id" | "name" | "isSaving"> & { balance: number };
-const WalletCardActionMenu: FC<WalletCardActionMenuProps> = ({ _id, name, isSaving, balance }) => {
+const WalletCardActionMenu: FC<TWalletData> = (
+  {
+    // _id, name, isSaving, balance
+  },
+) => {
   const { open, onOpenChange } = usePopupState();
 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
-      <UpdateWallet name={name} isSaving={isSaving} walletId={_id} onSuccess={() => onOpenChange(false)} />
-      <WalletTransfer balance={balance} walletId={_id} onSuccess={() => onOpenChange(false)} />
-      <DeleteWallet walletId={_id} />
+      {/* <UpdateWallet name={name} isSaving={!!isSaving} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
+      <WalletTransfer balance={balance} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
+      <DeleteWallet walletId={String(_id)} /> */}
     </ActionMenu>
   );
 };

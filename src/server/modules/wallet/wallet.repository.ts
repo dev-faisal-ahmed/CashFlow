@@ -18,9 +18,9 @@ export class WalletRepository {
   }
 
   async getAllWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
-    const { search, isSaving, page, limit } = query;
+    const { search, isSaving, page } = query;
     const requestedFields = query.fields;
-    const paginationHelper = new PaginationHelper(page, limit, query.getAll);
+    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
 
     const dbQuery = {
       isDeleted: false,
@@ -29,10 +29,12 @@ export class WalletRepository {
       ...(isSaving !== undefined && { isSaving }),
     };
 
-    const { getAll, skip } = paginationHelper.getPaginationInfo();
+    const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
     const fields = QueryHelper.selectFields(query.fields, ["_id", "name", "ownerId", "isSaving", "balance"]);
 
-    const wallets: TGetAllWalletResponse["wallets"] = await WalletModel.aggregate([
+    console.log({ fields });
+
+    const wallets = await WalletModel.aggregate([
       { $match: dbQuery },
       ...(requestedFields?.includes("balance") ? this.walletHelper.buildBalancePipeline() : []),
       ...(fields ? [{ $project: fields }] : []),
@@ -52,7 +54,3 @@ export class WalletRepository {
 }
 
 type CreateWalletDto = Pick<IWallet, "name" | "isSaving" | "ownerId">;
-
-type TGetAllWalletResponse = {
-  wallets: Array<Partial<Pick<IWallet, "_id" | "name" | "ownerId" | "isSaving">> & { balance: number }>;
-};

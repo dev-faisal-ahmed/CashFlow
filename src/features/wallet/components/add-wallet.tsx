@@ -6,9 +6,10 @@ import { PlusIcon } from "lucide-react";
 import { TWalletFormData, WalletForm } from "./wallet-form";
 import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
-import { addWallet } from "../wallet-api";
 import { useMutation } from "@tanstack/react-query";
 import { TAddWalletFormData } from "../wallet-schema";
+import { CreateWalletDto } from "@/server/modules/wallet/wallet.validation";
+import { walletClient } from "@/lib/client";
 
 const mutationKey = `add-${queryKeys.wallet}`;
 
@@ -44,4 +45,11 @@ export const AddWallet = () => {
       </FormDialog>
     </>
   );
+};
+
+const addWallet = async (dto: CreateWalletDto) => {
+  const res = await walletClient.index.$post({ json: dto });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
 };

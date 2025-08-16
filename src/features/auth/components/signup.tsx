@@ -5,9 +5,10 @@ import { AuthEntryCard } from "./auth-entry-card";
 import { AuthForm, TAuthFormData } from "./auth-form";
 import { queryKeys } from "@/lib/query.keys";
 import { useMutation } from "@tanstack/react-query";
-import { signup } from "../auth-api";
 import { TSignupFormData } from "../auth-schema";
 import { useRouter } from "next/navigation";
+import { SignupDto } from "@/server/modules/auth/auth.validation";
+import { authClient } from "@/lib/client";
 
 const FORM_ID = queryKeys.auth.singup;
 
@@ -35,4 +36,12 @@ export const Signup = () => {
       </Button>
     </AuthEntryCard>
   );
+};
+
+// api calling
+export const signup = async (payload: SignupDto) => {
+  const res = await authClient.signup.$post({ json: payload });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
 };
