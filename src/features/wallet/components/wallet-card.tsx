@@ -6,7 +6,7 @@ import { FaPiggyBank } from "react-icons/fa";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { ActionMenu } from "@/components/shared";
 import { usePopupState } from "@/lib/hooks";
-// import { UpdateWallet } from "./update-wallet";
+import { UpdateWallet } from "./update-wallet";
 // import { DeleteWallet } from "./delete-wallet";
 // import { WalletTransfer } from "./wallet-transfer";
 import { TWalletData } from "../wallet-schema";
@@ -47,16 +47,13 @@ const SavingBadge = () => (
   </Badge>
 );
 
-const WalletCardActionMenu: FC<TWalletData> = (
-  {
-    // _id, name, isSaving, balance
-  },
-) => {
+const WalletCardActionMenu: FC<TWalletData> = ({ _id, name, isSaving }) => {
   const { open, onOpenChange } = usePopupState();
 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
-      {/* <UpdateWallet name={name} isSaving={!!isSaving} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
+      <UpdateWallet name={name} isSaving={!!isSaving} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
+      {/* 
       <WalletTransfer balance={balance} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
       <DeleteWallet walletId={String(_id)} /> */}
     </ActionMenu>

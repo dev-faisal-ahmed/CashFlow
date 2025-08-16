@@ -21,6 +21,21 @@ export const walletRouter = new Hono()
     const user = ctx.get("user");
     const { wallets, meta } = await walletService.getAllWallets(query, user._id);
     return ctx.json(ResponseDto.success({ message: "Wallets fetched successfully", meta, data: wallets }));
+  })
+  // Update Wallet
+  .patch("/:id", authGuard, jsonValidator(walletValidation.updateWallet), async (ctx) => {
+    const dto = ctx.req.valid("json");
+    const user = ctx.get("user");
+    const id = ctx.req.param("id");
+    await walletService.updateWallet(dto, id, user._id);
+    return ctx.json(ResponseDto.success("Wallet updated successfully"));
+  })
+  // Delete Wallet
+  .delete("/:id", authGuard, async (ctx) => {
+    const user = ctx.get("user");
+    const id = ctx.req.param("id");
+    await walletService.deleteWallet(id, user._id);
+    return ctx.json(ResponseDto.success("Wallet deleted successfully"));
   });
 
 export type TWalletRoute = typeof walletRouter;

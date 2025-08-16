@@ -2,7 +2,7 @@ import { Types, startSession } from "mongoose";
 import { AppError } from "@/server/core/app.error";
 import { TransactionRepository } from "../transaction/transaction.repository";
 import { WalletRepository } from "./wallet.repository";
-import { CreateWalletDto, GetAllWalletsArgs } from "./wallet.validation";
+import { CreateWalletDto, GetAllWalletsArgs, UpdateWalletDto } from "./wallet.validation";
 
 export class WalletService {
   private walletRepository: WalletRepository;
@@ -44,5 +44,25 @@ export class WalletService {
 
   async getAllWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
     return this.walletRepository.getAllWallets(query, ownerId);
+  }
+
+  async updateWallet(dto: UpdateWalletDto, walletId: string, userId: Types.ObjectId) {
+    const isOwner = await this.walletRepository.isOwner(walletId, userId);
+    if (!isOwner) throw new AppError("You are not authorized to update this wallet", 401);
+
+    const result = await this.walletRepository.updateWallet(dto, walletId);
+    if (!result.modifiedCount) throw new AppError("Wallet was not updated", 500);
+
+    return result;
+  }
+
+  async deleteWallet(walletId: string, userId: Types.ObjectId) {
+    const isOwner = await this.walletRepository.isOwner(walletId, userId);
+    if (!isOwner) throw new AppError("You are not authorized to delete this wallet", 401);
+
+    const result = await this.walletRepository.deleteWallet(walletId);
+    if (!result.modifiedCount) throw new AppError("Wallet was not deleted", 500);
+
+    return result;
   }
 }

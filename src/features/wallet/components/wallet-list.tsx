@@ -1,15 +1,15 @@
 "use client";
 
-import { GetAllWalletsArgs } from "@/server/modules/wallet/wallet.validation";
+import { FC, PropsWithChildren } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { WalletCard } from "./wallet-card";
 import { ErrorMessage } from "@/components/shared";
 import { queryKeys } from "@/lib/query.keys";
-import { ToString } from "@/lib/types";
+import { GetAllWalletsArgs } from "@/server/modules/wallet/wallet.validation";
 import { walletClient } from "@/lib/client";
+import { ToString } from "@/lib/types";
+import { WalletCard } from "./wallet-card";
 import { walletSchema } from "../wallet-schema";
 import { WalletListSkeleton } from "./wallet-loading";
-import { FC, PropsWithChildren } from "react";
 
 export const WalletList = () => {
   const { data: walletList, isLoading } = useQuery({

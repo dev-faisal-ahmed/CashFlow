@@ -1,13 +1,37 @@
+"use client";
+
 import { FC } from "react";
-import { TUseUpdateWalletArgs, useUpdateWallet } from "../wallet-hook";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
-import { WalletForm } from "./wallet-form";
+import { TWalletFormData, WalletForm } from "./wallet-form";
+import { usePopupState } from "@/lib/hooks";
+import { queryKeys } from "@/lib/query.keys";
+import { TUpdateWalletFormData } from "../wallet-schema";
+import { walletClient } from "@/lib/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type UpdateWalletProps = TUseUpdateWalletArgs & { name: string; isSaving: boolean };
-export const UpdateWallet: FC<UpdateWalletProps> = ({ name, isSaving, walletId, onSuccess }) => {
-  const { open, onOpenChange, mutationKey, handleUpdateWallet } = useUpdateWallet({ walletId, onSuccess });
+type UpdateWalletProps = { walletId: string; name: string; isSaving: boolean; onSuccess: () => void };
+const mutationKey = `update-${queryKeys.wallet}`;
+
+export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, onSuccess }) => {
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateWalletApi });
+  const queryClient = useQueryClient();
+
+  const handleUpdateWallet = (formData: TWalletFormData, onReset: () => void) => {
+    mutate(
+      { walletId, name: formData.name, isSaving: formData.isSaving },
+      {
+        onSuccess: () => {
+          onReset();
+          queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+          onOpenChange(false);
+          onSuccess();
+        },
+      },
+    );
+  };
 
   return (
     <>
@@ -26,4 +50,12 @@ export const UpdateWallet: FC<UpdateWalletProps> = ({ name, isSaving, walletId, 
       </FormDialog>
     </>
   );
+};
+
+// Api calling
+const updateWalletApi = async ({ walletId, ...payload }: TUpdateWalletFormData & { walletId: string }) => {
+  const res = await walletClient[":id"].$patch({ param: { id: walletId }, json: payload });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
 };

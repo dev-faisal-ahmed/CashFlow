@@ -4,7 +4,8 @@ import { WalletModel } from "./wallet.schema";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
 import { WalletHelper } from "./wallet.helper";
-import { GetAllWalletsArgs } from "./wallet.validation";
+import { GetAllWalletsArgs, UpdateWalletDto } from "./wallet.validation";
+import { AppError } from "@/server/core/app.error";
 
 export class WalletRepository {
   private walletHelper: WalletHelper;
@@ -32,8 +33,6 @@ export class WalletRepository {
     const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
     const fields = QueryHelper.selectFields(query.fields, ["_id", "name", "ownerId", "isSaving", "balance"]);
 
-    console.log({ fields });
-
     const wallets = await WalletModel.aggregate([
       { $match: dbQuery },
       ...(requestedFields?.includes("balance") ? this.walletHelper.buildBalancePipeline() : []),
@@ -47,9 +46,23 @@ export class WalletRepository {
     return { wallets, meta };
   }
 
+  async updateWallet(dto: UpdateWalletDto, walletId: string) {
+    return WalletModel.updateOne({ _id: walletId }, { $set: dto });
+  }
+
+  async deleteWallet(walletId: string) {
+    return WalletModel.updateOne({ _id: walletId }, { $set: { isDeleted: true } });
+  }
+
   // helper
   async isWalletExistWithName(name: string, ownerId: string) {
     return WalletModel.findOne({ name, ownerId }, { _id: 1 }).lean();
+  }
+
+  async isOwner(walletId: string, userId: Types.ObjectId) {
+    const wallet = await WalletModel.findOne({ _id: walletId }, { ownerId: 1 }).lean();
+    if (!wallet) throw new AppError("Wallet not found!", 404);
+    return wallet.ownerId.equals(userId);
   }
 }
 
