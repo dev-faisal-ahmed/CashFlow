@@ -1,12 +1,10 @@
-import util from "util";
-
 import { ClientSession, Types } from "mongoose";
 import { IWallet } from "./wallet.interface";
 import { WalletModel } from "./wallet.schema";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
 import { WalletHelper } from "./wallet.helper";
-import { GetAllWalletsArgs, UpdateWalletDto } from "./wallet.validation";
+import { GetAllWalletsArgs } from "./wallet.validation";
 import { AppError } from "@/server/core/app.error";
 
 export class WalletRepository {
@@ -42,8 +40,6 @@ export class WalletRepository {
       ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);
 
-    console.log(util.inspect(wallets, { showHidden: false, depth: null, colors: true }));
-
     const total = await WalletModel.countDocuments(dbQuery);
     const meta = paginationHelper.getMeta(total);
 
@@ -73,12 +69,8 @@ export class WalletRepository {
     return { senderWallet: walletInfo.senderWallet, receiverWallet: walletInfo.receiverWallet };
   }
 
-  async updateWallet(dto: UpdateWalletDto, walletId: string) {
+  async updateWallet(dto: Partial<IWallet>, walletId: string) {
     return WalletModel.updateOne({ _id: walletId }, { $set: dto });
-  }
-
-  async deleteWallet(walletId: string) {
-    return WalletModel.updateOne({ _id: walletId }, { $set: { isDeleted: true } });
   }
 
   // helper

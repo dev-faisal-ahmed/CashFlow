@@ -58,7 +58,7 @@ const WalletCardActionMenu: FC<TWalletData> = ({ _id, name, isSaving, balance })
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateWallet name={name} isSaving={!!isSaving} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
       <WalletTransfer balance={balance} walletId={_id} onSuccess={() => onOpenChange(false)} />
-      <DeleteWallet walletId={_id} onSuccess={() => onOpenChange(false)} />
+      <DeleteWallet walletId={_id} />
     </ActionMenu>
   );
 };

@@ -18,11 +18,18 @@ export class SourceService {
     return this.sourceRepository.getSources(query, ownerId);
   }
 
-  async updateSource(dto: UpdateSourceDto, sourceId: string, ownerId: Types.ObjectId) {
-    const isOwner = await this.sourceRepository.isOwner(sourceId, ownerId);
+  async updateSource(dto: UpdateSourceDto, sourceId: string, userId: Types.ObjectId) {
+    const isOwner = await this.sourceRepository.isOwner(sourceId, userId);
     if (!isOwner) throw new AppError("You are not authorized to update this source", 401);
 
     const { addBudget, budget, ...rest } = dto;
     return this.sourceRepository.updateSource({ ...rest, ...(addBudget && { budget }) }, sourceId);
+  }
+
+  async deleteSource(id: string, userId: Types.ObjectId) {
+    const isOwner = await this.sourceRepository.isOwner(id, userId);
+    if (!isOwner) throw new AppError("You are not authorized to delete this source", 401);
+
+    return this.sourceRepository.updateSource({ isDeleted: true }, id);
   }
 }

@@ -9,10 +9,10 @@ import { walletClient } from "@/lib/client";
 import { queryKeys } from "@/lib/query.keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type DeleteWalletProps = { walletId: string; onSuccess: () => void };
+type DeleteWalletProps = { walletId: string };
 const mutationKey = `delete-${queryKeys.wallet}`;
 
-export const DeleteWallet: FC<DeleteWalletProps> = ({ walletId, onSuccess }) => {
+export const DeleteWallet: FC<DeleteWalletProps> = ({ walletId }) => {
   const { open, onOpenChange } = usePopupState();
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteWalletApi });
   const queryClient = useQueryClient();
@@ -22,7 +22,6 @@ export const DeleteWallet: FC<DeleteWalletProps> = ({ walletId, onSuccess }) => 
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
         onOpenChange(false);
-        onSuccess();
       },
     });
   };

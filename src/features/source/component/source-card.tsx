@@ -9,6 +9,7 @@ import { ActionMenu } from "@/components/shared";
 import { UpdateSource } from "./update-source";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 import { TSource } from "../source-type";
+import { DeleteSource } from "./delete-source";
 
 // Main
 type SourceCardProps = TSource & {
@@ -116,7 +117,7 @@ const SourceCardActionMenu: FC<SourceCardActionMenuProps> = ({ _id, name, type, 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateSource _id={_id} name={name} type={type} budget={budget} onSuccess={() => onOpenChange(false)} />
-      {/* <DeleteSource sourceId={_id} /> */}
+      <DeleteSource sourceId={_id} />
     </ActionMenu>
   );
 };

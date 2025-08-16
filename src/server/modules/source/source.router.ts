@@ -31,6 +31,14 @@ export const sourceRoute = new Hono()
     const id = ctx.req.param("id");
     await sourceService.updateSource(dto, id, user._id);
     return ctx.json(ResponseDto.success("Source updated successfully"));
+  })
+
+  // Delete Source
+  .delete("/:id", authGuard, async (ctx) => {
+    const user = ctx.get("user");
+    const id = ctx.req.param("id");
+    await sourceService.deleteSource(id, user._id);
+    return ctx.json(ResponseDto.success("Source deleted successfully"));
   });
 
 export type TSourceRoute = typeof sourceRoute;

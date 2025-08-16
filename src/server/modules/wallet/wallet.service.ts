@@ -60,7 +60,7 @@ export class WalletService {
     const isOwner = await this.walletRepository.isOwner(walletId, userId);
     if (!isOwner) throw new AppError("You are not authorized to delete this wallet", 401);
 
-    const result = await this.walletRepository.deleteWallet(walletId);
+    const result = await this.walletRepository.updateWallet({ isDeleted: true }, walletId);
     if (!result.modifiedCount) throw new AppError("Wallet was not deleted", 500);
 
     return result;
