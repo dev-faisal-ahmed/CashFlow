@@ -1,5 +1,6 @@
 import z from "zod";
 import { capitalize } from "@/lib/utils";
+import { commonValidation } from "@/server/common/validation";
 
 const createWallet = z.object({
   name: z
@@ -12,6 +13,13 @@ const createWallet = z.object({
   isSaving: z.boolean().optional(),
 });
 
-export const walletValidation = { createWallet };
+const getAllWallets = commonValidation.queryWithPagination.and(
+  z.object({
+    isSaving: z.boolean().optional(),
+  }),
+);
+
+export const walletValidation = { createWallet, getAllWallets };
 
 export type CreateWalletDto = z.infer<typeof createWallet>;
+export type GetAllWalletsArgs = z.infer<typeof getAllWallets>;

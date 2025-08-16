@@ -2,7 +2,7 @@ import { Types, startSession } from "mongoose";
 import { AppError } from "@/server/core/app.error";
 import { TransactionRepository } from "../transaction/transaction.repository";
 import { WalletRepository } from "./wallet.repository";
-import { CreateWalletDto } from "./wallet.validation";
+import { CreateWalletDto, GetAllWalletsArgs } from "./wallet.validation";
 
 export class WalletService {
   private walletRepository: WalletRepository;
@@ -40,5 +40,9 @@ export class WalletService {
     } finally {
       await session.endSession();
     }
+  }
+
+  async getAllWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
+    return this.walletRepository.getAllWallets(query, ownerId);
   }
 }
