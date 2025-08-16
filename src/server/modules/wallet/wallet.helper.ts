@@ -9,7 +9,7 @@ export class WalletHelper {
           pipeline: [
             {
               $match: {
-                $expr: { $and: [{ $eq: ["$walletId", "$$walletId"] }, { $in: ["$type", ["INITIAL", "REGULAR", "BORROW_LEND"]] }] },
+                $expr: { $and: [{ $eq: ["$walletId", "$$walletId"] }, { $in: ["$type", ["initial", "regular", "peerTransfer"]] }] },
               },
             },
             { $project: { amount: 1, nature: 1 } },
@@ -24,8 +24,8 @@ export class WalletHelper {
           from: "transactions",
           let: { walletId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $and: [{ $eq: ["$destinationWalletId", "$$walletId"] }, { $eq: ["$type", "TRANSFER"] }] } } },
-            { $project: { amount: 1, nature: { $literal: "INCOME" } } },
+            { $match: { $expr: { $and: [{ $eq: ["$destinationWalletId", "$$walletId"] }, { $eq: ["$type", "transfer"] }] } } },
+            { $project: { amount: 1, nature: { $literal: "income" } } },
           ],
           as: "incomeTransfers",
         },
@@ -37,8 +37,8 @@ export class WalletHelper {
           from: "transactions",
           let: { walletId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $and: [{ $eq: ["$sourceWalletId", "$$walletId"] }, { $eq: ["$type", "TRANSFER"] }] } } },
-            { $project: { amount: 1, nature: { $literal: "EXPENSE" } } },
+            { $match: { $expr: { $and: [{ $eq: ["$sourceWalletId", "$$walletId"] }, { $eq: ["$type", "transfer"] }] } } },
+            { $project: { amount: 1, nature: { $literal: "expense" } } },
           ],
           as: "expenseTransfers",
         },
@@ -52,7 +52,7 @@ export class WalletHelper {
               $map: {
                 input: "$allTransactions",
                 as: "tx",
-                in: { $cond: [{ $eq: ["$$tx.nature", "INCOME"] }, "$$tx.amount", { $multiply: ["$$tx.amount", -1] }] },
+                in: { $cond: [{ $eq: ["$$tx.nature", "income"] }, "$$tx.amount", { $multiply: ["$$tx.amount", -1] }] },
               },
             },
           },

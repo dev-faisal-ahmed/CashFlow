@@ -1,11 +1,31 @@
+"use client";
+
 import { FC } from "react";
-import { useDeleteWallet } from "../wallet-hook";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { DeleteDialog } from "@/components/shared";
+import { usePopupState } from "@/lib/hooks";
+import { walletClient } from "@/lib/client";
+import { queryKeys } from "@/lib/query.keys";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const DeleteWallet: FC<{ walletId: string }> = ({ walletId }) => {
-  const { open, onOpenChange, handleDeleteWallet, mutationKey } = useDeleteWallet(walletId);
+type DeleteWalletProps = { walletId: string; onSuccess: () => void };
+const mutationKey = `delete-${queryKeys.wallet}`;
+
+export const DeleteWallet: FC<DeleteWalletProps> = ({ walletId, onSuccess }) => {
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteWalletApi });
+  const queryClient = useQueryClient();
+
+  const handleDeleteWallet = () => {
+    mutate(walletId, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+        onOpenChange(false);
+        onSuccess();
+      },
+    });
+  };
 
   return (
     <>
@@ -16,4 +36,11 @@ export const DeleteWallet: FC<{ walletId: string }> = ({ walletId }) => {
       <DeleteDialog open={open} onOpenChange={onOpenChange} mutationKey={mutationKey} onDelete={handleDeleteWallet} />
     </>
   );
+};
+
+const deleteWalletApi = async (walletId: string) => {
+  const res = await walletClient[":id"].$delete({ param: { id: walletId } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
 };

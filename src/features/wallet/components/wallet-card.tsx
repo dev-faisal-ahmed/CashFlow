@@ -10,6 +10,7 @@ import { UpdateWallet } from "./update-wallet";
 // import { DeleteWallet } from "./delete-wallet";
 // import { WalletTransfer } from "./wallet-transfer";
 import { TWalletData } from "../wallet-schema";
+import { DeleteWallet } from "./delete-wallet";
 
 export const WalletCard: FC<TWalletData> = ({ _id, name, isSaving, balance }) => (
   <Card>
@@ -53,9 +54,11 @@ const WalletCardActionMenu: FC<TWalletData> = ({ _id, name, isSaving }) => {
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateWallet name={name} isSaving={!!isSaving} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
+      <DeleteWallet walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
+
       {/* 
       <WalletTransfer balance={balance} walletId={String(_id)} onSuccess={() => onOpenChange(false)} />
-      <DeleteWallet walletId={String(_id)} /> */}
+      */}
     </ActionMenu>
   );
 };

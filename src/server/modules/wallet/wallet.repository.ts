@@ -1,3 +1,5 @@
+import util from "util";
+
 import { ClientSession, Types } from "mongoose";
 import { IWallet } from "./wallet.interface";
 import { WalletModel } from "./wallet.schema";
@@ -39,6 +41,8 @@ export class WalletRepository {
       ...(fields ? [{ $project: fields }] : []),
       ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);
+
+    console.log(util.inspect(wallets, { showHidden: false, depth: null, colors: true }));
 
     const total = await WalletModel.countDocuments(dbQuery);
     const meta = paginationHelper.getMeta(total);
