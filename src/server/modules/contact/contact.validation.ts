@@ -1,6 +1,8 @@
 import { capitalize } from "@/lib/utils";
+import { commonValidation } from "@/server/common/validation";
 import z from "zod";
 
+// Json
 const createContact = z.object({
   name: z
     .string("Name is required")
@@ -12,6 +14,10 @@ const createContact = z.object({
   address: z.string().optional(),
 });
 
-export const contactValidation = { createContact };
+// Query
+const getContacts = commonValidation.queryWithPagination;
+
+export const contactValidation = { createContact, getContacts };
 
 export type CreateContactDto = z.infer<typeof createContact>;
+export type GetContactsArgs = z.infer<typeof getContacts>;
