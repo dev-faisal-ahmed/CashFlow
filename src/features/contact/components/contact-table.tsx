@@ -2,6 +2,7 @@
 
 import z from "zod";
 
+import { FC } from "react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { CommonAvatar } from "@/components/shared";
 import { MinusIcon, PlusIcon } from "lucide-react";
@@ -12,6 +13,7 @@ import { contactClient } from "@/lib/client";
 import { ToString } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
+import { UpdateContact } from "./update-contact";
 
 // Types
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
@@ -92,8 +94,11 @@ export const ContactTable = () => {
 
     {
       id: "action",
-      header: () => <div className="text-center">Action</div>,
-      cell: () => <div></div>,
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center gap-2">
+          <ContactActionMenu {...row.original} />
+        </div>
+      ),
     },
   ] as ColumnDef<TContact>[];
 
@@ -107,6 +112,10 @@ export const ContactTable = () => {
       onPaginationChange={setPagination}
     />
   );
+};
+
+const ContactActionMenu: FC<TContact> = ({ _id, name, phone, address }) => {
+  return <UpdateContact contactId={_id} name={name} phone={phone} address={address} />;
 };
 
 // Api Calling

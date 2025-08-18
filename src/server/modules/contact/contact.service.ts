@@ -15,7 +15,7 @@ export class ContactService {
   }
 
   async createContact(dto: CreateContactDto) {
-    const isContactExists = await this.contactRepository.isContactExistWithPhone({ phone: dto.phone, userId: dto.userId });
+    const isContactExists = await this.contactRepository.isContactExistWithPhone(dto.phone, dto.userId);
     if (isContactExists) throw new AppError("Contact already exists", 400);
     return this.contactRepository.createContact(dto);
   }
@@ -25,7 +25,7 @@ export class ContactService {
   }
 
   async updateContact(dto: UpdateContactDto, contactId: string, userId: Types.ObjectId) {
-    const isOwner = await this.contactRepository.isOwner({ id: contactId, userId });
+    const isOwner = await this.contactRepository.isOwner(contactId, userId);
     if (!isOwner) throw new AppError("You are not authorized to update this contact", 401);
     return this.contactRepository.updateContact(contactId, dto);
   }

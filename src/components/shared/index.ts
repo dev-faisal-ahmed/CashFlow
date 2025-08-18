@@ -4,3 +4,4 @@ export * from "./common-avatar";
 export * from "./delete-dialog";
 export * from "./error-message";
 export * from "./header";
+export * from "./tooltip-container";

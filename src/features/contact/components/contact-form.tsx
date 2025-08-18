@@ -17,9 +17,10 @@ type ContactFormProps = {
   formId: string;
   defaultValues: TContactFormData;
   onSubmit: (formData: TContactFormData, onReset: () => void) => void;
+  mode: "add" | "edit";
 };
 
-export const ContactForm: FC<ContactFormProps> = ({ formId, defaultValues, onSubmit }) => {
+export const ContactForm: FC<ContactFormProps> = ({ formId, defaultValues, onSubmit, mode }) => {
   const form = useForm<TContactFormData>({ resolver: zodResolver(contactFormSchema), defaultValues });
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
@@ -30,7 +31,7 @@ export const ContactForm: FC<ContactFormProps> = ({ formId, defaultValues, onSub
           {({ field }) => <Input {...field} placeholder="@: John Doe" />}
         </FieldForm>
 
-        <FieldForm control={form.control} name="phone" label="Phone Number">
+        <FieldForm control={form.control} name="phone" label="Phone Number" disabled={mode === "edit"}>
           {({ field }) => <Input {...field} placeholder="@: +8801234567890" />}
         </FieldForm>
 

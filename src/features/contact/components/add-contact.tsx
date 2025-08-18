@@ -44,7 +44,7 @@ export const AddContact = () => {
         title="Add New Contact"
         description="Fill up the form to create a new contact"
       >
-        <ContactForm formId={mutationKey} defaultValues={{ name: "", phone: "", address: "" }} onSubmit={handleAddContact} />
+        <ContactForm formId={mutationKey} defaultValues={{ name: "", phone: "", address: "" }} onSubmit={handleAddContact} mode="add" />
       </FormDialog>
     </>
   );

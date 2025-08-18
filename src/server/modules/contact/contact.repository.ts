@@ -4,11 +4,10 @@ import { ContactModel } from "./contact.schema";
 import { GetContactsArgs } from "./contact.validation";
 import { QueryHelper } from "@/server/helpers/query.helper";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
+import { AppError } from "@/server/core/app.error";
 
 // Types
 type CreateContactDto = Pick<IContact, "name" | "phone" | "address" | "userId">;
-type IsContactExistWithPhoneArgs = Pick<IContact, "phone" | "userId">;
-type IsContactOwnerArgs = Pick<IContact, "userId"> & { id: string };
 type UpdateContactDto = Partial<IContact>;
 
 export class ContactRepository {
@@ -87,11 +86,13 @@ export class ContactRepository {
   }
 
   // helper
-  async isContactExistWithPhone(args: IsContactExistWithPhoneArgs) {
-    return ContactModel.findOne(args, { _id: 1 }).lean();
+  async isContactExistWithPhone(phone: string, userId: Types.ObjectId) {
+    return ContactModel.findOne({ phone, userId }, { _id: 1 }).lean();
   }
 
-  async isOwner(args: IsContactOwnerArgs) {
-    return ContactModel.findOne(args, { _id: 1 }).lean();
+  async isOwner(contactId: string, userId: Types.ObjectId) {
+    const contact = await ContactModel.findOne({ _id: contactId }, { _id: 1, userId: 1 }).lean();
+    if (!contact) throw new AppError("Contact not found!", 404);
+    return contact.userId.equals(userId);
   }
 }
