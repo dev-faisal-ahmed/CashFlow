@@ -1,9 +1,6 @@
 import { Header } from "@/components/shared";
-import { AddContact } from "@/contact/components";
+import { AddContact, ContactTable } from "@/contact/components";
 import { TopbarContent } from "@/layout";
-
-// Disable SSR for this page
-export const dynamic = "force-dynamic";
 
 const Page = () => (
   <>
@@ -14,7 +11,7 @@ const Page = () => (
       <AddContact />
     </TopbarContent>
 
-    {/* <ContactTable /> */}
+    <ContactTable />
   </>
 );
 

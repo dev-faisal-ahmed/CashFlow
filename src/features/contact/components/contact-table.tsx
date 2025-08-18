@@ -1,21 +1,32 @@
 "use client";
 
+import z from "zod";
+
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { TGetAllContactsResponse } from "../contact-api";
 import { CommonAvatar } from "@/components/shared";
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { useGetAllContacts } from "../contact-hook";
 import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
+import { GetContactsArgs } from "@/server/modules/contact/contact.validation";
+import { contactClient } from "@/lib/client";
+import { ToString } from "@/lib/types";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query.keys";
 
-type TApiResponse = TGetAllContactsResponse[number];
+// Types
+type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
+type TContact = TApiResponse["data"][number];
 
-const LIMIT = 10;
-const { accessor } = createColumnHelper<TApiResponse>();
+// Accessor
+const { accessor } = createColumnHelper<TContact>();
 
 export const ContactTable = () => {
-  const { pagination, setPagination } = usePagination();
-  const { data: apiResponse, isLoading } = useGetAllContacts(pagination.pageIndex + 1, LIMIT);
+  const { pagination, setPagination } = usePagination(10);
+  const { data: apiResponse, isLoading } = useQuery({
+    queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1 }],
+    queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
+    select: (res) => ({ contacts: res.data, meta: res.meta }),
+  });
 
   const contacts = apiResponse?.contacts;
 
@@ -84,16 +95,38 @@ export const ContactTable = () => {
       header: () => <div className="text-center">Action</div>,
       cell: () => <div></div>,
     },
-  ] as ColumnDef<TApiResponse>[];
+  ] as ColumnDef<TContact>[];
 
   return (
     <DataTable
       columns={column}
       data={contacts ?? []}
       isLoading={isLoading}
-      pageCount={apiResponse?.meta?.totalPages ?? 0}
+      pageCount={apiResponse?.meta?.totalPage ?? 0}
       pagination={pagination}
       onPaginationChange={setPagination}
     />
   );
 };
+
+// Api Calling
+const getContactsApi = async (args: ToString<GetContactsArgs>) => {
+  const res = await contactClient.index.$get({ query: { ...args, fields: "_id,name,phone,address,given,taken" } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+
+  const parsedData = await getContactsSchema.parseAsync(resData.data);
+  return { data: parsedData, meta: resData.meta };
+};
+
+// Schema
+const getContactsSchema = z.array(
+  z.object({
+    _id: z.string(),
+    name: z.string(),
+    phone: z.string(),
+    address: z.string().optional(),
+    given: z.number(),
+    taken: z.number(),
+  }),
+);
