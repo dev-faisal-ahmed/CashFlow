@@ -7,6 +7,9 @@ import { PaginationHelper } from "@/server/helpers/pagination.helper";
 
 // Types
 type CreateContactDto = Pick<IContact, "name" | "phone" | "address" | "userId">;
+type IsContactExistWithPhoneArgs = Pick<IContact, "phone" | "userId">;
+type IsContactOwnerArgs = Pick<IContact, "userId"> & { id: string };
+type UpdateContactDto = Partial<IContact>;
 
 export class ContactRepository {
   async createContact(dto: CreateContactDto) {
@@ -77,5 +80,18 @@ export class ContactRepository {
     const meta = paginationHelper.getMeta(total);
 
     return { contacts, meta };
+  }
+
+  async updateContact(id: string, dto: UpdateContactDto) {
+    return ContactModel.updateOne({ _id: id }, { $set: dto });
+  }
+
+  // helper
+  async isContactExistWithPhone(args: IsContactExistWithPhoneArgs) {
+    return ContactModel.findOne(args, { _id: 1 }).lean();
+  }
+
+  async isOwner(args: IsContactOwnerArgs) {
+    return ContactModel.findOne(args, { _id: 1 }).lean();
   }
 }

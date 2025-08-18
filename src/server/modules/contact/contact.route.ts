@@ -15,12 +15,22 @@ export const contactRoute = new Hono()
     await contactService.createContact({ ...dto, userId: user._id });
     return ctx.json(ResponseDto.success("Contact created successfully"));
   })
+
   // Get Contacts
   .get("/", authGuard, queryValidator(contactValidation.getContacts), async (ctx) => {
     const user = ctx.get("user");
     const query = ctx.req.valid("query");
     const { contacts, meta } = await contactService.getContacts(query, user._id);
     return ctx.json(ResponseDto.success({ message: "Contacts fetched successfully", meta, data: contacts }));
+  })
+
+  // Update Contact
+  .patch("/:id", authGuard, jsonValidator(contactValidation.updateContact), async (ctx) => {
+    const user = ctx.get("user");
+    const dto = ctx.req.valid("json");
+    const id = ctx.req.param("id");
+    await contactService.updateContact(dto, id, user._id);
+    return ctx.json(ResponseDto.success("Contact updated successfully"));
   });
 
 export type TContactRoute = typeof contactRoute;
