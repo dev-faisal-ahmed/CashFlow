@@ -6,6 +6,7 @@ import { ResponseDto } from "./core/response.dto";
 import { handleGlobalError } from "./core/global.error.handler";
 import { walletRoute } from "./modules/wallet/wallet.route";
 import { sourceRoute } from "./modules/source/source.router";
+import { contactRoute } from "./modules/contact/contact.route";
 
 const app = new Hono().basePath("/api/v1");
 
@@ -20,6 +21,7 @@ app.get("/", (ctx) => {
 app.route("/auth", authRoute);
 app.route("/wallets", walletRoute);
 app.route("/sources", sourceRoute);
+app.route("/contacts", contactRoute);
 
 // Error Handler
 

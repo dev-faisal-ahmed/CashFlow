@@ -13,3 +13,5 @@ const createContact = z.object({
 });
 
 export const contactValidation = { createContact };
+
+export type CreateContactDto = z.infer<typeof createContact>;

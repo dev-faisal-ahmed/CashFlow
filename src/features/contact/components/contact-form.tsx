@@ -1,21 +1,26 @@
+import z from "zod";
+
 import { FC } from "react";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { TContactForm } from "../contact-type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { contactFormSchema } from "../contact-schema";
 import { FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { capitalize } from "@/lib/utils";
 
+// Shared Types
+export type TContactFormData = z.infer<typeof contactFormSchema>;
+
+// Main : Contact Form
 type ContactFormProps = {
   formId: string;
-  defaultValues: TContactForm;
-  onSubmit: (formData: TContactForm, onReset: () => void) => void;
+  defaultValues: TContactFormData;
+  onSubmit: (formData: TContactFormData, onReset: () => void) => void;
 };
 
 export const ContactForm: FC<ContactFormProps> = ({ formId, defaultValues, onSubmit }) => {
-  const form = useForm<TContactForm>({ resolver: zodResolver(contactFormSchema), defaultValues });
+  const form = useForm<TContactFormData>({ resolver: zodResolver(contactFormSchema), defaultValues });
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
@@ -36,3 +41,20 @@ export const ContactForm: FC<ContactFormProps> = ({ formId, defaultValues, onSub
     </Form>
   );
 };
+
+// Schemas
+export const contactFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .nonempty("Name can not be empty")
+    .transform((value) => capitalize(value)),
+
+  phone: z
+    .string()
+    .trim()
+    .nonempty("Phone can not be empty")
+    .regex(/^\+?[0-9]{5,20}$/, "Invalid phone number"),
+
+  address: z.string().trim().optional(),
+});

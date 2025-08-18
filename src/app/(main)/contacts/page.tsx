@@ -15,7 +15,7 @@ const Page = () => (
       <AddContact />
     </TopbarContent>
 
-    <ContactTable />
+    {/* <ContactTable /> */}
   </>
 );
 
