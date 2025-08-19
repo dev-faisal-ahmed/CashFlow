@@ -2,7 +2,16 @@ import { Types, startSession } from "mongoose";
 import { AppError } from "@/server/core/app.error";
 import { TransactionRepository } from "../transaction/transaction.repository";
 import { WalletRepository } from "./wallet.repository";
-import { CreateWalletDto, GetAllWalletsArgs, UpdateWalletDto, WalletTransferDto } from "./wallet.validation";
+import { GetAllWalletsArgs, UpdateWalletDto, WalletTransferDto } from "./wallet.validation";
+import { IWallet } from "./wallet.interface";
+import { WithUserId } from "@/server/types";
+
+// types
+type CreateWallet = Pick<IWallet, "name" | "isSaving" | "ownerId"> & { initialBalance?: number };
+type GetWallets = WithUserId<{ query: GetAllWalletsArgs }>;
+type UpdateWallet = WithUserId<{ id: string; dto: UpdateWalletDto }>;
+type DeleteWallet = WithUserId<{ id: string }>;
+type WalletTransfer = WithUserId<{ dto: WalletTransferDto }>;
 
 export class WalletService {
   private walletRepository: WalletRepository;
@@ -13,7 +22,7 @@ export class WalletService {
     this.transactionRepository = new TransactionRepository();
   }
 
-  async createWalletWithInitialTransaction(dto: CreateWalletDto, ownerId: Types.ObjectId) {
+  async createWalletWithInitialTransaction({ ownerId, ...dto }: CreateWallet) {
     const isWalletExist = await this.walletRepository.isWalletExistWithName(dto.name, ownerId.toString());
     if (isWalletExist) throw new AppError("Wallet already exists", 409);
 
@@ -24,10 +33,10 @@ export class WalletService {
       const [wallet] = await this.walletRepository.createWallet({ ...dto, ownerId }, session);
 
       if (dto.initialBalance) {
-        const transaction = await this.transactionRepository.createInitialTransaction(
-          { ownerId, amount: dto.initialBalance, walletId: wallet._id },
+        const transaction = await this.transactionRepository.createInitialTransaction({
+          dto: { ownerId, amount: dto.initialBalance, walletId: wallet._id },
           session,
-        );
+        });
 
         if (!transaction) throw new AppError("Failed to create initial transaction", 500);
       }
@@ -42,31 +51,31 @@ export class WalletService {
     }
   }
 
-  async getWallets(query: GetAllWalletsArgs, ownerId: Types.ObjectId) {
-    return this.walletRepository.getWallets(query, ownerId);
+  async getWallets({ query, userId }: GetWallets) {
+    return this.walletRepository.getWallets(query, userId);
   }
 
-  async updateWallet(dto: UpdateWalletDto, walletId: string, userId: Types.ObjectId) {
-    const isOwner = await this.walletRepository.isOwner(walletId, userId);
+  async updateWallet({ id, userId, dto }: UpdateWallet) {
+    const isOwner = await this.walletRepository.isOwner(id, userId);
     if (!isOwner) throw new AppError("You are not authorized to update this wallet", 401);
 
-    const result = await this.walletRepository.updateWallet(dto, walletId);
+    const result = await this.walletRepository.updateWallet(dto, id);
     if (!result.modifiedCount) throw new AppError("Wallet was not updated", 500);
 
     return result;
   }
 
-  async deleteWallet(walletId: string, userId: Types.ObjectId) {
-    const isOwner = await this.walletRepository.isOwner(walletId, userId);
+  async deleteWallet({ id, userId }: DeleteWallet) {
+    const isOwner = await this.walletRepository.isOwner(id, userId);
     if (!isOwner) throw new AppError("You are not authorized to delete this wallet", 401);
 
-    const result = await this.walletRepository.updateWallet({ isDeleted: true }, walletId);
+    const result = await this.walletRepository.updateWallet({ isDeleted: true }, id);
     if (!result.modifiedCount) throw new AppError("Wallet was not deleted", 500);
 
     return result;
   }
 
-  async walletTransfer(dto: WalletTransferDto, userId: Types.ObjectId) {
+  async walletTransfer({ dto, userId }: WalletTransfer) {
     const { senderWallet, receiverWallet } = await this.walletRepository.getWalletInfoForTransfer(dto.senderWalletId, dto.receiverWalletId);
 
     if (!senderWallet) throw new AppError("Sender wallet not found", 404);
