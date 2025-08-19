@@ -16,9 +16,8 @@ import {
 
 import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
-import { AppLogo } from "../components/shared/app-logo";
+import { AppLogo, CommonAvatar } from "../components/shared";
 import { useNavItems } from "./main-layout-hook";
-import { CommonAvatar } from "../components/shared/common-avatar";
 import { useSession } from "next-auth/react";
 import { Logout } from "@/features/auth/components";
 import { usePopupState } from "@/lib/hooks";

@@ -1,17 +1,18 @@
+import { FC } from "react";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartNoAxesCombinedIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
-import { FC } from "react";
 import { usePopupState } from "@/lib/hooks";
 import { ActionMenu } from "@/components/shared";
 import { UpdateSource } from "./update-source";
-import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
-import { TSource } from "../source-type";
+import { EBudgetInterval, ESourceType, ISource } from "@/server/modules/source/source.interface";
 import { DeleteSource } from "./delete-source";
 
 // Main
+type TSource = Pick<ISource, "name" | "type" | "budget"> & { _id: string };
+
 type SourceCardProps = TSource & {
   income: number;
   expense: number;
