@@ -20,7 +20,7 @@ export const contactRoute = new Hono()
   .get("/", authGuard, queryValidator(contactValidation.getContacts), async (ctx) => {
     const user = ctx.get("user");
     const query = ctx.req.valid("query");
-    const { contacts, meta } = await contactService.getContacts(query, user._id);
+    const { contacts, meta } = await contactService.getContacts({ query, userId: user._id });
     return ctx.json(ResponseDto.success({ message: "Contacts fetched successfully", meta, data: contacts }));
   })
 
@@ -29,7 +29,7 @@ export const contactRoute = new Hono()
     const user = ctx.get("user");
     const dto = ctx.req.valid("json");
     const id = ctx.req.param("id");
-    await contactService.updateContact(dto, id, user._id);
+    await contactService.updateContact({ id, dto, userId: user._id });
     return ctx.json(ResponseDto.success("Contact updated successfully"));
   })
 
@@ -37,7 +37,7 @@ export const contactRoute = new Hono()
   .delete("/:id", authGuard, async (ctx) => {
     const user = ctx.get("user");
     const id = ctx.req.param("id");
-    await contactService.deleteContact(id, user._id);
+    await contactService.deleteContact({ id, userId: user._id });
     return ctx.json(ResponseDto.success("Contact deleted successfully"));
   });
 

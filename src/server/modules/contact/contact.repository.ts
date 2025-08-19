@@ -5,17 +5,21 @@ import { GetContactsArgs } from "./contact.validation";
 import { QueryHelper } from "@/server/helpers/query.helper";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { AppError } from "@/server/core/app.error";
+import { WithUserId } from "@/server/types";
 
 // Types
-type CreateContactDto = Pick<IContact, "name" | "phone" | "address" | "userId">;
-type UpdateContactDto = Partial<IContact>;
+type CreateContact = Pick<IContact, "name" | "phone" | "address" | "userId">;
+type GetContacts = WithUserId<{ query: GetContactsArgs }>;
+type UpdateContact = { id: string; dto: Partial<IContact> };
+type IsContactExist = { phone: string; userId: Types.ObjectId };
+type IsOwner = WithUserId<{ id: string }>;
 
 export class ContactRepository {
-  async createContact(dto: CreateContactDto) {
+  async createContact(dto: CreateContact) {
     return ContactModel.create(dto);
   }
 
-  async getContacts(query: GetContactsArgs, userId: Types.ObjectId) {
+  async getContacts({ query, userId }: GetContacts) {
     const requestedFields = query.fields;
     const { search, page } = query;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
@@ -81,17 +85,17 @@ export class ContactRepository {
     return { contacts, meta };
   }
 
-  async updateContact(id: string, dto: UpdateContactDto) {
+  async updateContact({ id, dto }: UpdateContact) {
     return ContactModel.updateOne({ _id: id }, { $set: dto });
   }
 
   // helper
-  async isContactExistWithPhone(phone: string, userId: Types.ObjectId) {
+  async isContactExist({ phone, userId }: IsContactExist) {
     return ContactModel.findOne({ phone, userId }, { _id: 1 }).lean();
   }
 
-  async isOwner(contactId: string, userId: Types.ObjectId) {
-    const contact = await ContactModel.findOne({ _id: contactId }, { _id: 1, userId: 1 }).lean();
+  async isOwner({ id, userId }: IsOwner) {
+    const contact = await ContactModel.findOne({ _id: id }, { _id: 1, userId: 1 }).lean();
     if (!contact) throw new AppError("Contact not found!", 404);
     return contact.userId.equals(userId);
   }
