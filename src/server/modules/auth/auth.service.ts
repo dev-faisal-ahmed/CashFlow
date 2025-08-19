@@ -9,6 +9,7 @@ import { UserRepository } from "../user/user.repository";
 
 // Types
 type TLoginResponse = { _id: Types.ObjectId; name: string; email: string; image?: string };
+type ComparePassword = { givenPassword: string; hashedPassword: string };
 
 export class AuthService {
   private userRepository: UserRepository;
@@ -27,7 +28,7 @@ export class AuthService {
     if (!user) throw new AppError("User not found", 404);
     if (user.provider !== EUserProvider.credentials) throw new AppError("Invalid provider");
 
-    const isPasswordMatch = await this.comparePassword(dto.password, user.password ?? "");
+    const isPasswordMatch = await this.comparePassword({ givenPassword: dto.password, hashedPassword: user.password ?? "" });
     if (!isPasswordMatch) throw new AppError("Password did not match!");
 
     return this.mapLoginResponse(user);
@@ -46,7 +47,7 @@ export class AuthService {
     return bcrypt.hash(password, SALT);
   }
 
-  async comparePassword(givenPassword: string, hashedPassword: string) {
+  async comparePassword({ givenPassword, hashedPassword }: ComparePassword) {
     return bcrypt.compare(givenPassword, hashedPassword);
   }
 
