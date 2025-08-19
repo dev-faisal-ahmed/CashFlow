@@ -29,4 +29,10 @@ export class ContactService {
     if (!isOwner) throw new AppError("You are not authorized to update this contact", 401);
     return this.contactRepository.updateContact(contactId, dto);
   }
+
+  async deleteContact(contactId: string, userId: Types.ObjectId) {
+    const isOwner = await this.contactRepository.isOwner(contactId, userId);
+    if (!isOwner) throw new AppError("You are not authorized to delete this contact", 401);
+    return this.contactRepository.updateContact(contactId, { isDeleted: true });
+  }
 }

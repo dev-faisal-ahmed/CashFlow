@@ -64,7 +64,7 @@ export const DataTable = <TData, TValue>({
             <DataTableBody tableRows={table.getRowModel().rows} tableColumns={tableColumns} />
           </TableBody>
         </Table>
-        {pagination && pageCount < 1 && <TablePagination table={table} />}
+        {pagination && pageCount > 1 && <TablePagination table={table} />}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

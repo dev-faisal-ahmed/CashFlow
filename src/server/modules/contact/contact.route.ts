@@ -31,6 +31,14 @@ export const contactRoute = new Hono()
     const id = ctx.req.param("id");
     await contactService.updateContact(dto, id, user._id);
     return ctx.json(ResponseDto.success("Contact updated successfully"));
+  })
+
+  // Delete Contact
+  .delete("/:id", authGuard, async (ctx) => {
+    const user = ctx.get("user");
+    const id = ctx.req.param("id");
+    await contactService.deleteContact(id, user._id);
+    return ctx.json(ResponseDto.success("Contact deleted successfully"));
   });
 
 export type TContactRoute = typeof contactRoute;

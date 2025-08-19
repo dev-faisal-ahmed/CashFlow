@@ -14,6 +14,7 @@ import { ToString } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { UpdateContact } from "./update-contact";
+import { DeleteContact } from "./delete-contact";
 
 // Types
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
@@ -94,11 +95,7 @@ export const ContactTable = () => {
 
     {
       id: "action",
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center gap-2">
-          <ContactActionMenu {...row.original} />
-        </div>
-      ),
+      cell: ({ row }) => <ContactActionMenu {...row.original} />,
     },
   ] as ColumnDef<TContact>[];
 
@@ -115,7 +112,12 @@ export const ContactTable = () => {
 };
 
 const ContactActionMenu: FC<TContact> = ({ _id, name, phone, address }) => {
-  return <UpdateContact contactId={_id} name={name} phone={phone} address={address} />;
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <UpdateContact contactId={_id} name={name} phone={phone} address={address} />
+      <DeleteContact contactId={_id} />
+    </div>
+  );
 };
 
 // Api Calling
