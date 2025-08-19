@@ -12,7 +12,7 @@ export const sourceRoute = new Hono()
   .post("/", authGuard, jsonValidator(sourceValidation.createSource), async (ctx) => {
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
-    await sourceService.createSource(dto, user._id);
+    await sourceService.createSource({ userId: user._id, dto });
     return ctx.json(ResponseDto.success("Source created successfully"));
   })
 
@@ -20,7 +20,7 @@ export const sourceRoute = new Hono()
   .get("/", authGuard, queryValidator(sourceValidation.getSources), async (ctx) => {
     const query = ctx.req.valid("query");
     const user = ctx.get("user");
-    const { sources, meta } = await sourceService.getSources(query, user._id);
+    const { sources, meta } = await sourceService.getSources({ userId: user._id, query });
     return ctx.json(ResponseDto.success({ message: "Sources fetched successfully", meta, data: sources }));
   })
 
@@ -29,7 +29,7 @@ export const sourceRoute = new Hono()
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
     const id = ctx.req.param("id");
-    await sourceService.updateSource(dto, id, user._id);
+    await sourceService.updateSource({ id, userId: user._id, dto });
     return ctx.json(ResponseDto.success("Source updated successfully"));
   })
 
@@ -37,7 +37,7 @@ export const sourceRoute = new Hono()
   .delete("/:id", authGuard, async (ctx) => {
     const user = ctx.get("user");
     const id = ctx.req.param("id");
-    await sourceService.deleteSource(id, user._id);
+    await sourceService.deleteSource({ id, userId: user._id });
     return ctx.json(ResponseDto.success("Source deleted successfully"));
   });
 

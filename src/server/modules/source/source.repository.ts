@@ -6,12 +6,18 @@ import { QueryHelper } from "@/server/helpers/query.helper";
 import { AppError } from "@/server/core/app.error";
 import { ISource } from "./source.interface";
 
+// Types
+type CreateSource = { dto: CreateSourceDto; ownerId: Types.ObjectId };
+type GetSources = { query: GetSourcesArgs; ownerId: Types.ObjectId };
+type UpdateSource = { id: string; dto: Partial<ISource> };
+type IsOwner = { sourceId: string; userId: Types.ObjectId };
+
 export class SourceRepository {
-  async createSource(dto: CreateSourceDto, ownerId: Types.ObjectId) {
+  async createSource({ dto, ownerId }: CreateSource) {
     return SourceModel.create({ ...dto, ownerId });
   }
 
-  async getSources(query: GetSourcesArgs, ownerId: Types.ObjectId) {
+  async getSources({ query, ownerId }: GetSources) {
     const { search, type, page } = query;
     const requestedFields = query.fields;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
@@ -140,12 +146,12 @@ export class SourceRepository {
     return { sources, meta };
   }
 
-  async updateSource(dto: Partial<ISource>, id: string) {
+  async updateSource({ id, dto }: UpdateSource) {
     return SourceModel.updateOne({ _id: id }, dto);
   }
 
   // helper
-  async isOwner(sourceId: string, userId: Types.ObjectId) {
+  async isOwner({ sourceId, userId }: IsOwner) {
     const source = await SourceModel.findOne({ _id: sourceId }, { ownerId: 1 }).lean();
     if (!source) throw new AppError("Source not found!", 404);
     return source.ownerId.equals(userId);
