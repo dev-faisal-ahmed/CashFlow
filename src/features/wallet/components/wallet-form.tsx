@@ -1,14 +1,13 @@
+"use client";
+
 import { FC } from "react";
 import { Form } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { TAddWalletFormData, TUpdateWalletFormData, walletSchema } from "../wallet-schema";
-
-export type TWalletFormData = TAddWalletFormData | TUpdateWalletFormData;
+import { TWalletFormData } from "../wallet.schema";
+import { useWalletForm } from "../wallet.hook";
 
 type WalletFormProps = {
   formId: string;
@@ -18,9 +17,7 @@ type WalletFormProps = {
 };
 
 export const WalletForm: FC<WalletFormProps> = ({ formId, mode, defaultValues, onSubmit }) => {
-  const schema = mode === "add" ? walletSchema.addWallet : walletSchema.updateWallet;
-  const form = useForm<TWalletFormData>({ resolver: zodResolver(schema), defaultValues });
-  const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
+  const { form, handleSubmit } = useWalletForm({ mode, defaultValues, onSubmit });
 
   return (
     <Form {...form}>

@@ -11,9 +11,10 @@ import { usePopupState } from "@/lib/hooks";
 import { UpdateWallet } from "./update-wallet";
 import { DeleteWallet } from "./delete-wallet";
 import { WalletTransfer } from "./wallet-transfer";
-
+import { IWallet } from "@/server/modules/wallet/wallet.interface";
 // Shared Types
-type TWalletData = { _id: string; name: string; isSaving?: boolean; balance: number };
+
+type TWalletData = Pick<IWallet, "name" | "isSaving"> & { _id: string; balance: number };
 
 export const WalletCard: FC<TWalletData> = ({ _id, name, isSaving, balance }) => (
   <Card>

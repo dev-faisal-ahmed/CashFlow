@@ -1,48 +1,22 @@
 "use client";
 
 import { FC, Suspense } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { CommonSelect, FieldForm, FormDialog } from "@/components/shared/form";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { SendHorizontalIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
-import { TWalletTransferFormData, walletSchema } from "../wallet-schema";
-import { walletClient } from "@/lib/client";
-import { WalletTransferDto } from "@/server/modules/wallet/wallet.validation";
+import { TWalletTransferFormData } from "../wallet.schema";
+import { useGetWalletsForTransfer, useTransferWallet, useTransferWalletForm } from "../wallet.hook";
 
 type WalletTransferProps = { balance: number; walletId: string; onSuccess: () => void };
-const mutationKey = `transfer-${queryKeys.wallet}`;
 
 export const WalletTransfer: FC<WalletTransferProps> = ({ walletId, onSuccess }) => {
-  const { open, onOpenChange } = usePopupState();
-  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: transferWalletApi });
-  const queryClient = useQueryClient();
-
-  const handleTransferWallet = (formData: TWalletTransferFormData, onReset: () => void) => {
-    mutate(
-      {
-        amount: formData.amount,
-        senderWalletId: walletId,
-        receiverWalletId: formData.destinationWalletId,
-        ...(formData.description && { description: formData.description }),
-      },
-      {
-        onSuccess: () => {
-          onReset();
-          queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
-          onOpenChange(false);
-          onSuccess();
-        },
-      },
-    );
-  };
+  const mutationKey = `transfer-${queryKeys.wallet}-${walletId}`;
+  const { open, onOpenChange, handleTransferWallet } = useTransferWallet({ mutationKey, walletId, onSuccess });
 
   return (
     <>
@@ -70,12 +44,7 @@ type TransferWalletFormProps = {
 };
 
 const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sourceWalletId }) => {
-  const form = useForm<TWalletTransferFormData>({
-    resolver: zodResolver(walletSchema.walletTransfer),
-    defaultValues: { amount: 0, description: "", destinationWalletId: "", sourceWalletId },
-  });
-
-  const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
+  const { form, handleSubmit } = useTransferWalletForm({ sourceWalletId, onSubmit });
 
   return (
     <Form {...form}>
@@ -105,29 +74,9 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
 type DestinationWalletSelectionProps = { sourceWalletId: string; value: string; onChange: (value: string) => void };
 
 const DestinationWalletSelection: FC<DestinationWalletSelectionProps> = ({ sourceWalletId, value, onChange }) => {
-  const { data: walletList } = useQuery({
-    queryKey: [queryKeys.wallet, "for-transaction"],
-    queryFn: getWalletListForTransferApi,
-    select: (res) => res.map((wallet) => ({ value: wallet._id, label: wallet.name })).filter((wallet) => wallet.value !== sourceWalletId),
-  });
+  const { data: walletList } = useGetWalletsForTransfer(sourceWalletId);
 
   return <CommonSelect value={value} onChange={onChange} options={walletList ?? []} placeholder="Select destination wallet" />;
 };
 
 const WalletSelectionSKeleton = () => <Skeleton className="h-input" />;
-
-// Api
-const getWalletListForTransferApi = async () => {
-  const res = await walletClient.index.$get({ query: { fields: "_id,name,balance", getAll: "true" } });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-  const parsed = await walletSchema.walletListDataForTransfer.parseAsync(resData.data);
-  return parsed;
-};
-
-const transferWalletApi = async (payload: WalletTransferDto) => {
-  const res = await walletClient.transfer.$post({ json: payload });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-  return resData;
-};

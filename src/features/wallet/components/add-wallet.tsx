@@ -3,30 +3,14 @@
 import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { TWalletFormData, WalletForm } from "./wallet-form";
-import { usePopupState } from "@/lib/hooks";
+import { WalletForm } from "./wallet-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useMutation } from "@tanstack/react-query";
-import { TAddWalletFormData } from "../wallet-schema";
-import { CreateWalletDto } from "@/server/modules/wallet/wallet.validation";
-import { walletClient } from "@/lib/client";
+import { useAddWallet } from "../wallet.hook";
 
 const mutationKey = `add-${queryKeys.wallet}`;
 
 export const AddWallet = () => {
-  const { open, onOpenChange } = usePopupState();
-  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: addWalletApi });
-
-  const handleAddWallet = (formData: TWalletFormData, onReset: () => void) => {
-    const payload = formData as TAddWalletFormData;
-
-    mutate(payload, {
-      onSuccess: () => {
-        onReset();
-        onOpenChange(false);
-      },
-    });
-  };
+  const { open, onOpenChange, handleAddWallet } = useAddWallet(mutationKey);
 
   return (
     <>
@@ -45,11 +29,4 @@ export const AddWallet = () => {
       </FormDialog>
     </>
   );
-};
-
-const addWalletApi = async (dto: CreateWalletDto) => {
-  const res = await walletClient.index.$post({ json: dto });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-  return resData;
 };

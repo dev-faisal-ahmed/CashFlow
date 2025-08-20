@@ -62,3 +62,5 @@ export const walletSchema = {
 export type TAddWalletFormData = z.infer<typeof addWallet>;
 export type TUpdateWalletFormData = z.infer<typeof updateWallet>;
 export type TWalletTransferFormData = z.infer<typeof walletTransfer>;
+
+export type TWalletFormData = TAddWalletFormData | TUpdateWalletFormData;

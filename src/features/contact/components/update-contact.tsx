@@ -18,7 +18,7 @@ type UpdateContactProps = {
 
 export const UpdateContact: FC<UpdateContactProps> = ({ contactId, name, phone, address }) => {
   const mutationKey = `update-${queryKeys.contact}-${contactId}`;
-  const { open, onOpenChange, handleUpdateContact } = useUpdateContact({ mutationKey, contactId });
+  const { open, onOpenChange, handleUpdateContact } = useUpdateContact({ mutationKey, id: contactId });
 
   return (
     <>
