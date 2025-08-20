@@ -2,16 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { LogOutIcon } from "lucide-react";
-import { logout } from "../auth.action";
-import { useRouter } from "next/navigation";
+import { useLogout } from "../auth.hooks";
 
 export const Logout = () => {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
+  const { handleLogout } = useLogout();
 
   return (
     <Button

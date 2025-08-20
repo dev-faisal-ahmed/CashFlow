@@ -1,9 +1,11 @@
 "use server";
 
 import { auth, signIn, signOut } from "@/lib/auth";
-import { TLoginFormData } from "./auth-schema";
 
-export const loginWithCredentials = async (payload: TLoginFormData) => {
+// Types
+export type LoginWithCredentialsDto = { email: string; password: string };
+
+export const loginWithCredentials = async (payload: LoginWithCredentialsDto) => {
   try {
     await signIn("credentials", { ...payload, redirect: false });
     return { success: true, message: "You have been successfully logged in" };
@@ -13,7 +15,7 @@ export const loginWithCredentials = async (payload: TLoginFormData) => {
 };
 
 export const logout = async () => {
-  await signOut();
+  return signOut();
 };
 
-export const getAuth = async () => await auth();
+export const getAuth = async () => auth();

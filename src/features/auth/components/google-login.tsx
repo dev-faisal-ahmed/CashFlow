@@ -2,12 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { signIn } from "next-auth/react";
+import { useGoogleLogin } from "../auth.hooks";
 
 export const GoogleLogin = () => {
-  const handleGoogleLogin = async () => {
-    signIn("google");
-  };
+  const { handleGoogleLogin } = useGoogleLogin();
 
   return (
     <Button onClick={handleGoogleLogin} className="w-full cursor-pointer font-semibold" variant="outline">

@@ -1,7 +1,8 @@
 export const queryKeys = {
   auth: {
     login: "login",
-    singup: "signup",
+    signup: "singup",
+    session: "session",
   },
   wallet: "wallet",
   source: "source",

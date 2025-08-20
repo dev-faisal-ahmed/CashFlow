@@ -18,10 +18,10 @@ import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { AppLogo, CommonAvatar } from "../components/shared";
 import { useNavItems } from "./main-layout-hook";
-import { useSession } from "next-auth/react";
 import { Logout } from "@/features/auth/components";
 import { usePopupState } from "@/lib/hooks";
 import { Button } from "../components/ui/button";
+import { useAuth } from "@/features/auth/auth.hooks";
 
 export const AppSidebar = () => (
   <Sidebar variant="inset">
@@ -69,10 +69,10 @@ const AppSidebarNavItems = () => {
 };
 
 const AppSidebarFooter = () => {
-  const session = useSession();
-  if (!session.data?.user) return null;
+  const { data: session } = useAuth();
+  if (!session?.user) return null;
 
-  const user = session.data.user;
+  const user = session.user;
 
   return (
     <SidebarFooter>

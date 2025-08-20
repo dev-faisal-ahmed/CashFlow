@@ -2,11 +2,11 @@
 
 import { FC } from "react";
 import { useForm } from "react-hook-form";
-import { authSchema, TLoginFormData, TSignupFormData } from "../auth-schema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
+import { authSchema, TLoginFormData, TSignupFormData } from "../auth.schema";
 import { FieldForm, PasswordInput } from "@/components/shared/form";
 import { LockIcon, MailIcon, UserIcon } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 
 type AuthFormProps = {
@@ -25,9 +25,7 @@ export const AuthForm: FC<AuthFormProps> = ({ formId, formType, onSubmit }) => {
   const defaultValues = formType === "signup" ? signupDefaultValue : loginDefaultValue;
   const form = useForm<TAuthFormData>({ resolver: zodResolver(schema), defaultValues });
 
-  const handleSubmit = form.handleSubmit((formData: TAuthFormData) => {
-    onSubmit(formData, form.reset);
-  });
+  const handleSubmit = form.handleSubmit((formData: TAuthFormData) => onSubmit(formData, form.reset));
 
   return (
     <Form {...form}>
