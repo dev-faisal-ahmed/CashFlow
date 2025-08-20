@@ -1,37 +1,23 @@
 "use client";
 
-import z from "zod";
-
 import { FC } from "react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { CommonAvatar } from "@/components/shared";
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
-import { GetContactsArgs } from "@/server/modules/contact/contact.validation";
-import { contactClient } from "@/lib/client";
-import { ToString } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/lib/query.keys";
 import { UpdateContact } from "./update-contact";
 import { DeleteContact } from "./delete-contact";
+import { useGetContacts } from "../contact.hooks";
 
-// Types
-type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
-type TContact = TApiResponse["data"][number];
+type TApiResponse = ReturnType<typeof useGetContacts>["apiResponse"];
+type TContact = NonNullable<TApiResponse>["contacts"][number];
 
 // Accessor
 const { accessor } = createColumnHelper<TContact>();
 
 export const ContactTable = () => {
-  const { pagination, setPagination } = usePagination(10);
-  const { data: apiResponse, isLoading } = useQuery({
-    queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1 }],
-    queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
-    select: (res) => ({ contacts: res.data, meta: res.meta }),
-  });
-
-  const contacts = apiResponse?.contacts;
+  const { apiResponse, isLoading, pagination, setPagination } = useGetContacts();
+  const contacts = apiResponse?.contacts ?? [];
 
   const column = [
     {
@@ -102,7 +88,7 @@ export const ContactTable = () => {
   return (
     <DataTable
       columns={column}
-      data={contacts ?? []}
+      data={contacts}
       isLoading={isLoading}
       pageCount={apiResponse?.meta?.totalPage ?? 0}
       pagination={pagination}
@@ -119,25 +105,3 @@ const ContactActionMenu: FC<TContact> = ({ _id, name, phone, address }) => {
     </div>
   );
 };
-
-// Api Calling
-const getContactsApi = async (args: ToString<GetContactsArgs>) => {
-  const res = await contactClient.index.$get({ query: { ...args, fields: "_id,name,phone,address,given,taken" } });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-
-  const parsedData = await getContactsSchema.parseAsync(resData.data);
-  return { data: parsedData, meta: resData.meta };
-};
-
-// Schema
-const getContactsSchema = z.array(
-  z.object({
-    _id: z.string(),
-    name: z.string(),
-    phone: z.string(),
-    address: z.string().optional(),
-    given: z.number(),
-    taken: z.number(),
-  }),
-);
