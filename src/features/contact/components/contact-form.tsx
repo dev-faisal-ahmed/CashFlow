@@ -3,7 +3,7 @@ import { Form } from "@/components/ui/form";
 import { FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useContactForm } from "../contact.hooks";
+import { useContactForm } from "../contact.hook";
 import { TContactFormData } from "../contact.schema";
 
 // Main : Contact Form

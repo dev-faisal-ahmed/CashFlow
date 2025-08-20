@@ -6,11 +6,8 @@ import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
 import { SourceForm } from "./source-form";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
-import { usePopupState } from "@/lib/hooks";
-import { UpdateSourceDto } from "@/server/modules/source/source.validation";
-import { sourceClient } from "@/lib/client";
 import { queryKeys } from "@/lib/query.keys";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUpdateSource } from "../source.hook";
 
 interface UpdateSourceProps {
   _id: string;
@@ -22,24 +19,7 @@ interface UpdateSourceProps {
 
 export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, onSuccess }) => {
   const mutationKey = `update-${queryKeys.source}-${_id}`;
-  const queryClient = useQueryClient();
-
-  const { open, onOpenChange } = usePopupState();
-  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateSourceApi });
-
-  const handleUpdateSource = async (formData: UpdateSourceDto, onReset: () => void) => {
-    mutate(
-      { id: _id, ...formData },
-      {
-        onSuccess: () => {
-          onReset();
-          queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
-          onOpenChange(false);
-          onSuccess();
-        },
-      },
-    );
-  };
+  const { open, onOpenChange, handleUpdateSource } = useUpdateSource({ id: _id, mutationKey, onSuccess });
 
   return (
     <>
@@ -63,11 +43,4 @@ export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, o
       </FormDialog>
     </>
   );
-};
-
-const updateSourceApi = async ({ id, ...dto }: UpdateSourceDto & { id: string }) => {
-  const res = await sourceClient[":id"].$patch({ param: { id }, json: dto });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-  return resData;
 };

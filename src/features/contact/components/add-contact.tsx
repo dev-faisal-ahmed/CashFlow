@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { ContactForm } from "./contact-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useAddContact } from "../contact.hooks";
+import { useAddContact } from "../contact.hook";
 
 const mutationKey = `add-${queryKeys.contact}`;
 

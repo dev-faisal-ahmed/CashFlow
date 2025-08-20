@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AuthEntryCard } from "./auth-entry-card";
 import { AuthForm } from "./auth-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useSignup } from "../auth.hooks";
+import { useSignup } from "../auth.hook";
 
 const queryKey = queryKeys.auth.signup;
 

@@ -82,7 +82,7 @@ const SourceCardIncomeExpense: FC<SourceCardIncomeExpenseProps> = ({ type, incom
   return (
     <div
       data-type={type}
-      className="dark:bg-background data-[type=EXPENSE]:bg-destructive/5 flex items-center justify-between gap-6 rounded-md p-4 data-[type=INCOME]:bg-emerald-50"
+      className="dark:bg-background data-[type=expense]:bg-destructive/5 flex items-center justify-between gap-6 rounded-md p-4 data-[type=income]:bg-emerald-50"
     >
       <p className="text-sm font-semibold">{description}</p>
       <h3 className="text-2xl font-semibold">$ {amount}</h3>

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { useLoginWithGoogle } from "../auth.hooks";
+import { useLoginWithGoogle } from "../auth.hook";
 
 export const GoogleLogin = () => {
   const { handleGoogleLogin } = useLoginWithGoogle();

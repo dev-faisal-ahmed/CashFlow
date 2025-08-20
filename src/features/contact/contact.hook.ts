@@ -52,10 +52,10 @@ export const useGetContacts = () => {
 // Update Contact
 type TUseUpdateContact = {
   mutationKey: string;
-  contactId: string;
+  id: string;
 };
 
-export const useUpdateContact = ({ mutationKey, contactId }: TUseUpdateContact) => {
+export const useUpdateContact = ({ mutationKey, id }: TUseUpdateContact) => {
   const queryClient = useQueryClient();
 
   const { open, onOpenChange } = usePopupState();
@@ -63,7 +63,7 @@ export const useUpdateContact = ({ mutationKey, contactId }: TUseUpdateContact) 
 
   const handleUpdateContact = (formData: TContactFormData, onReset: () => void) => {
     mutate(
-      { id: contactId, name: formData.name, address: formData.address },
+      { id, name: formData.name, address: formData.address },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
@@ -80,17 +80,17 @@ export const useUpdateContact = ({ mutationKey, contactId }: TUseUpdateContact) 
 // Delete Contact
 type TUseDeleteContact = {
   mutationKey: string;
-  contactId: string;
+  id: string;
 };
 
-export const useDeleteContact = ({ mutationKey, contactId }: TUseDeleteContact) => {
+export const useDeleteContact = ({ mutationKey, id }: TUseDeleteContact) => {
   const queryClient = useQueryClient();
 
   const { open, onOpenChange } = usePopupState();
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteContactApi });
 
   const handleDeleteContact = () => {
-    mutate(contactId, {
+    mutate(id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
         onOpenChange(false);

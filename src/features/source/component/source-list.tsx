@@ -1,16 +1,13 @@
 "use client";
 
-import { queryKeys } from "@/lib/query.keys";
-import { useQuery } from "@tanstack/react-query";
 import { SourceCard } from "./source-card";
 import { ErrorMessage } from "@/components/shared";
-import { sourceClient } from "@/lib/client";
-import { sourceSchema } from "../source-schema";
 import { SourceListSkeleton } from "./source-loading";
 import { FC, PropsWithChildren } from "react";
+import { useGetSources } from "../source.hook";
 
 export const SourceList = () => {
-  const { data: sourceList, isLoading, isError, error } = useQuery({ queryKey: [queryKeys.source], queryFn: getSourceListApi });
+  const { data: sourceList, isLoading, isError, error } = useGetSources();
 
   if (isLoading) return <LoadingSkeleton />;
   if (isError) throw error;
@@ -32,12 +29,3 @@ const LoadingSkeleton = () => (
     <SourceListSkeleton size={6} />
   </Grid>
 );
-
-// Api
-const getSourceListApi = async () => {
-  const res = await sourceClient.index.$get({ query: { fields: "_id,name,type,budget,income,expense", getAll: "true" } });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-  const validatedData = await sourceSchema.sourceListData.parseAsync(resData.data);
-  return validatedData;
-};

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AuthEntryCard } from "./auth-entry-card";
 import { AuthForm } from "./auth-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useLoginWithCredentials } from "../auth.hooks";
+import { useLoginWithCredentials } from "../auth.hook";
 
 const mutationKey = queryKeys.auth.login;
 

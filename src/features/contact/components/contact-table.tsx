@@ -7,7 +7,7 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/shared/data-table/data-table";
 import { UpdateContact } from "./update-contact";
 import { DeleteContact } from "./delete-contact";
-import { useGetContacts } from "../contact.hooks";
+import { useGetContacts } from "../contact.hook";
 
 type TApiResponse = ReturnType<typeof useGetContacts>["apiResponse"];
 type TContact = NonNullable<TApiResponse>["contacts"][number];

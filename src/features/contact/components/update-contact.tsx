@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
 import { TooltipContainer } from "@/components/shared/tooltip-container";
-import { useUpdateContact } from "../contact.hooks";
+import { useUpdateContact } from "../contact.hook";
 
 type UpdateContactProps = {
   contactId: string;

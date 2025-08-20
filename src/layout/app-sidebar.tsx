@@ -21,7 +21,7 @@ import { useNavItems } from "./main-layout-hook";
 import { Logout } from "@/auth/components";
 import { usePopupState } from "@/lib/hooks";
 import { Button } from "../components/ui/button";
-import { useAuth } from "@/auth/auth.hooks";
+import { useAuth } from "@/features/auth/auth.hook";
 
 export const AppSidebar = () => (
   <Sidebar variant="inset">
@@ -80,6 +80,7 @@ const AppSidebarFooter = () => {
         <SidebarMenuItem>
           <div className="flex h-16 items-center justify-center gap-2 rounded-none border-t py-4 hover:bg-transparent">
             <CommonAvatar name={user.name ?? ""} fallbackClassName="bg-primary text-white" size="SM" />
+
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">{user.name}</span>
               <span className="text-muted-foreground truncate text-xs">{user.email}</span>
@@ -102,6 +103,7 @@ const ActionMenu = () => {
           <EllipsisVerticalIcon className="size-4" />
         </button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent className="w-48 p-2">
         <Button variant="ghost" className="w-full cursor-pointer justify-start px-4 py-2">
           <LockIcon /> Change Password
