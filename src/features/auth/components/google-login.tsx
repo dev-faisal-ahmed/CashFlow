@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { useGoogleLogin } from "../auth.hooks";
+import { useLoginWithGoogle } from "../auth.hooks";
 
 export const GoogleLogin = () => {
-  const { handleGoogleLogin } = useGoogleLogin();
+  const { handleGoogleLogin } = useLoginWithGoogle();
 
   return (
     <Button onClick={handleGoogleLogin} className="w-full cursor-pointer font-semibold" variant="outline">

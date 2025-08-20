@@ -28,3 +28,4 @@ export const authSchema = { signup, login };
 
 export type TSignupFormData = z.infer<typeof signup>;
 export type TLoginFormData = z.infer<typeof login>;
+export type TAuthFormData = TSignupFormData | TLoginFormData;
