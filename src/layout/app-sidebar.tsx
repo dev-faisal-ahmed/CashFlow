@@ -18,10 +18,10 @@ import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { AppLogo, CommonAvatar } from "../components/shared";
 import { useNavItems } from "./main-layout-hook";
-import { Logout } from "@/features/auth/components";
+import { Logout } from "@/auth/components";
 import { usePopupState } from "@/lib/hooks";
 import { Button } from "../components/ui/button";
-import { useAuth } from "@/features/auth/auth.hooks";
+import { useAuth } from "@/auth/auth.hooks";
 
 export const AppSidebar = () => (
   <Sidebar variant="inset">

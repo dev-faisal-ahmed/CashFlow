@@ -1,4 +1,4 @@
-import { SourceListSkeleton } from "@/features/source/component";
+import { SourceListSkeleton } from "@/source/component";
 
 const Loading = () => {
   return (

@@ -1,6 +1,6 @@
 import { TopbarContent } from "@/layout/index";
 import { Header } from "@/components/shared";
-import { getAuth } from "@/features/auth/auth.action";
+import { getAuth } from "@/auth/auth.action";
 
 const Page = async () => {
   const user = await getAuth();

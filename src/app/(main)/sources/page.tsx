@@ -1,5 +1,5 @@
 import { Header } from "@/components/shared";
-import { AddSource, SourceList } from "@/features/source/component";
+import { AddSource, SourceList } from "@/source/component";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (
