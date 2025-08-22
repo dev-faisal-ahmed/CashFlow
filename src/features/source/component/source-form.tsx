@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
-import { useSourceForm } from "../source.hook";
-import { TSourceFormData } from "../source.schema";
+import { sourceSchema, TSourceFormData } from "../source.schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type SourceFormProps = {
   formId: string;
@@ -30,9 +31,11 @@ const typeOptions: { label: string; value: ESourceType }[] = [
 ];
 
 export const SourceForm: FC<SourceFormProps> = ({ mode, formId, defaultValues, onSubmit }) => {
-  const { form, handleSubmit } = useSourceForm({ defaultValues, onSubmit });
+  const form = useForm<TSourceFormData>({ resolver: zodResolver(sourceSchema.source), defaultValues });
   const addBudget = form.watch("addBudget");
   const type = form.watch("type");
+
+  const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
     <Form {...form}>

@@ -7,7 +7,10 @@ import { FormDialog } from "@/components/shared/form";
 import { SourceForm } from "./source-form";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 import { queryKeys } from "@/lib/query.keys";
-import { useUpdateSource } from "../source.hook";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { updateSourceApi } from "../source.api";
+import { TSourceFormData } from "../source.schema";
 
 interface UpdateSourceProps {
   _id: string;
@@ -19,7 +22,24 @@ interface UpdateSourceProps {
 
 export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, onSuccess }) => {
   const mutationKey = `update-${queryKeys.source}-${_id}`;
-  const { open, onOpenChange, handleUpdateSource } = useUpdateSource({ id: _id, mutationKey, onSuccess });
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateSourceApi });
+
+  const handleUpdateSource = async (formData: TSourceFormData, onReset: () => void) => {
+    mutate(
+      { id: _id, ...formData },
+      {
+        onSuccess: () => {
+          onReset();
+          queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+          onOpenChange(false);
+          onSuccess();
+        },
+      },
+    );
+  };
 
   return (
     <>

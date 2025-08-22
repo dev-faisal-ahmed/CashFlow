@@ -6,13 +6,30 @@ import { PlusIcon } from "lucide-react";
 import { SourceForm } from "./source-form";
 import { queryKeys } from "@/lib/query.keys";
 import { ESourceType } from "@/server/modules/source/source.interface";
-import { useAddSource } from "../source.hook";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { addSourceApi } from "../source.api";
+import { TSourceFormData } from "../source.schema";
 
 const mutationKey = `add-${queryKeys.source}`;
 
 export const AddSource = () => {
-  const { open, onOpenChange, handleAddSource } = useAddSource(mutationKey);
+  const queryClient = useQueryClient();
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: addSourceApi });
 
+  const handleAddSource = (formData: TSourceFormData, onReset: () => void) => {
+    mutate(
+      { name: formData.name, type: formData.type, ...(formData.addBudget && { budget: formData.budget }) },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+          onReset();
+          onOpenChange(false);
+        },
+      },
+    );
+  };
   return (
     <>
       <Button onClick={() => onOpenChange(true)}>

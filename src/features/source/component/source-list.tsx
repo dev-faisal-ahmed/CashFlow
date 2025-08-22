@@ -4,10 +4,23 @@ import { SourceCard } from "./source-card";
 import { ErrorMessage } from "@/components/shared";
 import { SourceListSkeleton } from "./source-loading";
 import { FC, PropsWithChildren } from "react";
-import { useGetSources } from "../source.hook";
+import { useSearch } from "@/lib/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query.keys";
+import { getSourceListApi } from "../source.api";
 
 export const SourceList = () => {
-  const { data: sourceList, isLoading, isError, error } = useGetSources();
+  const { value } = useSearch();
+
+  const {
+    data: sourceList,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: [queryKeys.source, value],
+    queryFn: () => getSourceListApi({ search: value }),
+  });
 
   if (isLoading) return <LoadingSkeleton />;
   if (isError) throw error;
