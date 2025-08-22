@@ -4,12 +4,26 @@ import { FC } from "react";
 import { DeleteDialog, TooltipContainer } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
-import { useDeleteContact } from "../contact.hook";
 import { queryKeys } from "@/lib/query.keys";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { deleteContactApi } from "../contact.api";
 
 export const DeleteContact: FC<{ contactId: string }> = ({ contactId }) => {
   const mutationKey = `delete-${queryKeys.contact}-${contactId}`;
-  const { open, onOpenChange, handleDeleteContact } = useDeleteContact({ mutationKey, id: contactId });
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteContactApi });
+
+  const handleDeleteContact = () => {
+    mutate(contactId, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
+        onOpenChange(false);
+      },
+    });
+  };
 
   return (
     <>

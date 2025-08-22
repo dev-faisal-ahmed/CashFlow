@@ -5,12 +5,31 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { ContactForm } from "./contact-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useAddContact } from "../contact.hook";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { createContactApi } from "../contact.api";
+import { TContactFormData } from "../contact.schema";
 
 const mutationKey = `add-${queryKeys.contact}`;
 
 export const AddContact = () => {
-  const { open, onOpenChange, handleAddContact } = useAddContact(mutationKey);
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: createContactApi });
+
+  const handleAddContact = (formData: TContactFormData, onReset: () => void) => {
+    mutate(
+      { ...formData, ...(formData.address && { address: formData.address }) },
+      {
+        onSuccess: () => {
+          onReset();
+          queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
+          onOpenChange(false);
+        },
+      },
+    );
+  };
 
   return (
     <>

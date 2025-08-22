@@ -7,16 +7,25 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/shared/data-table/data-table";
 import { UpdateContact } from "./update-contact";
 import { DeleteContact } from "./delete-contact";
-import { useGetContacts } from "../contact.hook";
+import { usePagination } from "@/lib/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query.keys";
+import { getContactsApi } from "../contact.api";
 
-type TApiResponse = ReturnType<typeof useGetContacts>["apiResponse"];
-type TContact = NonNullable<TApiResponse>["contacts"][number];
+type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
+type TContact = NonNullable<TApiResponse>["data"][number];
 
 // Accessor
 const { accessor } = createColumnHelper<TContact>();
 
 export const ContactTable = () => {
-  const { apiResponse, isLoading, pagination, setPagination } = useGetContacts();
+  const { pagination, setPagination } = usePagination(10);
+  const { data: apiResponse, isLoading } = useQuery({
+    queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1 }],
+    queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
+    select: (res) => ({ contacts: res.data, meta: res.meta }),
+  });
+
   const contacts = apiResponse?.contacts ?? [];
 
   const column = [

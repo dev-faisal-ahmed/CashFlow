@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
 import { TooltipContainer } from "@/components/shared/tooltip-container";
-import { useUpdateContact } from "../contact.hook";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { useMutation } from "@tanstack/react-query";
+import { updateContactApi } from "../contact.api";
+import { TContactFormData } from "../contact.schema";
 
 type UpdateContactProps = {
   contactId: string;
@@ -18,7 +22,23 @@ type UpdateContactProps = {
 
 export const UpdateContact: FC<UpdateContactProps> = ({ contactId, name, phone, address }) => {
   const mutationKey = `update-${queryKeys.contact}-${contactId}`;
-  const { open, onOpenChange, handleUpdateContact } = useUpdateContact({ mutationKey, id: contactId });
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateContactApi });
+
+  const handleUpdateContact = (formData: TContactFormData, onReset: () => void) => {
+    mutate(
+      { id: contactId, name: formData.name, address: formData.address },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
+          onReset();
+          onOpenChange(false);
+        },
+      },
+    );
+  };
 
   return (
     <>
