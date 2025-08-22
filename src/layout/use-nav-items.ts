@@ -13,7 +13,15 @@ export const useNavItems = () => {
       { title: "Wallets", url: "/wallets", icon: WalletIcon, isActive: isActive("/wallets") },
       { title: "Sources", url: "/sources", icon: Plug2Icon, isActive: isActive("/sources") },
       { title: "Contacts", url: "/contacts", icon: UsersIcon, isActive: isActive("/contacts") },
-      { title: "Transactions", url: "/transactions", icon: ArrowUpDown, isActive: isActive("/transactions") },
+      {
+        title: "Transactions",
+        icon: ArrowUpDown,
+        isActive: isActive("/transactions"),
+        items: [
+          { title: "Regular", url: "/transactions/regular", isActive: isActive("/transactions/regular") },
+          { title: "Borrow", url: "/transactions/borrow", isActive: isActive("/transactions/borrow") },
+        ],
+      },
     ];
   }, [pathname]);
 

@@ -12,15 +12,21 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "../components/ui/sidebar";
 
-import { EllipsisVerticalIcon, LockIcon } from "lucide-react";
+import { ChevronRightIcon, EllipsisVerticalIcon, LockIcon } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { AppLogo, CommonAvatar } from "../components/shared";
-import { useNavItems } from "./main-layout-hook";
+import { useNavItems } from "./use-nav-items";
 import { Logout } from "@/auth/components";
 import { useAuth, usePopupState } from "@/lib/hooks";
 import { Button } from "../components/ui/button";
+import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { CollapsibleContent } from "@radix-ui/react-collapsible";
+import { cn } from "@/lib/utils";
 
 export const AppSidebar = () => (
   <Sidebar variant="inset">
@@ -52,19 +58,57 @@ const AppSidebarNavItems = () => {
   return (
     <SidebarGroupContent>
       <SidebarMenu>
-        {navItems.map(({ url, isActive, icon: Icon, title }) => (
-          <SidebarMenuItem key={url}>
-            <SidebarMenuButton asChild isActive={isActive}>
-              <Link className="text-muted-foreground" href={url}>
-                <Icon />
-                <span>{title}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+        {navItems.map((item) => (
+          <SidebarLink key={item.url} {...item} />
         ))}
       </SidebarMenu>
     </SidebarGroupContent>
   );
+};
+
+type TSidebarItem = ReturnType<typeof useNavItems>["navItems"][number];
+
+const SidebarLink = ({ url, icon: Icon, title, items, isActive }: TSidebarItem) => {
+  if (!items)
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={isActive}>
+          <Link className="text-muted-foreground" href={url}>
+            <Icon />
+            <span>{title}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+
+  if (items)
+    return (
+      <Collapsible asChild defaultOpen={isActive} className="group/collapsible">
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton isActive={isActive} className={cn(!isActive && "text-muted-foreground")} tooltip={title}>
+              <Icon />
+              <span>{title}</span>
+              <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {items.map(({ title, url, isActive }) => (
+                <SidebarMenuSubItem key={url}>
+                  <SidebarMenuSubButton asChild isActive={isActive}>
+                    <Link className="text-muted-foreground" href={url}>
+                      <span>{title}</span>
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
+    );
 };
 
 const AppSidebarFooter = () => {
