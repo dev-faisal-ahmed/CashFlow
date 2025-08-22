@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, Suspense } from "react";
-import { CommonSelect, FieldForm, FormDialog } from "@/components/shared/form";
+import { FieldForm, FormDialog } from "@/components/shared/form";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { SendHorizontalIcon } from "lucide-react";
@@ -10,11 +10,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { queryKeys } from "@/lib/query.keys";
 import { TWalletTransferFormData, walletSchema } from "../wallet.schema";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePopupState } from "@/lib/hooks";
-import { getWalletListForTransferApi, transferWalletApi } from "../wallet.api";
+import { transferWalletApi } from "../wallet.api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { WalletSelection } from "./wallet-selection";
 
 type WalletTransferProps = { balance: number; walletId: string; onSuccess: () => void };
 
@@ -87,9 +88,7 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
 
         <Suspense fallback={<WalletSelectionSKeleton />}>
           <FieldForm control={form.control} name="destinationWalletId" label="Destination Wallet">
-            {({ field: { value, onChange } }) => (
-              <DestinationWalletSelection sourceWalletId={sourceWalletId} value={value} onChange={onChange} />
-            )}
+            {({ field: { value, onChange } }) => <WalletSelection skipWalletId={sourceWalletId} value={value} onChange={onChange} />}
           </FieldForm>
         </Suspense>
 
@@ -98,26 +97,6 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
         </FieldForm>
       </form>
     </Form>
-  );
-};
-
-type DestinationWalletSelectionProps = { sourceWalletId: string; value: string; onChange: (value: string) => void };
-
-const DestinationWalletSelection: FC<DestinationWalletSelectionProps> = ({ sourceWalletId, value, onChange }) => {
-  const { data: walletList } = useQuery({
-    queryKey: [queryKeys.wallet, "for-transaction"],
-    queryFn: getWalletListForTransferApi,
-    select: (res) => res.map((wallet) => ({ value: wallet._id, label: wallet.name })).filter((wallet) => wallet.value !== sourceWalletId),
-  });
-
-  return (
-    <CommonSelect
-      value={value}
-      onChange={onChange}
-      options={walletList ?? []}
-      placeholder="Select destination wallet"
-      disabled={!walletList?.length}
-    />
   );
 };
 

@@ -27,6 +27,7 @@ const source = z
   });
 
 // API response validation
+
 const sourceListData = z.array(
   z.object({
     _id: z.string(),
@@ -37,12 +38,21 @@ const sourceListData = z.array(
     expense: z.number().catch(0),
   }),
 );
+
+const sourceListWihBasicData = z.array(
+  z.object({
+    _id: z.string(),
+    name: z.string(),
+  }),
+);
+
 export const sourceSchema = {
   // Form validation
   source,
 
   // API response validation
   sourceListData,
+  sourceListWihBasicData,
 };
 
 export type TSourceFormData = z.infer<typeof source>;

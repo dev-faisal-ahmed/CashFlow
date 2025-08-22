@@ -1,8 +1,7 @@
 "use client";
 
-import { FormControl, FormDescription, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { ComponentProps } from "react";
+import { FormControl, FormDescription, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
 
 type FieldFormProps<TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>> = Omit<
@@ -13,21 +12,21 @@ type FieldFormProps<TFieldValues extends FieldValues, TName extends FieldPath<TF
   description?: string;
   showMessage?: boolean;
   children: ControllerProps<TFieldValues, TName>["render"];
-  formItemProps?: ComponentProps<"div">;
+  formItemClassName?: string;
 };
 
 export const FieldForm = <TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>({
   label,
   description,
   children,
-  formItemProps,
+  formItemClassName,
   showMessage = true,
   ...props
 }: FieldFormProps<TFieldValues, TName>) => (
   <FormField
     {...props}
     render={(filedProps) => (
-      <FormItem {...formItemProps}>
+      <FormItem className={formItemClassName}>
         {label && <Label className="text-muted-foreground font-semibold">{label}</Label>}
         <FormControl>{children(filedProps)}</FormControl>
         {description && <FormDescription>{description}</FormDescription>}

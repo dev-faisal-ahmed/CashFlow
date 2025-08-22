@@ -7,4 +7,5 @@ export const queryKeys = {
   wallet: "wallet",
   source: "source",
   contact: "contact",
+  transaction: "transaction",
 };

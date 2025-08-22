@@ -1,10 +1,11 @@
 import { Types } from "mongoose";
-import { CreateSourceDto, GetSourcesArgs } from "./source.validation";
 import { SourceModel } from "./source.schema";
+import { CreateSourceDto, GetSourcesArgs } from "./source.validation";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
 import { AppError } from "@/server/core/app.error";
-import { ISource } from "./source.interface";
+import { EBudgetInterval, ESourceType, ISource } from "./source.interface";
+import { ETransactionNature, ETransactionType } from "../transaction/transaction.interface";
 
 // Types
 type CreateSource = { dto: CreateSourceDto; ownerId: Types.ObjectId };
@@ -27,7 +28,7 @@ export class SourceRepository {
       isDeleted: false,
       ownerId,
       ...(search && { name: { $regex: search, $options: "i" } }),
-      ...(type && { type }),
+      ...(type && { type: { $in: [type, ESourceType.both] } }),
     };
 
     const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
@@ -35,11 +36,12 @@ export class SourceRepository {
 
     const sources = await SourceModel.aggregate([
       { $match: dbQuery },
+      ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
 
       // adding this stage when user needs income or expense
       ...(requestedFields?.includes("income") || requestedFields?.includes("expense")
         ? [
-            { $addFields: { now: now, interval: { $ifNull: ["$budget.interval", "monthly"] } } },
+            { $addFields: { now: now, interval: { $ifNull: ["$budget.interval", EBudgetInterval.monthly] } } },
 
             {
               $addFields: {
@@ -47,19 +49,19 @@ export class SourceRepository {
                   $switch: {
                     branches: [
                       {
-                        case: { $eq: ["$interval", "weekly"] },
+                        case: { $eq: ["$interval", EBudgetInterval.weekly] },
                         then: { $dateTrunc: { date: "$now", unit: "week", binSize: 1 } },
                       },
                       {
-                        case: { $eq: ["$interval", "monthly"] },
+                        case: { $eq: ["$interval", EBudgetInterval.monthly] },
                         then: { $dateTrunc: { date: "$now", unit: "month", binSize: 1 } },
                       },
                       {
-                        case: { $eq: ["$interval", "yearly"] },
+                        case: { $eq: ["$interval", EBudgetInterval.yearly] },
                         then: { $dateTrunc: { date: "$now", unit: "year", binSize: 1 } },
                       },
                       {
-                        case: { $eq: ["$interval", "yearly"] },
+                        case: { $eq: ["$interval", EBudgetInterval.yearly] },
                         then: { $dateTrunc: { date: "$now", unit: "year", binSize: 1 } },
                       },
                     ],
@@ -79,11 +81,11 @@ export class SourceRepository {
                     $match: {
                       $expr: {
                         $and: [
-                          { $eq: ["$type", "regular"] },
+                          { $eq: ["$type", ETransactionType.regular] },
                           { $eq: ["$sourceId", "$$sourceId"] },
                           { $gte: ["$date", "$startDate"] },
                           { $lte: ["$date", "$now"] },
-                          { $in: ["$nature", ["income", "expense"]] },
+                          { $in: ["$nature", [ETransactionNature.income, ETransactionNature.expense]] },
                         ],
                       },
                     },
@@ -104,7 +106,7 @@ export class SourceRepository {
                           $map: {
                             input: "$transactions",
                             as: "tx",
-                            in: { $cond: [{ $eq: ["$$tx.nature", "income"] }, "$$tx.amount", 0] },
+                            in: { $cond: [{ $eq: ["$$tx.nature", ETransactionNature.income] }, "$$tx.amount", 0] },
                           },
                         },
                       },
@@ -123,7 +125,7 @@ export class SourceRepository {
                           $map: {
                             input: "$transactions",
                             as: "tx",
-                            in: { $cond: [{ $eq: ["$$tx.nature", "expense"] }, "$$tx.amount", 0] },
+                            in: { $cond: [{ $eq: ["$$tx.nature", ETransactionNature.expense] }, "$$tx.amount", 0] },
                           },
                         },
                       },
@@ -137,7 +139,6 @@ export class SourceRepository {
         : []),
 
       ...(fields ? [{ $project: fields }] : []),
-      ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
     ]);
 
     const total = await SourceModel.countDocuments(dbQuery);

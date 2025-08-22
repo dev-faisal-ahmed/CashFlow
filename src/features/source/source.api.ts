@@ -20,6 +20,14 @@ export const getSourceListApi = async (args: ToString<GetSourcesArgs>) => {
   return validatedData;
 };
 
+export const getSourceListWithBasicInfoApi = async () => {
+  const res = await sourceClient.index.$get({ query: { fields: "_id,name", getAll: "true" } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  const validatedData = await sourceSchema.sourceListWihBasicData.parseAsync(resData.data);
+  return validatedData;
+};
+
 // Update
 export const updateSourceApi = async ({ id, ...dto }: UpdateSourceDto & { id: string }) => {
   const res = await sourceClient[":id"].$patch({ param: { id }, json: dto });

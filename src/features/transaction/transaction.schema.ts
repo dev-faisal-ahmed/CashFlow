@@ -1,4 +1,5 @@
 import z from "zod";
+
 import { ETransactionNature } from "@/server/modules/transaction/transaction.interface";
 
 const regularTransaction = z.object({
