@@ -55,18 +55,18 @@ transactionSchema.index({ ownerId: 1, date: -1 });
 export const TransactionModel: Model<IBaseTransaction> = models.transaction ?? model("transaction", transactionSchema);
 
 // Create discriminator models
-export const InitialTransaction: Model<IInitialTransaction> =
+export const InitialTransactionModel: Model<IInitialTransaction> =
   TransactionModel.discriminators?.[ETransactionType.initial] ||
   TransactionModel.discriminator(ETransactionType.initial, initialTransactionSchema);
 
-export const RegularTransaction: Model<IRegularTransaction> =
+export const RegularTransactionModel: Model<IRegularTransaction> =
   TransactionModel.discriminators?.[ETransactionType.regular] ||
   TransactionModel.discriminator(ETransactionType.regular, regularTransactionSchema);
 
-export const TransferTransaction: Model<ITransferTransaction> =
+export const TransferTransactionModel: Model<ITransferTransaction> =
   TransactionModel.discriminators?.[ETransactionType.transfer] ||
   TransactionModel.discriminator(ETransactionType.transfer, transferTransactionSchema);
 
-export const PeerTransferTransaction: Model<IPeerTransferTransaction> =
+export const PeerTransferTransactionModel: Model<IPeerTransferTransaction> =
   TransactionModel.discriminators?.[ETransactionType.peerTransfer] ||
   TransactionModel.discriminator(ETransactionType.peerTransfer, peerTransferTransactionSchema);
