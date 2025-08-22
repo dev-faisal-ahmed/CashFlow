@@ -1,22 +1,34 @@
 "use client";
 
+import { PlusIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
-import { PlusIcon } from "lucide-react";
 import { TransactionForm } from "./transaction-form";
 import { TRegularTransactionFormData } from "../transaction.schema";
 import { ETransactionNature } from "@/server/modules/transaction/transaction.interface";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createRegularTransactionApi } from "../transaction.api";
 
 const mutationKey = `add-${queryKeys.transaction}`;
 
-export const AddTransaction = () => {
-  const { open, onOpenChange } = usePopupState();
+export const AddRegularTransaction = () => {
+  const queryClient = useQueryClient();
 
-  const handleAddTransaction = (formData: TRegularTransactionFormData, onReset: () => void) => {
-    console.log(formData);
-    console.log(onReset);
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: createRegularTransactionApi });
+
+  const handleAddRegularTransaction = (formData: TRegularTransactionFormData, onReset: () => void) => {
+    mutate(formData, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [queryKeys.transaction] });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+        onReset();
+        onOpenChange(false);
+      },
+    });
   };
 
   return (
@@ -33,7 +45,7 @@ export const AddTransaction = () => {
         description="Fill up the form to create a new transaction"
       >
         <TransactionForm
-          onSubmit={handleAddTransaction}
+          onSubmit={handleAddRegularTransaction}
           defaultValues={{ date: new Date(), sourceId: "", walletId: "", nature: ETransactionNature.income }}
         />
       </FormDialog>

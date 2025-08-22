@@ -5,6 +5,7 @@ export const walletSchema = new Schema<IWallet>(
   {
     name: { type: String, required: true },
     ownerId: { type: Schema.Types.ObjectId, ref: "user", required: true },
+    balance: { type: Number, default: 0 },
     isSaving: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
   },

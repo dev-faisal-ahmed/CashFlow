@@ -1,3 +1,5 @@
+import { ETransactionNature, ETransactionType } from "../transaction/transaction.interface";
+
 export class WalletHelper {
   buildBalancePipeline() {
     return [
@@ -9,7 +11,12 @@ export class WalletHelper {
           pipeline: [
             {
               $match: {
-                $expr: { $and: [{ $eq: ["$walletId", "$$walletId"] }, { $in: ["$type", ["initial", "regular", "peerTransfer"]] }] },
+                $expr: {
+                  $and: [
+                    { $eq: ["$walletId", "$$walletId"] },
+                    { $in: ["$type", [ETransactionType.initial, ETransactionType.regular, ETransactionType.peerTransfer]] },
+                  ],
+                },
               },
             },
             { $project: { amount: 1, nature: 1 } },
@@ -24,7 +31,9 @@ export class WalletHelper {
           from: "transactions",
           let: { walletId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $and: [{ $eq: ["$destinationWalletId", "$$walletId"] }, { $eq: ["$type", "transfer"] }] } } },
+            {
+              $match: { $expr: { $and: [{ $eq: ["$destinationWalletId", "$$walletId"] }, { $eq: ["$type", ETransactionType.transfer] }] } },
+            },
             { $project: { amount: 1, nature: { $literal: "income" } } },
           ],
           as: "incomeTransfers",
@@ -37,7 +46,7 @@ export class WalletHelper {
           from: "transactions",
           let: { walletId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $and: [{ $eq: ["$sourceWalletId", "$$walletId"] }, { $eq: ["$type", "transfer"] }] } } },
+            { $match: { $expr: { $and: [{ $eq: ["$sourceWalletId", "$$walletId"] }, { $eq: ["$type", ETransactionType.transfer] }] } } },
             { $project: { amount: 1, nature: { $literal: "expense" } } },
           ],
           as: "expenseTransfers",
@@ -52,7 +61,7 @@ export class WalletHelper {
               $map: {
                 input: "$allTransactions",
                 as: "tx",
-                in: { $cond: [{ $eq: ["$$tx.nature", "income"] }, "$$tx.amount", { $multiply: ["$$tx.amount", -1] }] },
+                in: { $cond: [{ $eq: ["$$tx.nature", ETransactionNature.income] }, "$$tx.amount", { $multiply: ["$$tx.amount", -1] }] },
               },
             },
           },

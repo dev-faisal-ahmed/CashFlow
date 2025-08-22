@@ -7,6 +7,8 @@ import { WalletHelper } from "./wallet.helper";
 import { GetAllWalletsArgs } from "./wallet.validation";
 import { AppError } from "@/server/core/app.error";
 
+type CreateWallet = { dto: Pick<IWallet, "name" | "isSaving" | "ownerId" | "balance">; session: ClientSession };
+
 export class WalletRepository {
   private walletHelper: WalletHelper;
 
@@ -14,7 +16,7 @@ export class WalletRepository {
     this.walletHelper = new WalletHelper();
   }
 
-  async createWallet(dto: CreateWalletDto, session: ClientSession) {
+  async createWallet({ dto, session }: CreateWallet) {
     return WalletModel.create([{ ...dto }], { session });
   }
 
@@ -83,6 +85,17 @@ export class WalletRepository {
     if (!wallet) throw new AppError("Wallet not found!", 404);
     return wallet.ownerId.equals(userId);
   }
-}
 
-type CreateWalletDto = Pick<IWallet, "name" | "isSaving" | "ownerId">;
+  async checkBalance(walletId: string) {
+    const [walletInfo] = await WalletModel.aggregate([
+      {
+        $match: { _id: new Types.ObjectId(walletId) },
+        ...this.walletHelper.buildBalancePipeline(),
+      },
+    ]);
+
+    if (!walletInfo) throw new AppError("Wallet not found!", 404);
+
+    return walletInfo.balance;
+  }
+}

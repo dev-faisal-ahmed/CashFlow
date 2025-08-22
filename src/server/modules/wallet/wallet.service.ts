@@ -30,7 +30,7 @@ export class WalletService {
     session.startTransaction();
 
     try {
-      const [wallet] = await this.walletRepository.createWallet({ ...dto, ownerId }, session);
+      const [wallet] = await this.walletRepository.createWallet({ dto: { ...dto, ownerId, balance: dto.initialBalance ?? 0 }, session });
 
       if (dto.initialBalance) {
         const transaction = await this.transactionRepository.createInitialTransaction({

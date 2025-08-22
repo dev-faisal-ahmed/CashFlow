@@ -50,6 +50,7 @@ const peerTransferTransactionSchema = new Schema<IPeerTransferTransaction>({
 
 // applying indexing
 transactionSchema.index({ ownerId: 1, date: -1 });
+transactionSchema.index({ walletId: 1 });
 
 // Create the base model
 export const TransactionModel: Model<IBaseTransaction> = models.transaction ?? model("transaction", transactionSchema);
