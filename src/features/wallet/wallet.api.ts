@@ -21,11 +21,11 @@ export const getAllWalletListApi = async (args: ToString<GetAllWalletsArgs>) => 
 };
 
 //  Get Wallet List For Transfer
-export const getWalletListForTransferApi = async () => {
-  const res = await walletClient.index.$get({ query: { fields: "_id,name,balance", getAll: "true" } });
+export const getWalletListWithBasicDataApi = async (args: ToString<GetAllWalletsArgs>) => {
+  const res = await walletClient.index.$get({ query: { fields: "_id,name,balance,isSaving", getAll: "true", ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  const parsed = await walletSchema.walletListDataForTransfer.parseAsync(resData.data);
+  const parsed = await walletSchema.walletListWithBasicData.parseAsync(resData.data);
   return parsed;
 };
 

@@ -45,6 +45,7 @@ export const AddRegularTransaction = () => {
         description="Fill up the form to create a new transaction"
       >
         <TransactionForm
+          formId={mutationKey}
           onSubmit={handleAddRegularTransaction}
           defaultValues={{ date: new Date(), sourceId: "", walletId: "", nature: ETransactionNature.income }}
         />

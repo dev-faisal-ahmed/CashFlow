@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 // Main : Transaction Form
 type TransactionFormProps = {
+  formId: string;
   defaultValues: Partial<TRegularTransactionFormData>;
   onSubmit: (formData: TRegularTransactionFormData, onReset: () => void) => void;
 };
@@ -27,17 +28,19 @@ const natureOptions = [
   { label: "Expense", value: ETransactionNature.expense },
 ];
 
-export const TransactionForm: FC<TransactionFormProps> = ({ defaultValues, onSubmit }) => {
+export const TransactionForm: FC<TransactionFormProps> = ({ formId, defaultValues, onSubmit }) => {
   const form = useForm<TRegularTransactionFormData>({
     resolver: zodResolver(transactionSchema.regularTransaction),
     defaultValues,
   });
 
+  const nature = form.watch("nature");
+
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form id={formId} onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FieldForm control={form.control} name="amount" label="Amount">
             {({ field: { value, onChange } }) => (
@@ -55,7 +58,9 @@ export const TransactionForm: FC<TransactionFormProps> = ({ defaultValues, onSub
         </FieldForm>
 
         <FieldForm control={form.control} name="walletId" label="Wallet">
-          {({ field: { value, onChange } }) => <WalletSelection value={value} onChange={onChange} />}
+          {({ field: { value, onChange } }) => (
+            <WalletSelection value={value} onChange={onChange} {...(nature === ETransactionNature.expense && { isSaving: false })} />
+          )}
         </FieldForm>
 
         <FieldForm control={form.control} name="date" label="Date">

@@ -40,7 +40,7 @@ const walletListData = z.array(
   }),
 );
 
-const walletListDataForTransfer = z.array(
+const walletListWithBasicData = z.array(
   z.object({
     _id: z.string(),
     name: z.string(),
@@ -56,7 +56,7 @@ export const walletSchema = {
 
   // Api Response Validation
   walletListData,
-  walletListDataForTransfer,
+  walletListWithBasicData,
 };
 
 export type TAddWalletFormData = z.infer<typeof addWallet>;

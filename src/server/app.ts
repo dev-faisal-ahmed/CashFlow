@@ -7,6 +7,7 @@ import { handleGlobalError } from "./core/global.error.handler";
 import { walletRoute } from "./modules/wallet/wallet.route";
 import { sourceRoute } from "./modules/source/source.router";
 import { contactRoute } from "./modules/contact/contact.route";
+import { transactionRoute } from "./modules/transaction/transaction.route";
 
 const app = new Hono().basePath("/api/v1");
 
@@ -22,6 +23,7 @@ app.route("/auth", authRoute);
 app.route("/wallets", walletRoute);
 app.route("/sources", sourceRoute);
 app.route("/contacts", contactRoute);
+app.route("/transactions", transactionRoute);
 
 // Error Handler
 

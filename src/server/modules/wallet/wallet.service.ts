@@ -59,6 +59,8 @@ export class WalletService {
     const { search, isSaving, page } = query;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
 
+    console.log(query);
+
     const dbQuery = {
       isDeleted: false,
       ownerId: userId,
@@ -80,8 +82,10 @@ export class WalletService {
     ]);
 
     const wallets = result.wallets;
-    const total = result.total[0].count;
+    const total = result.total[0]?.count ?? 0;
     const meta = paginationHelper.getMeta(total);
+
+    console.log(wallets);
 
     return { wallets, meta };
   }
