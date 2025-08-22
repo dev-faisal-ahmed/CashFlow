@@ -19,9 +19,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../compo
 import { AppLogo, CommonAvatar } from "../components/shared";
 import { useNavItems } from "./main-layout-hook";
 import { Logout } from "@/auth/components";
-import { usePopupState } from "@/lib/hooks";
+import { useAuth, usePopupState } from "@/lib/hooks";
 import { Button } from "../components/ui/button";
-import { useAuth } from "@/features/auth/auth.hook";
 
 export const AppSidebar = () => (
   <Sidebar variant="inset">

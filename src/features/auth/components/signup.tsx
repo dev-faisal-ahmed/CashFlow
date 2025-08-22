@@ -4,17 +4,33 @@ import { Button } from "@/components/ui/button";
 import { AuthEntryCard } from "./auth-entry-card";
 import { AuthForm } from "./auth-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useSignup } from "../auth.hook";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { signupApi } from "../auth.api";
+import { TAuthFormData, TSignupFormData } from "../auth.schema";
 
-const queryKey = queryKeys.auth.signup;
+const mutationKey = queryKeys.auth.signup;
 
 export const Signup = () => {
-  const { isPending, handleSignup } = useSignup(queryKey);
+  const router = useRouter();
+  const { mutate, isPending } = useMutation({ mutationKey: [mutationKey], mutationFn: signupApi });
+
+  const handleSignup = (formData: TAuthFormData, reset: () => void) => {
+    const { name, email, password } = formData as TSignupFormData;
+    const payload = { name, email, password };
+
+    mutate(payload, {
+      onSuccess: () => {
+        reset();
+        router.push("/login");
+      },
+    });
+  };
 
   return (
     <AuthEntryCard formType="signup">
-      <AuthForm formId={queryKey} formType="signup" onSubmit={handleSignup} />
-      <Button form={queryKey} type="submit" className="mt-6" isLoading={isPending}>
+      <AuthForm formId={mutationKey} formType="signup" onSubmit={handleSignup} />
+      <Button form={mutationKey} type="submit" className="mt-6" isLoading={isPending}>
         {isPending ? " Signing up..." : "Signup"}
       </Button>
     </AuthEntryCard>

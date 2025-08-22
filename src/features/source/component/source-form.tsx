@@ -4,12 +4,12 @@ import { FC } from "react";
 import { Form } from "@/components/ui/form";
 import { CommonSelect, FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 import { sourceSchema, TSourceFormData } from "../source.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Switch } from "@/components/ui/switch";
 
 type SourceFormProps = {
   formId: string;
@@ -70,8 +70,8 @@ export const SourceForm: FC<SourceFormProps> = ({ mode, formId, defaultValues, o
           <FieldForm control={form.control} name="addBudget">
             {({ field: { value, onChange } }) => (
               <div className="flex items-center gap-2">
-                <Checkbox id="addBudget" checked={!!value} onCheckedChange={onChange} className="cursor-pointer" />
-                <Label htmlFor="addBudget" className="text-muted-foreground cursor-pointer">
+                <Switch id="add-budget" checked={!!value} onCheckedChange={onChange} />
+                <Label htmlFor="add-budget" className="text-muted-foreground cursor-pointer">
                   Add Budget Info?
                 </Label>
               </div>

@@ -2,10 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { LogOutIcon } from "lucide-react";
-import { useLogout } from "../auth.hook";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { logout } from "../auth.action";
+import { queryKeys } from "@/lib/query.keys";
 
 export const Logout = () => {
-  const { handleLogout } = useLogout();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const handleLogout = async () => {
+    await logout();
+    queryClient.invalidateQueries({ queryKey: [queryKeys.auth.session] });
+    router.push("/login");
+  };
 
   return (
     <Button

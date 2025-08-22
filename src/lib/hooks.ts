@@ -1,5 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import { PaginationState } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
+import { queryKeys } from "./query.keys";
+import { getAuth } from "@/features/auth/auth.action";
 
 // Is Mobile
 const MOBILE_BREAKPOINT = 768;
@@ -50,4 +53,10 @@ export const useSearch = () => {
 export const usePagination = (limit = 10) => {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: limit });
   return { pagination, setPagination };
+};
+
+// Auth
+const gcTime = 12 * 60 * 60 * 1000;
+export const useAuth = () => {
+  return useQuery({ queryKey: [queryKeys.auth.session], queryFn: getAuth, staleTime: Infinity, gcTime });
 };
