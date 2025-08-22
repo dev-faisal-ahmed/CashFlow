@@ -6,8 +6,9 @@ import { FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { TWalletFormData } from "../wallet.schema";
-import { useWalletForm } from "../wallet.hook";
+import { TWalletFormData, walletSchema } from "../wallet.schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type WalletFormProps = {
   formId: string;
@@ -17,7 +18,9 @@ type WalletFormProps = {
 };
 
 export const WalletForm: FC<WalletFormProps> = ({ formId, mode, defaultValues, onSubmit }) => {
-  const { form, handleSubmit } = useWalletForm({ mode, defaultValues, onSubmit });
+  const schema = mode === "add" ? walletSchema.addWallet : walletSchema.updateWallet;
+  const form = useForm<TWalletFormData>({ resolver: zodResolver(schema), defaultValues });
+  const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
     <Form {...form}>

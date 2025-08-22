@@ -5,12 +5,31 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { WalletForm } from "./wallet-form";
 import { queryKeys } from "@/lib/query.keys";
-import { useAddWallet } from "../wallet.hook";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { useMutation } from "@tanstack/react-query";
+import { addWalletApi } from "../wallet.api";
+import { TAddWalletFormData, TWalletFormData } from "../wallet.schema";
 
 const mutationKey = `add-${queryKeys.wallet}`;
 
 export const AddWallet = () => {
-  const { open, onOpenChange, handleAddWallet } = useAddWallet(mutationKey);
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: addWalletApi });
+
+  const handleAddWallet = (formData: TWalletFormData, onReset: () => void) => {
+    const payload = formData as TAddWalletFormData;
+
+    mutate(payload, {
+      onSuccess: () => {
+        onReset();
+        queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+        onOpenChange(false);
+      },
+    });
+  };
 
   return (
     <>

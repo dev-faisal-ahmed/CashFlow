@@ -4,10 +4,23 @@ import { FC, PropsWithChildren } from "react";
 import { ErrorMessage } from "@/components/shared";
 import { WalletCard } from "./wallet-card";
 import { WalletListSkeleton } from "./wallet-loading";
-import { useGetWallet } from "../wallet.hook";
+import { useSearch } from "@/lib/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query.keys";
+import { getAllWalletListApi } from "../wallet.api";
 
 export const WalletList = () => {
-  const { data: walletList, isLoading, isError, error } = useGetWallet();
+  const { value } = useSearch();
+
+  const {
+    data: walletList,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: [queryKeys.wallet],
+    queryFn: () => getAllWalletListApi({ search: value }),
+  });
 
   if (isLoading) return <LoadingSkeleton />;
   if (isError) throw error;

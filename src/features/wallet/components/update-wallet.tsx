@@ -4,10 +4,10 @@ import { FC } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
-import { TWalletFormData, WalletForm } from "./wallet-form";
+import { WalletForm } from "./wallet-form";
 import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
-import { TUpdateWalletFormData } from "../wallet.schema";
+import { TUpdateWalletFormData, TWalletFormData } from "../wallet.schema";
 import { walletClient } from "@/lib/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 

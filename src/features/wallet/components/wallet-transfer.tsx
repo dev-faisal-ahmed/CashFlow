@@ -9,14 +9,39 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { queryKeys } from "@/lib/query.keys";
-import { TWalletTransferFormData } from "../wallet.schema";
-import { useGetWalletsForTransfer, useTransferWallet, useTransferWalletForm } from "../wallet.hook";
+import { TWalletTransferFormData, walletSchema } from "../wallet.schema";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePopupState } from "@/lib/hooks";
+import { getWalletListForTransferApi, transferWalletApi } from "../wallet.api";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type WalletTransferProps = { balance: number; walletId: string; onSuccess: () => void };
 
 export const WalletTransfer: FC<WalletTransferProps> = ({ walletId, onSuccess }) => {
   const mutationKey = `transfer-${queryKeys.wallet}-${walletId}`;
-  const { open, onOpenChange, handleTransferWallet } = useTransferWallet({ mutationKey, walletId, onSuccess });
+  const queryClient = useQueryClient();
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: transferWalletApi });
+
+  const handleTransferWallet = (formData: TWalletTransferFormData, onReset: () => void) => {
+    mutate(
+      {
+        amount: formData.amount,
+        senderWalletId: walletId,
+        receiverWalletId: formData.destinationWalletId,
+        ...(formData.description && { description: formData.description }),
+      },
+      {
+        onSuccess: () => {
+          onReset();
+          queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+          onOpenChange(false);
+          onSuccess();
+        },
+      },
+    );
+  };
 
   return (
     <>
@@ -44,7 +69,12 @@ type TransferWalletFormProps = {
 };
 
 const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sourceWalletId }) => {
-  const { form, handleSubmit } = useTransferWalletForm({ sourceWalletId, onSubmit });
+  const form = useForm<TWalletTransferFormData>({
+    resolver: zodResolver(walletSchema.walletTransfer),
+    defaultValues: { amount: 0, description: "", destinationWalletId: "", sourceWalletId },
+  });
+
+  const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
     <Form {...form}>
@@ -74,9 +104,21 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
 type DestinationWalletSelectionProps = { sourceWalletId: string; value: string; onChange: (value: string) => void };
 
 const DestinationWalletSelection: FC<DestinationWalletSelectionProps> = ({ sourceWalletId, value, onChange }) => {
-  const { data: walletList } = useGetWalletsForTransfer(sourceWalletId);
+  const { data: walletList } = useQuery({
+    queryKey: [queryKeys.wallet, "for-transaction"],
+    queryFn: getWalletListForTransferApi,
+    select: (res) => res.map((wallet) => ({ value: wallet._id, label: wallet.name })).filter((wallet) => wallet.value !== sourceWalletId),
+  });
 
-  return <CommonSelect value={value} onChange={onChange} options={walletList ?? []} placeholder="Select destination wallet" />;
+  return (
+    <CommonSelect
+      value={value}
+      onChange={onChange}
+      options={walletList ?? []}
+      placeholder="Select destination wallet"
+      disabled={!walletList?.length}
+    />
+  );
 };
 
 const WalletSelectionSKeleton = () => <Skeleton className="h-input" />;
