@@ -13,8 +13,6 @@ type WalletSelectionProps = {
 };
 
 export const WalletSelection: FC<WalletSelectionProps> = ({ value, onChange, skipWalletId, isSaving }) => {
-  console.log(isSaving);
-
   const { data: walletList, isLoading } = useQuery({
     queryKey: [queryKeys.wallet, "basic", { isSaving }],
     queryFn: () => getWalletListWithBasicDataApi({ ...(typeof isSaving === "boolean" && { isSaving: isSaving ? "true" : "false" }) }),

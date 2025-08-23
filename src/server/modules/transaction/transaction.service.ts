@@ -74,15 +74,8 @@ export class TransactionService {
     };
 
     const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
-    const fields = QueryHelper.selectFields(query.fields, [
-      "_id",
-      "ownerId",
-      "amount",
-      "description",
-      "date",
-      "wallet.name",
-      "source.name",
-    ]);
+    const allowedFields = ["_id", "ownerId", "amount", "description", "nature", "date", "walletName", "sourceName"];
+    const fields = QueryHelper.selectFields(query.fields, allowedFields);
 
     const [result] = await TransactionModel.aggregate([
       { $match: dbQuery },
@@ -94,6 +87,8 @@ export class TransactionService {
             { $lookup: { from: "sources", localField: "sourceId", foreignField: "_id", as: "source" } },
             { $unwind: "$wallet" },
             { $unwind: "$source" },
+            { $addFields: { walletName: "$wallet.name", sourceName: "$source.name" } },
+            { $project: { wallet: 0, source: 0 } },
             ...(fields ? [{ $project: fields }] : []),
           ],
           total: [{ $count: "count" }],

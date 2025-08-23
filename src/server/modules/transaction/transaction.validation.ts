@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ETransactionNature, ETransactionType } from "./transaction.interface";
+import { ETransactionNature } from "./transaction.interface";
 import { commonValidation } from "@/server/common/validation";
 
 // Base transaction schema
@@ -24,7 +24,6 @@ const getTransactions = commonValidation.queryWithPagination.and(
     nature: z.enum(Object.values(ETransactionNature), "Invalid transaction nature").optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
-    type: z.enum(Object.values(ETransactionType), "Invalid transaction type").optional(),
   }),
 );
 

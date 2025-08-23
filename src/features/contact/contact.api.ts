@@ -17,7 +17,8 @@ export const getContactsApi = async (args: ToString<GetContactsArgs>) => {
   const res = await contactClient.index.$get({ query: { ...args, fields: "_id,name,phone,address,given,taken" } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  return resData.data as TContactData[];
+  const contacts = resData.data as TContactData[];
+  return { contacts, meta: resData.meta };
 };
 
 // Update Contact

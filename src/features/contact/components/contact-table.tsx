@@ -13,7 +13,7 @@ import { queryKeys } from "@/lib/query.keys";
 import { getContactsApi } from "../contact.api";
 
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
-type TContact = NonNullable<TApiResponse>["data"][number];
+type TContact = NonNullable<TApiResponse>["contacts"][number];
 
 // Accessor
 const { accessor } = createColumnHelper<TContact>();
@@ -23,7 +23,6 @@ export const ContactTable = () => {
   const { data: apiResponse, isLoading } = useQuery({
     queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1 }],
     queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
-    select: (res) => ({ contacts: res.data, meta: res.meta }),
   });
 
   const contacts = apiResponse?.contacts ?? [];
