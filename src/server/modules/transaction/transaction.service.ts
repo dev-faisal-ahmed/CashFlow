@@ -1,12 +1,16 @@
 import { startSession, Types } from "mongoose";
-import { CreateRegularTransactionDto } from "./transaction.validation";
-import { InitialTransactionModel } from "./transaction.schema";
-import { ETransactionNature } from "./transaction.interface";
+import { CreateRegularTransactionDto, GetTransactionsArgs } from "./transaction.validation";
+import { RegularTransactionModel, TransactionModel } from "./transaction.schema";
+import { ETransactionNature, ETransactionType } from "./transaction.interface";
 import { WalletModel } from "../wallet/wallet.schema";
 import { AppError } from "@/server/core/app.error";
+import { PaginationHelper } from "@/server/helpers/pagination.helper";
+import { QueryHelper } from "@/server/helpers/query.helper";
+import { WithUserId } from "@/server/types";
 
 // Types
 type CreateRegularTransaction = { dto: CreateRegularTransactionDto; userId: Types.ObjectId };
+type GetTransactions = WithUserId<{ query: GetTransactionsArgs }>;
 
 export class TransactionService {
   static async createRegularTransaction({ dto, userId }: CreateRegularTransaction) {
@@ -18,12 +22,15 @@ export class TransactionService {
     session.startTransaction();
 
     try {
-      const [transaction] = await InitialTransactionModel.create(
+      const [transaction] = await RegularTransactionModel.create(
         [
           {
             ownerId: userId,
             amount: dto.amount,
             walletId: dto.walletId,
+            sourceId: dto.sourceId,
+            date: dto.date,
+            description: dto.description,
             nature: ETransactionNature.income,
           },
         ],
@@ -48,5 +55,56 @@ export class TransactionService {
     } finally {
       await session.endSession();
     }
+  }
+
+  static async getRegularTransactions({ query, userId }: GetTransactions) {
+    const { page, nature, startDate, endDate } = query;
+    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
+
+    const dbQuery = {
+      type: ETransactionType.regular,
+      ownerId: userId,
+      ...(nature && { nature }),
+      ...((startDate || endDate) && {
+        date: {
+          ...(startDate && { $gte: startDate }),
+          ...(endDate && { $lte: endDate }),
+        },
+      }),
+    };
+
+    const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
+    const fields = QueryHelper.selectFields(query.fields, [
+      "_id",
+      "ownerId",
+      "amount",
+      "description",
+      "date",
+      "wallet.name",
+      "source.name",
+    ]);
+
+    const [result] = await TransactionModel.aggregate([
+      { $match: dbQuery },
+      {
+        $facet: {
+          transactions: [
+            ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
+            { $lookup: { from: "wallets", localField: "walletId", foreignField: "_id", as: "wallet" } },
+            { $lookup: { from: "sources", localField: "sourceId", foreignField: "_id", as: "source" } },
+            { $unwind: "$wallet" },
+            { $unwind: "$source" },
+            ...(fields ? [{ $project: fields }] : []),
+          ],
+          total: [{ $count: "count" }],
+        },
+      },
+    ]);
+
+    const transactions = result.transactions;
+    const total = result.total[0]?.count ?? 0;
+    const meta = paginationHelper.getMeta(total);
+
+    return { transactions, meta };
   }
 }
