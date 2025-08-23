@@ -1,9 +1,9 @@
-import { IUser } from "../modules/user/user.interface";
 import { createMiddleware } from "hono/factory";
 import { getToken } from "next-auth/jwt";
 import { AppError } from "../core/app.error";
 import { AUTH_SECRET } from "@/lib/config";
 import { AuthService } from "../modules/auth/auth.service";
+import { userTable } from "../db/schema";
 
 export const authGuard = createMiddleware<TEnv>(async (ctx, next) => {
   const req = ctx.req.raw;
@@ -19,4 +19,4 @@ export const authGuard = createMiddleware<TEnv>(async (ctx, next) => {
 });
 
 type TEnv = { Variables: { user: TAppUser } };
-type TAppUser = Pick<IUser, "_id" | "name" | "email">;
+type TAppUser = Pick<typeof userTable.$inferSelect, "id" | "name" | "email">;

@@ -1,9 +1,9 @@
 import { TLoginFormData } from "./auth.schema";
 import { loginWithCredentials } from "./auth.action";
-import { SignupDto } from "@/server/modules/auth/auth.validation";
+import { SignupWithCredentialsDto } from "@/server/modules/auth/auth.validation";
 import { authClient } from "@/lib/client";
 
-export const signupApi = async (payload: SignupDto) => {
+export const signupApi = async (payload: SignupWithCredentialsDto) => {
   const res = await authClient.signup.$post({ json: payload });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);

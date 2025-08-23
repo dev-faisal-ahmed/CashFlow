@@ -1,7 +1,7 @@
 import { capitalize } from "@/lib/utils";
 import z from "zod";
 
-const signup = z.object({
+const signupWithCredentials = z.object({
   name: z
     .string({ error: "Name is required" })
     .trim()
@@ -28,8 +28,8 @@ const loginWithGoogle = z.object({
   image: z.string().nonempty("Image can not be empty").optional(),
 });
 
-export const authValidation = { signup, loginWithCredentials, loginWithGoogle };
+export const authValidation = { signupWithCredentials, loginWithCredentials, loginWithGoogle };
 
-export type SignupDto = z.infer<typeof signup>;
+export type SignupWithCredentialsDto = z.infer<typeof signupWithCredentials>;
 export type LoginWithCredentialsDto = z.infer<typeof loginWithCredentials>;
 export type LoginWithGoogleDto = z.infer<typeof loginWithGoogle>;

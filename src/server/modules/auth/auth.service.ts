@@ -1,20 +1,21 @@
 import bcrypt from "bcrypt";
 
-import { Types } from "mongoose";
 import { AppError } from "@/server/core/app.error";
 import { SALT } from "@/lib/config";
-import { LoginWithCredentialsDto, LoginWithGoogleDto, SignupDto } from "./auth.validation";
+import { LoginWithCredentialsDto, LoginWithGoogleDto, SignupWithCredentialsDto } from "./auth.validation";
 import { EUserProvider } from "../user/user.interface";
-import { UserModel } from "../user/user.schema";
+import { db } from "@/server/db";
+import { userTable } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 
 // Types
-type TLoginResponse = { _id: Types.ObjectId; name: string; email: string; image?: string };
+type TLoginResponse = Pick<typeof userTable.$inferSelect, "id" | "name" | "email" | "image">;
 type ComparePassword = { givenPassword: string; hashedPassword: string };
 
 export class AuthService {
-  static async signup(dto: SignupDto) {
+  static async signup(dto: SignupWithCredentialsDto) {
     const hashedPassword = await this.hashPassword(dto.password);
-    return UserModel.create({ ...dto, password: hashedPassword, provider: EUserProvider.credentials });
+    return db.insert(userTable).values({ ...dto, password: hashedPassword, provider: EUserProvider.credentials });
   }
 
   static async loginWithCredentials(dto: LoginWithCredentialsDto) {
@@ -32,7 +33,16 @@ export class AuthService {
     const user = await this.findUserForLogin(dto.email);
     if (user) return this.mapLoginResponse(user);
 
-    const newUser = await UserModel.create({ ...dto, provider: EUserProvider.google });
+    const [newUser] = await db
+      .insert(userTable)
+      .values({ ...dto, provider: EUserProvider.google })
+      .returning({
+        id: userTable.id,
+        name: userTable.name,
+        email: userTable.email,
+        image: userTable.image,
+      });
+
     return this.mapLoginResponse(newUser);
   }
 
@@ -46,16 +56,39 @@ export class AuthService {
   }
 
   static async findUserForLogin(email: string) {
-    return UserModel.findOne({ email }, { _id: 1, email: 1, name: 1, image: 1, password: 1, provider: 1 }).lean();
+    const [user] = await db
+      .select({
+        id: userTable.id,
+        name: userTable.name,
+        email: userTable.email,
+        image: userTable.image,
+        password: userTable.password,
+        provider: userTable.provider,
+      })
+      .from(userTable)
+      .where(eq(userTable.email, email))
+      .limit(1);
+
+    return user;
   }
 
-  static async findUserFormAuthGuard(id: string) {
-    return UserModel.findOne({ _id: id }, { _id: 1, email: 1, name: 1 }).lean();
+  static async findUserFormAuthGuard(id: number) {
+    const [user] = await db
+      .select({
+        id: userTable.id,
+        name: userTable.name,
+        email: userTable.email,
+      })
+      .from(userTable)
+      .where(eq(userTable.id, id))
+      .limit(1);
+
+    return user;
   }
 
   static mapLoginResponse(user: TLoginResponse) {
     const dto: TLoginResponse = {
-      _id: user._id,
+      id: user.id,
       name: user.name,
       email: user.email,
       image: user.image,

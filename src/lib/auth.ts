@@ -3,28 +3,28 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 
 import { AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, AUTH_SECRET } from "./config";
-import { authClient } from "./client";
 import { DefaultSession, AuthError } from "next-auth";
 import { DefaultJWT } from "next-auth/jwt";
+import { authClient } from "./client";
 
 // Types
 type TCredentials = { email: string; password: string };
 
 declare module "next-auth" {
   interface User {
-    userId: string;
+    userId: number;
   }
 
   interface Session extends DefaultSession {
     user: {
-      userId: string;
+      userId: number;
     } & DefaultSession["user"];
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
-    userId: string;
+    userId: number;
   }
 }
 
@@ -61,7 +61,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth(() => ({
           if (!responseData.success) throw new Error(responseData.message);
           const userInfo = responseData.data;
 
-          return { id: userInfo._id, userId: userInfo._id, name: userInfo.name, email: userInfo.email, image: userInfo.image };
+          return { id: userInfo.id.toString(), userId: userInfo.id, name: userInfo.name, email: userInfo.email, image: userInfo.image };
         } catch (error) {
           throw new AuthCredentialError(error instanceof Error ? error.message : "Invalid credentials");
         }
@@ -86,8 +86,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth(() => ({
 
           const userInfo = resData.data;
 
-          user.id = userInfo._id;
-          user.userId = userInfo._id;
+          user.id = userInfo.id.toString();
+          user.userId = userInfo.id;
           user.name = userInfo.name;
           user.email = userInfo.email;
           user.image = userInfo.image;
