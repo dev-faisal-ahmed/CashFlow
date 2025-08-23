@@ -10,9 +10,10 @@ type WalletSelectionProps = {
   onChange: (value: string) => void;
   skipWalletId?: string;
   isSaving?: boolean;
+  disabled?: boolean;
 };
 
-export const WalletSelection: FC<WalletSelectionProps> = ({ value, onChange, skipWalletId, isSaving }) => {
+export const WalletSelection: FC<WalletSelectionProps> = ({ value, onChange, skipWalletId, isSaving, disabled }) => {
   const { data: walletList, isLoading } = useQuery({
     queryKey: [queryKeys.wallet, "basic", { isSaving }],
     queryFn: () => getWalletListWithBasicDataApi({ ...(typeof isSaving === "boolean" && { isSaving: isSaving ? "true" : "false" }) }),
@@ -29,7 +30,7 @@ export const WalletSelection: FC<WalletSelectionProps> = ({ value, onChange, ski
       onChange={onChange}
       options={filteredWalletList ?? []}
       placeholder="Select destination wallet"
-      disabled={!filteredWalletList?.length}
+      disabled={disabled}
     />
   );
 };

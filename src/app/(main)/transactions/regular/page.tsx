@@ -1,5 +1,5 @@
 import { Header } from "@/components/shared";
-import { AddRegularTransaction, RegularTransactionList } from "@/features/transaction/component";
+import { AddRegularTransaction, RegularTransactionTable } from "@/features/transaction/component";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (
@@ -12,7 +12,7 @@ const Page = () => (
       <AddRegularTransaction />
     </TopbarContent>
 
-    <RegularTransactionList />
+    <RegularTransactionTable />
   </>
 );
 

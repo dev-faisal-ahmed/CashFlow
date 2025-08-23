@@ -9,13 +9,15 @@ import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
 import { CommonAvatar } from "@/components/shared";
 import { format } from "date-fns";
+import { FC } from "react";
+import { UpdateRegularTransaction } from "./update-regular-transaction";
 
 type TApiResponse = Awaited<ReturnType<typeof getRegularTransactionsApi>>;
 type TTransaction = TApiResponse["transactions"][number];
 
 const { accessor } = createColumnHelper<TTransaction>();
 
-export const RegularTransactionList = () => {
+export const RegularTransactionTable = () => {
   const { pagination, setPagination } = usePagination(10);
   const { data: apiResponse, isLoading } = useQuery({
     queryKey: [queryKeys.transaction, { type: ETransactionType.regular, page: pagination.pageIndex + 1 }],
@@ -61,6 +63,10 @@ export const RegularTransactionList = () => {
       header: "Date",
       cell: ({ getValue }) => <p className="text-sm">{format(getValue(), "PPP")}</p>,
     }),
+    {
+      id: "action",
+      cell: ({ row }) => <RegularTransactionActionMenu {...row.original} />,
+    },
   ] as ColumnDef<TTransaction>[];
 
   return (
@@ -74,3 +80,9 @@ export const RegularTransactionList = () => {
     />
   );
 };
+
+const RegularTransactionActionMenu: FC<TTransaction> = (transaction) => (
+  <div className="flex items-center justify-center gap-2">
+    <UpdateRegularTransaction {...transaction} />
+  </div>
+);

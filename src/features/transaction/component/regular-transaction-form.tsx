@@ -19,10 +19,11 @@ import { ESourceType } from "@/server/modules/source/source.interface";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Main : Transaction Form
-type TransactionFormProps = {
+type RegularTransactionFormProps = {
   formId: string;
   defaultValues: Partial<TRegularTransactionFormData>;
   onSubmit: (formData: TRegularTransactionFormData, onReset: () => void) => void;
+  mode: "add" | "edit";
 };
 
 const natureOptions = [
@@ -30,14 +31,13 @@ const natureOptions = [
   { label: "Expense", value: ETransactionNature.expense },
 ];
 
-export const TransactionForm: FC<TransactionFormProps> = ({ formId, defaultValues, onSubmit }) => {
+export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId, defaultValues, onSubmit, mode }) => {
   const form = useForm<TRegularTransactionFormData>({
     resolver: zodResolver(transactionSchema.regularTransaction),
     defaultValues,
   });
 
   const nature = form.watch("nature");
-
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
@@ -46,12 +46,19 @@ export const TransactionForm: FC<TransactionFormProps> = ({ formId, defaultValue
         <div className="grid grid-cols-2 gap-4">
           <FieldForm control={form.control} name="amount" label="Amount">
             {({ field: { value, onChange } }) => (
-              <Input value={value ?? ""} onChange={(e) => onChange(Number(e.target.value))} placeholder="@: 100" />
+              <Input
+                value={value ?? ""}
+                onChange={(e) => onChange(Number(e.target.value))}
+                placeholder="@: 100"
+                disabled={mode === "edit"}
+              />
             )}
           </FieldForm>
 
           <FieldForm control={form.control} name="nature" label="Income/Expense">
-            {({ field: { value, onChange } }) => <CommonSelect options={natureOptions} value={value} onChange={onChange} />}
+            {({ field: { value, onChange } }) => (
+              <CommonSelect options={natureOptions} value={value} onChange={onChange} disabled={mode === "edit"} />
+            )}
           </FieldForm>
         </div>
 
@@ -67,7 +74,12 @@ export const TransactionForm: FC<TransactionFormProps> = ({ formId, defaultValue
 
         <FieldForm control={form.control} name="walletId" label="Wallet">
           {({ field: { value, onChange } }) => (
-            <WalletSelection value={value} onChange={onChange} {...(nature === ETransactionNature.expense && { isSaving: false })} />
+            <WalletSelection
+              value={value}
+              onChange={onChange}
+              disabled={mode === "edit"}
+              {...(nature === ETransactionNature.expense && { isSaving: false })}
+            />
           )}
         </FieldForm>
 

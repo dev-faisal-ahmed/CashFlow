@@ -75,7 +75,7 @@ export class TransactionService {
     };
 
     const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
-    const allowedFields = ["_id", "ownerId", "amount", "description", "nature", "date", "walletName", "sourceName"];
+    const allowedFields = ["_id", "ownerId", "amount", "description", "nature", "walletId", "sourceId", "date", "walletName", "sourceName"];
     const fields = QueryHelper.selectFields(query.fields, allowedFields);
 
     const [result] = await TransactionModel.aggregate([

@@ -5,7 +5,7 @@ import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
-import { TransactionForm } from "./transaction-form";
+import { RegularTransactionForm } from "./regular-transaction-form";
 import { TRegularTransactionFormData } from "../transaction.schema";
 import { ETransactionNature } from "@/server/modules/transaction/transaction.interface";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -44,7 +44,8 @@ export const AddRegularTransaction = () => {
         title="Add New Transaction"
         description="Fill up the form to create a new transaction"
       >
-        <TransactionForm
+        <RegularTransactionForm
+          mode="add"
           formId={mutationKey}
           onSubmit={handleAddRegularTransaction}
           defaultValues={{ date: new Date(), sourceId: "", walletId: "", nature: ETransactionNature.income }}

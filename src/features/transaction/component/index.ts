@@ -1,2 +1,2 @@
 export * from "./add-regular-transaction";
-export * from "./regular-transaction-list";
+export * from "./regular-transaction-table";
