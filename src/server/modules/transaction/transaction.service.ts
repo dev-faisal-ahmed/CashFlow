@@ -1,16 +1,17 @@
 import { startSession, Types } from "mongoose";
-import { CreateRegularTransactionDto, GetTransactionsArgs } from "./transaction.validation";
+import { CreateRegularTransactionDto, GetTransactionsArgs, UpdateRegularTransactionDto } from "./transaction.validation";
 import { RegularTransactionModel, TransactionModel } from "./transaction.schema";
 import { ETransactionNature, ETransactionType } from "./transaction.interface";
 import { WalletModel } from "../wallet/wallet.schema";
 import { AppError } from "@/server/core/app.error";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
-import { WithUserId } from "@/server/types";
+import { IsOwner, WithUserId } from "@/server/types";
 
 // Types
 type CreateRegularTransaction = { dto: CreateRegularTransactionDto; userId: Types.ObjectId };
 type GetTransactions = WithUserId<{ query: GetTransactionsArgs }>;
+type UpdateRegularTransaction = { id: string; dto: UpdateRegularTransactionDto; userId: Types.ObjectId };
 
 export class TransactionService {
   static async createRegularTransaction({ dto, userId }: CreateRegularTransaction) {
@@ -101,5 +102,17 @@ export class TransactionService {
     const meta = paginationHelper.getMeta(total);
 
     return { transactions, meta };
+  }
+
+  static async updateRegularTransaction({ id, userId, dto }: UpdateRegularTransaction) {
+    const isOwner = await this.isOwner({ id, userId });
+    if (!isOwner) throw new AppError("You are not authorized to update this transaction", 401);
+    return TransactionModel.updateOne({ _id: id }, { $set: dto });
+  }
+
+  static async isOwner({ id, userId }: IsOwner) {
+    const transaction = await TransactionModel.findOne({ _id: id }, { ownerId: 1 }).lean();
+    if (!transaction) throw new AppError("Transaction not found!", 404);
+    return transaction.ownerId.equals(userId);
   }
 }

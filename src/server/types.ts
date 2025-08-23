@@ -6,3 +6,4 @@ export type TRecord<TValue = string> = Record<string, TValue>;
 
 // Shared
 export type WithUserId<T = unknown> = { userId: Types.ObjectId } & T;
+export type IsOwner = WithUserId<{ id: string }>;

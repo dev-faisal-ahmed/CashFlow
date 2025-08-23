@@ -21,6 +21,15 @@ export const transactionRoute = new Hono()
     const user = ctx.get("user");
     const { transactions, meta } = await TransactionService.getRegularTransactions({ query, userId: user._id });
     return ctx.json(ResponseDto.success({ message: "Transactions fetched successfully", meta, data: transactions }));
+  })
+
+  // Update Regular Transaction
+  .patch("/regular/:id", authGuard, jsonValidator(transactionValidation.updateRegularTransaction), async (ctx) => {
+    const id = ctx.req.param("id");
+    const dto = ctx.req.valid("json");
+    const user = ctx.get("user");
+    await TransactionService.updateRegularTransaction({ id, userId: user._id, dto });
+    return ctx.json(ResponseDto.success("Regular transaction updated successfully"));
   });
 
 export type TTransactionRoute = typeof transactionRoute;
