@@ -21,8 +21,8 @@ export const getSourceListApi = async (args: ToString<GetSourcesArgs>) => {
 };
 
 type TSourceListWithBasicInfo = Pick<ISource, "name"> & { _id: string };
-export const getSourceListWithBasicInfoApi = async () => {
-  const res = await sourceClient.index.$get({ query: { fields: "_id,name", getAll: "true" } });
+export const getSourceListWithBasicInfoApi = async (args: ToString<GetSourcesArgs>) => {
+  const res = await sourceClient.index.$get({ query: { fields: "_id,name", getAll: "true", ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData.data as TSourceListWithBasicInfo[];

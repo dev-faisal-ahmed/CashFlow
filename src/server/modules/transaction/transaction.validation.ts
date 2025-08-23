@@ -9,11 +9,13 @@ const baseTransaction = z.object({
 });
 
 // Regular transaction schema
-export const createRegularTransaction = baseTransaction.extend({
-  sourceId: z.string("Source id is required"),
-  walletId: z.string("Wallet id is required"),
-  nature: z.enum(Object.values(ETransactionNature), "Invalid transaction nature"),
-});
+export const createRegularTransaction = baseTransaction.and(
+  z.object({
+    sourceId: z.string("Source id is required"),
+    walletId: z.string("Wallet id is required"),
+    nature: z.enum(Object.values(ETransactionNature), "Invalid transaction nature"),
+  }),
+);
 
 export const transactionValidation = {
   createRegularTransaction,

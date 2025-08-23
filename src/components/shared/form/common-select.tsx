@@ -44,7 +44,7 @@ const SelectionOptionsContent: FC<SelectionOptionsContentProps> = ({ options, is
       </div>
     );
 
-  if (!options.length) return <ErrorMessage className="my-2" message="No options available" />;
+  if (!options.length) return <ErrorMessage className="my-2" message="No options are available" />;
 
   return (
     <>

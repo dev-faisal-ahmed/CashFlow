@@ -15,6 +15,8 @@ import { getSourceListWithBasicInfoApi } from "@/features/source/source.api";
 import { WalletSelection } from "@/features/wallet/components";
 import { DatePicker } from "@/components/shared/form/date-picker";
 import { Textarea } from "@/components/ui/textarea";
+import { ESourceType } from "@/server/modules/source/source.interface";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Main : Transaction Form
 type TransactionFormProps = {
@@ -54,7 +56,13 @@ export const TransactionForm: FC<TransactionFormProps> = ({ formId, defaultValue
         </div>
 
         <FieldForm control={form.control} name="sourceId" label="Source">
-          {({ field: { value, onChange } }) => <SourceListSelect value={value} onChange={onChange} />}
+          {({ field: { value, onChange } }) => (
+            <SourceSelection
+              value={value}
+              onChange={onChange}
+              type={nature === ETransactionNature.income ? ESourceType.income : ESourceType.expense}
+            />
+          )}
         </FieldForm>
 
         <FieldForm control={form.control} name="walletId" label="Wallet">
@@ -75,17 +83,20 @@ export const TransactionForm: FC<TransactionFormProps> = ({ formId, defaultValue
   );
 };
 
-type SourceListSelectProps = {
+type SourceSelectionProps = {
   value: string;
   onChange: (value: string) => void;
+  type?: ESourceType;
 };
 
-export const SourceListSelect: FC<SourceListSelectProps> = ({ value, onChange }) => {
-  const { data: sourceList } = useQuery({
-    queryKey: [queryKeys.source, "for-transaction"],
-    queryFn: getSourceListWithBasicInfoApi,
+export const SourceSelection: FC<SourceSelectionProps> = ({ value, onChange, type }) => {
+  const { data: sourceList, isLoading } = useQuery({
+    queryKey: [queryKeys.source, "for-transaction", { type }],
+    queryFn: () => getSourceListWithBasicInfoApi({ ...(type && { type }) }),
     select: (res) => res.map(({ _id, name }) => ({ label: name, value: _id })),
   });
 
-  return <CommonSelect value={value} onChange={onChange} options={sourceList ?? []} disabled={!sourceList?.length} />;
+  if (isLoading) return <Skeleton className="h-input" />;
+
+  return <CommonSelect value={value} onChange={onChange} options={sourceList ?? []} />;
 };

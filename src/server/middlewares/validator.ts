@@ -10,7 +10,7 @@ export const jsonValidator = <TSchema extends ZodType>(schema: TSchema) => {
 
 export const queryValidator = <TSchema extends ZodType>(schema: TSchema) => {
   return validator("query", async (value) => {
-    const parsed = schema.parseAsync(value);
+    const parsed = await schema.parseAsync(value);
     return parsed;
   });
 };

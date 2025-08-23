@@ -19,12 +19,14 @@ export class TransactionService {
 
     try {
       const [transaction] = await InitialTransactionModel.create(
-        {
-          ownerId: userId,
-          amount: dto.amount,
-          walletId: dto.walletId,
-          nature: ETransactionNature.income,
-        },
+        [
+          {
+            ownerId: userId,
+            amount: dto.amount,
+            walletId: dto.walletId,
+            nature: ETransactionNature.income,
+          },
+        ],
         { session },
       );
 

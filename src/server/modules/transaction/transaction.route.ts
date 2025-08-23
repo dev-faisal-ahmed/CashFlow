@@ -10,6 +10,7 @@ export const transactionRoute = new Hono()
   .post("/regular", authGuard, jsonValidator(transactionValidation.createRegularTransaction), async (ctx) => {
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
+    console.log(dto);
     await TransactionService.createRegularTransaction({ dto, userId: user._id });
     return ctx.json(ResponseDto.success("Regular transaction created successfully"));
   });
