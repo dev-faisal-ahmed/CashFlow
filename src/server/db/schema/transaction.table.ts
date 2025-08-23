@@ -4,7 +4,7 @@ import { categoryTable } from "./category.table";
 import { contactTable } from "./contact.table";
 import { createdAt } from "./shared";
 
-enum ETransactionType {
+export enum ETransactionType {
   initial = "initial",
   income = "income",
   expense = "expense",
@@ -13,7 +13,7 @@ enum ETransactionType {
   lend = "lend",
 }
 
-export const transactions = pgTable("transactions", {
+export const transactionTable = pgTable("transactions", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   // Main wallet

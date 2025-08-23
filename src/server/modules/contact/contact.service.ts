@@ -1,75 +1,78 @@
+import { db } from "@/server/db";
+import { contactTable, ETransactionType, transactionTable } from "@/server/db/schema";
+import { and, asc, eq, ilike, or, sql } from "drizzle-orm";
+
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
-import { IContact } from "./contact.interface";
-import { ContactModel } from "./contact.schema";
 import { GetContactsArgs } from "./contact.validation";
 import { AppError } from "@/server/core/app.error";
 import { WithUserId } from "@/server/types";
-import { QueryHelper } from "@/server/helpers/query.helper";
-import { Types } from "mongoose";
 
 // types
-type CreateContact = Pick<IContact, "name" | "phone" | "address" | "userId">;
+type TContact = typeof contactTable.$inferSelect;
+type CreateContact = typeof contactTable.$inferInsert;
 type GetContacts = WithUserId<{ query: GetContactsArgs }>;
-type UpdateContact = WithUserId<{ id: string; dto: Partial<IContact> }>;
-type DeleteContact = WithUserId<{ id: string }>;
-type IsOwner = { id: string; userId: Types.ObjectId };
+type UpdateContact = WithUserId<{ id: number; dto: Partial<TContact> }>;
+type DeleteContact = WithUserId<{ id: number }>;
+type IsOwner = WithUserId<{ id: number }>;
 
 export class ContactService {
   static async createContact(dto: CreateContact) {
-    const isContactExists = await ContactModel.findOne({ phone: dto.phone, userId: dto.userId }, { _id: 1 }).lean();
-    if (isContactExists) throw new AppError("Contact already exists", 400);
-    return ContactModel.create(dto);
+    return db.insert(contactTable).values(dto);
   }
 
   static async getContacts({ query, userId }: GetContacts) {
-    const requestedFields = query.fields;
     const { search, page } = query;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
-    const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
+    const { skip, limit } = paginationHelper.getPaginationInfo();
 
-    const fields = QueryHelper.selectFields(requestedFields, ["_id", "name", "phone", "address", "userId", "given", "taken"]);
+    const baseQuery = and(
+      eq(contactTable.userId, userId),
+      ...(search ? [or(ilike(contactTable.name, `%${search}%`), ilike(contactTable.phone, `%${search}%`))] : []),
+    );
 
-    const dbQuery = {
-      userId,
-      isDeleted: false,
-      ...(search && { name: { $regex: search, $options: "i" }, phone: { $regex: search, $options: "i" } }),
-    };
+    const contactsQuery = db
+      .select({
+        id: contactTable.id,
+        name: contactTable.name,
+        phone: contactTable.phone,
+        address: contactTable.address,
+        totalBorrowed: sql<number>`COALESCE(SUM(CASE WHEN ${transactionTable.type} = '${ETransactionType.borrow}' THEN ${transactionTable.amount} ELSE 0 END), 0)`,
+        totalLent: sql<number>`COALESCE(SUM(CASE WHEN ${transactionTable.type} = '${ETransactionType.lend}' THEN ${transactionTable.amount} ELSE 0 END), 0)`,
+      })
+      .from(contactTable)
+      .leftJoin(transactionTable, eq(transactionTable.contactId, contactTable.id))
+      .where(baseQuery)
+      .groupBy(contactTable.id)
+      .orderBy(asc(contactTable.name));
 
-    const [result] = await ContactModel.aggregate([
-      { $match: dbQuery },
-      ...(fields ? [{ $project: fields }] : []),
+    // pagination
+    const contacts = await contactsQuery.offset(skip).limit(limit);
 
-      {
-        $facet: {
-          contacts: [...(!getAll ? [{ $skip: skip }, { $limit: limit }] : [])],
-          total: [{ $count: "count" }],
-        },
-      },
-    ]);
+    const [{ count }] = await db
+      .select({ count: sql<number>`COUNT(${contactTable.id})` })
+      .from(contactTable)
+      .where(baseQuery);
 
-    const contacts = result.contacts;
-    const total = result.total[0].count;
-    const meta = paginationHelper.getMeta(total);
-
+    const meta = paginationHelper.getMeta(count);
     return { contacts, meta };
   }
 
   static async updateContact({ id, dto, userId }: UpdateContact) {
     const isOwner = await this.isOwner({ id, userId });
     if (!isOwner) throw new AppError("You are not authorized to update this contact", 401);
-    return ContactModel.updateOne({ _id: id }, { $set: dto });
+    return db.update(contactTable).set(dto).where(eq(contactTable.id, id));
   }
 
   static async deleteContact({ id, userId }: DeleteContact) {
     const isOwner = await this.isOwner({ id, userId });
     if (!isOwner) throw new AppError("You are not authorized to delete this contact", 401);
-    return ContactModel.updateOne({ _id: id }, { $set: { isDeleted: true } });
+    return db.update(contactTable).set({ isDeleted: true }).where(eq(contactTable.id, id));
   }
 
   // helper
   static async isOwner({ id, userId }: IsOwner) {
-    const contact = await ContactModel.findOne({ _id: id }, { _id: 1, userId: 1 }).lean();
+    const [contact] = await db.select({ userId: contactTable.userId }).from(contactTable).where(eq(contactTable.id, id)).limit(1);
     if (!contact) throw new AppError("Contact not found!", 404);
-    return contact.userId.equals(userId);
+    return contact.userId === userId;
   }
 }

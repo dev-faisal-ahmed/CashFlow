@@ -1,7 +1,7 @@
 import { pgTable, uniqueIndex } from "drizzle-orm/pg-core";
 import { varchar, boolean, integer } from "drizzle-orm/pg-core";
 import { userTable } from "./user.table";
-import { id, createdAt } from "./shared";
+import { id, isDeleted, createdAt } from "./shared";
 
 export const walletTable = pgTable(
   "wallets",
@@ -12,6 +12,7 @@ export const walletTable = pgTable(
       .notNull()
       .references(() => userTable.id),
     isSaving: boolean("is_saving").default(false),
+    isDeleted,
     createdAt,
   },
   (table) => [{ nameAndUserIndex: uniqueIndex("name_and_user_idx").on(table.name, table.userId) }],

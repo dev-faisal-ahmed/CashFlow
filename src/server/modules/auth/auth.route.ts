@@ -6,7 +6,7 @@ import { ResponseDto } from "@/server/core/response.dto";
 
 export const authRoute = new Hono()
   // Signup
-  .post("/signup", jsonValidator(authValidation.signup), async (ctx) => {
+  .post("/signup", jsonValidator(authValidation.signupWithCredentials), async (ctx) => {
     const dto = ctx.req.valid("json");
     console.log({ dto });
     await AuthService.signup(dto);

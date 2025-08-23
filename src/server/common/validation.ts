@@ -1,8 +1,7 @@
 import z from "zod";
 
-const query = z.object({
+const baseQuery = z.object({
   search: z.string().optional(),
-  fields: z.string().optional(),
 });
 
 const pagination = z.object({
@@ -11,6 +10,6 @@ const pagination = z.object({
   getAll: z.coerce.boolean().optional().catch(false),
 });
 
-const queryWithPagination = query.and(pagination);
+const queryWithPagination = baseQuery.and(pagination);
 
-export const commonValidation = { pagination, query, queryWithPagination };
+export const commonValidation = { pagination, queryWithPagination, baseQuery };
