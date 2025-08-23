@@ -1,7 +1,7 @@
 import { sourceClient } from "@/lib/client";
 import { CreateSourceDto, GetSourcesArgs, UpdateSourceDto } from "@/server/modules/source/source.validation";
-import { sourceSchema } from "./source.schema";
 import { ToString } from "@/lib/types";
+import { ISource } from "@/server/modules/source/source.interface";
 
 // Add
 export const addSourceApi = async (payload: CreateSourceDto) => {
@@ -12,20 +12,20 @@ export const addSourceApi = async (payload: CreateSourceDto) => {
 };
 
 // Get
+type TSourceData = Pick<ISource, "name" | "type" | "budget"> & { _id: string; income: number; expense: number };
 export const getSourceListApi = async (args: ToString<GetSourcesArgs>) => {
   const res = await sourceClient.index.$get({ query: { fields: "_id,name,type,budget,income,expense", getAll: "true", ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  const validatedData = await sourceSchema.sourceListData.parseAsync(resData.data);
-  return validatedData;
+  return resData.data as TSourceData[];
 };
 
+type TSourceListWithBasicInfo = Pick<ISource, "name"> & { _id: string };
 export const getSourceListWithBasicInfoApi = async () => {
   const res = await sourceClient.index.$get({ query: { fields: "_id,name", getAll: "true" } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  const validatedData = await sourceSchema.sourceListWihBasicData.parseAsync(resData.data);
-  return validatedData;
+  return resData.data as TSourceListWithBasicInfo[];
 };
 
 // Update

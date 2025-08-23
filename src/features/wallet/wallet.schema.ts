@@ -30,33 +30,10 @@ const walletTransfer = z.object({
   destinationWalletId: z.string().nonempty("Destination wallet can not be empty"),
 });
 
-// Api Response Validation
-const walletListData = z.array(
-  z.object({
-    _id: z.string(),
-    name: z.string(),
-    isSaving: z.boolean().optional().default(false),
-    balance: z.number(),
-  }),
-);
-
-const walletListWithBasicData = z.array(
-  z.object({
-    _id: z.string(),
-    name: z.string(),
-    balance: z.number(),
-  }),
-);
-
 export const walletSchema = {
-  // Form Validation
   addWallet,
   updateWallet,
   walletTransfer,
-
-  // Api Response Validation
-  walletListData,
-  walletListWithBasicData,
 };
 
 export type TAddWalletFormData = z.infer<typeof addWallet>;

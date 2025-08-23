@@ -1,7 +1,7 @@
 import { contactClient } from "@/lib/client";
 import { ToString } from "@/lib/types";
 import { CreateContactDto, GetContactsArgs, UpdateContactDto } from "@/server/modules/contact/contact.validation";
-import { contactSchema } from "./contact.schema";
+import { IContact } from "@/server/modules/contact/contact.interface";
 
 // Create Contact
 export const createContactApi = async (payload: CreateContactDto) => {
@@ -12,12 +12,12 @@ export const createContactApi = async (payload: CreateContactDto) => {
 };
 
 // Get Contacts
+type TContactData = Pick<IContact, "name" | "phone" | "address" | "given" | "taken"> & { _id: string };
 export const getContactsApi = async (args: ToString<GetContactsArgs>) => {
   const res = await contactClient.index.$get({ query: { ...args, fields: "_id,name,phone,address,given,taken" } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  const parsedData = await contactSchema.getContacts.parseAsync(resData.data);
-  return { data: parsedData, meta: resData.meta };
+  return resData.data as TContactData[];
 };
 
 // Update Contact

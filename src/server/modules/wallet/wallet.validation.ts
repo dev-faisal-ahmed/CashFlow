@@ -35,7 +35,7 @@ const transfer = z.object({
 // query
 const getAllWallets = commonValidation.queryWithPagination.and(
   z.object({
-    isSaving: z.coerce.boolean().optional(),
+    isSaving: z.stringbool().optional(),
   }),
 );
 
