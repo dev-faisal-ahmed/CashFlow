@@ -1,8 +1,8 @@
 import z from "zod";
 
 import { capitalize } from "@/lib/utils";
-import { EBudgetInterval, ESourceType } from "./source.interface";
 import { commonValidation } from "@/server/common/validation";
+import { EBudgetInterval, ECategoryType } from "@/server/db/schema";
 
 // Json
 const budget = z.object({
@@ -10,18 +10,18 @@ const budget = z.object({
   interval: z.enum(Object.values(EBudgetInterval), "Invalid budget interval"),
 });
 
-const createSource = z.object({
+const createCategory = z.object({
   name: z
     .string("Name is required")
     .trim()
     .nonempty("Name can not be empty")
     .transform((v) => capitalize(v)),
 
-  type: z.enum(Object.values(ESourceType)),
+  type: z.enum(Object.values(ECategoryType)),
   budget: z.optional(budget),
 });
 
-const updateSource = z
+const updateCategory = z
   .object({
     name: z
       .string()
@@ -42,22 +42,22 @@ const updateSource = z
   });
 
 // Query
-const getSources = commonValidation.queryWithPagination.and(
+const getCategories = commonValidation.queryWithPagination.and(
   z.object({
-    type: z.enum(Object.values(ESourceType), "Invalid Source Type").optional(),
+    type: z.enum(Object.values(ECategoryType), "Invalid Category Type").optional(),
   }),
 );
 
-export const sourceValidation = {
+export const categoryValidation = {
   // Json
-  createSource,
-  updateSource,
+  createCategory,
+  updateCategory,
 
   // Query
-  getSources,
+  getCategories,
 };
 
-export type CreateSourceDto = z.infer<typeof createSource>;
-export type UpdateSourceDto = z.infer<typeof updateSource>;
+export type CreateCategoryDto = z.infer<typeof createCategory>;
+export type UpdateCategoryDto = z.infer<typeof updateCategory>;
 
-export type GetSourcesArgs = z.infer<typeof getSources>;
+export type GetCategoriesArgs = z.infer<typeof getCategories>;

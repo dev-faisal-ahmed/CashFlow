@@ -6,7 +6,10 @@ export const categoryTable = pgTable(
   "categories",
   {
     id,
-    userId: integer("user_id").references(() => userTable.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .references(() => userTable.id, { onDelete: "cascade" })
+      .notNull(),
+
     name: varchar("name", { length: 100 }).notNull(),
     type: text("type").notNull().$type<ECategoryType>(),
     budget: json("budget").$type<TBudget>(),
@@ -23,11 +26,10 @@ export enum ECategoryType {
 
 export type TBudget = {
   amount: number;
-  interval: EInterval;
+  interval: EBudgetInterval;
 };
 
-export enum EInterval {
-  daily = "daily",
+export enum EBudgetInterval {
   weekly = "weekly",
   monthly = "monthly",
   yearly = "yearly",

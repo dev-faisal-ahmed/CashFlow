@@ -10,7 +10,7 @@ export const contactRoute = new Hono()
   .post("/", authGuard, jsonValidator(contactValidation.createContact), async (ctx) => {
     const user = ctx.get("user");
     const dto = ctx.req.valid("json");
-    await ContactService.createContact({ ...dto, userId: user._id });
+    await ContactService.createContact({ ...dto, userId: user.id });
     return ctx.json(ResponseDto.success("Contact created successfully"));
   })
 
@@ -18,7 +18,7 @@ export const contactRoute = new Hono()
   .get("/", authGuard, queryValidator(contactValidation.getContacts), async (ctx) => {
     const user = ctx.get("user");
     const query = ctx.req.valid("query");
-    const { contacts, meta } = await ContactService.getContacts({ query, userId: user._id });
+    const { contacts, meta } = await ContactService.getContacts({ query, userId: user.id });
     return ctx.json(ResponseDto.success({ message: "Contacts fetched successfully", meta, data: contacts }));
   })
 
@@ -27,7 +27,7 @@ export const contactRoute = new Hono()
     const user = ctx.get("user");
     const dto = ctx.req.valid("json");
     const id = ctx.req.param("id");
-    await ContactService.updateContact({ id, dto, userId: user._id });
+    await ContactService.updateContact({ id: Number(id), dto, userId: user.id });
     return ctx.json(ResponseDto.success("Contact updated successfully"));
   })
 
@@ -35,7 +35,7 @@ export const contactRoute = new Hono()
   .delete("/:id", authGuard, async (ctx) => {
     const user = ctx.get("user");
     const id = ctx.req.param("id");
-    await ContactService.deleteContact({ id, userId: user._id });
+    await ContactService.deleteContact({ id: Number(id), userId: user.id });
     return ctx.json(ResponseDto.success("Contact deleted successfully"));
   });
 

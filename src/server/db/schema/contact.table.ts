@@ -6,7 +6,10 @@ export const contactTable = pgTable(
   "contacts",
   {
     id,
-    userId: integer("user_id").references(() => userTable.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .references(() => userTable.id, { onDelete: "cascade" })
+      .notNull(),
+
     name: varchar("name", { length: 100 }).notNull(),
     phone: varchar("phone", { length: 20 }).notNull(),
     address: varchar("address", { length: 255 }),

@@ -1,7 +1,6 @@
 import { contactClient } from "@/lib/client";
 import { ToString } from "@/lib/types";
 import { CreateContactDto, GetContactsArgs, UpdateContactDto } from "@/server/modules/contact/contact.validation";
-import { IContact } from "@/server/modules/contact/contact.interface";
 
 // Create Contact
 export const createContactApi = async (payload: CreateContactDto) => {
@@ -12,13 +11,11 @@ export const createContactApi = async (payload: CreateContactDto) => {
 };
 
 // Get Contacts
-type TContactData = Pick<IContact, "name" | "phone" | "address" | "given" | "taken"> & { _id: string };
 export const getContactsApi = async (args: ToString<GetContactsArgs>) => {
-  const res = await contactClient.index.$get({ query: { ...args, fields: "_id,name,phone,address,given,taken" } });
+  const res = await contactClient.index.$get({ query: { ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  const contacts = resData.data as TContactData[];
-  return { contacts, meta: resData.meta };
+  return resData;
 };
 
 // Update Contact

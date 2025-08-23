@@ -4,4 +4,4 @@ export type TRecord<TValue = string> = Record<string, TValue>;
 
 // Shared
 export type WithUserId<T = unknown> = { userId: number } & T;
-export type IsOwner = WithUserId<{ id: string }>;
+export type IsOwner<TId = number> = WithUserId<{ id: TId }>;

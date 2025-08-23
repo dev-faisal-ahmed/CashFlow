@@ -9,8 +9,9 @@ export const walletTable = pgTable(
     id,
     name: varchar("name", { length: 100 }).notNull(),
     userId: integer("user_id")
-      .notNull()
-      .references(() => userTable.id),
+      .references(() => userTable.id)
+      .notNull(),
+
     isSaving: boolean("is_saving").default(false),
     isDeleted,
     createdAt,

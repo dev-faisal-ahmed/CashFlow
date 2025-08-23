@@ -1,6 +1,6 @@
 {
-  "id": "2d41040c-6808-4b1d-b9a1-2f31c7f14e71",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "d95a5d31-e313-4b37-a2e5-97bbae5d1536",
+  "prevId": "2d41040c-6808-4b1d-b9a1-2f31c7f14e71",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -18,7 +18,7 @@
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -89,7 +89,7 @@
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -157,6 +157,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "wallet_id": {
           "name": "wallet_id",
           "type": "integer",
@@ -223,6 +229,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "transactions_user_id_users_id_fk": {
+          "name": "transactions_user_id_users_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "transactions_wallet_id_wallets_id_fk": {
           "name": "transactions_wallet_id_wallets_id_fk",
           "tableFrom": "transactions",

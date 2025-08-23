@@ -5,7 +5,7 @@ import { and, asc, eq, ilike, or, sql } from "drizzle-orm";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { GetContactsArgs } from "./contact.validation";
 import { AppError } from "@/server/core/app.error";
-import { WithUserId } from "@/server/types";
+import { IsOwner, WithUserId } from "@/server/types";
 
 // types
 type TContact = typeof contactTable.$inferSelect;
@@ -13,7 +13,6 @@ type CreateContact = typeof contactTable.$inferInsert;
 type GetContacts = WithUserId<{ query: GetContactsArgs }>;
 type UpdateContact = WithUserId<{ id: number; dto: Partial<TContact> }>;
 type DeleteContact = WithUserId<{ id: number }>;
-type IsOwner = WithUserId<{ id: number }>;
 
 export class ContactService {
   static async createContact(dto: CreateContact) {
@@ -25,12 +24,12 @@ export class ContactService {
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
     const { skip, limit } = paginationHelper.getPaginationInfo();
 
-    const baseQuery = and(
+    const whereQuery = and(
       eq(contactTable.userId, userId),
       ...(search ? [or(ilike(contactTable.name, `%${search}%`), ilike(contactTable.phone, `%${search}%`))] : []),
     );
 
-    const contactsQuery = db
+    const contacts = await db
       .select({
         id: contactTable.id,
         name: contactTable.name,
@@ -41,17 +40,18 @@ export class ContactService {
       })
       .from(contactTable)
       .leftJoin(transactionTable, eq(transactionTable.contactId, contactTable.id))
-      .where(baseQuery)
+      .where(whereQuery)
       .groupBy(contactTable.id)
-      .orderBy(asc(contactTable.name));
+      .orderBy(asc(contactTable.name))
+      .limit(limit)
+      .offset(skip);
 
     // pagination
-    const contacts = await contactsQuery.offset(skip).limit(limit);
 
     const [{ count }] = await db
       .select({ count: sql<number>`COUNT(${contactTable.id})` })
       .from(contactTable)
-      .where(baseQuery);
+      .where(whereQuery);
 
     const meta = paginationHelper.getMeta(count);
     return { contacts, meta };

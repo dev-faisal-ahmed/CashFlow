@@ -3,6 +3,7 @@ import { walletTable } from "./wallet.table";
 import { categoryTable } from "./category.table";
 import { contactTable } from "./contact.table";
 import { createdAt } from "./shared";
+import { userTable } from "./user.table";
 
 export enum ETransactionType {
   initial = "initial",
@@ -15,6 +16,10 @@ export enum ETransactionType {
 
 export const transactionTable = pgTable("transactions", {
   id: uuid("id").defaultRandom().primaryKey(),
+
+  userId: integer("user_id")
+    .references(() => userTable.id, { onDelete: "cascade" })
+    .notNull(),
 
   // Main wallet
   walletId: integer("wallet_id")
