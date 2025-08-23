@@ -4,6 +4,7 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // DB
 export const MONGO_URI = process.env.MONGO_URI;
+export const DATABASE_URL = process.env.DATABASE_URL;
 
 // Auth
 export const SALT = Number(process.env.SALT) ?? 7;
