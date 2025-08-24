@@ -1,16 +1,17 @@
-import { Types, startSession } from "mongoose";
+import { Types } from "mongoose";
 import { AppError } from "@/server/core/app.error";
 import { GetAllWalletsArgs, UpdateWalletDto, WalletTransferDto } from "./wallet.validation";
-import { IWallet } from "./wallet.interface";
 import { WithUserId } from "@/server/types";
 import { WalletModel } from "./wallet.schema";
-import { InitialTransactionModel, TransferTransactionModel } from "../transaction/transaction.schema";
-import { ETransactionNature } from "../transaction/transaction.interface";
+import { TransferTransactionModel } from "../transaction/transaction.schema";
+
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { QueryHelper } from "@/server/helpers/query.helper";
+import { ETransactionType, transactionTable, walletTable } from "@/server/db/schema";
+import { db } from "@/server/db";
 
 // types
-type CreateWallet = Pick<IWallet, "name" | "isSaving" | "ownerId"> & { initialBalance?: number };
+type CreateWallet = typeof walletTable.$inferSelect & { initialBalance?: number };
 type GetWallets = WithUserId<{ query: GetAllWalletsArgs }>;
 type UpdateWallet = WithUserId<{ id: string; dto: UpdateWalletDto }>;
 type DeleteWallet = WithUserId<{ id: string }>;
@@ -19,40 +20,31 @@ type IsWalletExist = WithUserId<{ name: string }>;
 type IsOwner = WithUserId<{ id: string }>;
 
 export class WalletService {
-  static async createWallet(dto: CreateWallet) {
-    const isWalletExist = await this.isWalletExists({ name: dto.name, userId: dto.ownerId });
-    if (isWalletExist) throw new AppError("Wallet already exists", 409);
+  static async createWallet({ initialBalance, ...dto }: CreateWallet) {
+    return db.transaction(async (tx) => {
+      try {
+        const [wallet] = await tx.insert(walletTable).values(dto).returning({ id: walletTable.id });
+        if (!wallet) throw new AppError("Failed to create wallet", 500);
+        if (initialBalance) {
+          const [transaction] = await tx
+            .insert(transactionTable)
+            .values({
+              amount: initialBalance.toFixed(2),
+              type: ETransactionType.initial,
+              userId: dto.userId,
+              walletId: wallet.id,
+              date: new Date(),
+            })
+            .returning({ id: transactionTable.id });
 
-    const session = await startSession();
-    session.startTransaction();
-
-    try {
-      const [wallet] = await WalletModel.create([{ ...dto, balance: dto.initialBalance ?? 0 }], { session });
-
-      if (dto.initialBalance) {
-        const [transaction] = await InitialTransactionModel.create(
-          [
-            {
-              ownerId: dto.ownerId,
-              amount: dto.initialBalance,
-              walletId: wallet._id,
-              nature: ETransactionNature.income,
-            },
-          ],
-          { session },
-        );
-
-        if (!transaction) throw new AppError("Failed to create initial transaction", 500);
+          if (!transaction) throw new AppError("Failed to create initial transaction", 500);
+          return { wallet, transaction };
+        }
+      } catch (error) {
+        tx.rollback();
+        throw error;
       }
-
-      await session.commitTransaction();
-      return wallet;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   static async getWallets({ query, userId }: GetWallets) {
