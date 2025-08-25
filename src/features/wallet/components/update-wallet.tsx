@@ -11,7 +11,7 @@ import { TUpdateWalletFormData, TWalletFormData } from "../wallet.schema";
 import { walletClient } from "@/lib/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type UpdateWalletProps = { walletId: string; name: string; isSaving: boolean; onSuccess: () => void };
+type UpdateWalletProps = { walletId: number; name: string; isSaving: boolean; onSuccess: () => void };
 const mutationKey = `update-${queryKeys.wallet}`;
 
 export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, onSuccess }) => {
@@ -53,8 +53,8 @@ export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, 
 };
 
 // Api calling
-const updateWalletApi = async ({ walletId, ...payload }: TUpdateWalletFormData & { walletId: string }) => {
-  const res = await walletClient[":id"].$patch({ param: { id: walletId }, json: payload });
+const updateWalletApi = async ({ walletId, ...payload }: TUpdateWalletFormData & { walletId: number }) => {
+  const res = await walletClient[":id"].$patch({ param: { id: walletId.toString() }, json: payload });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;

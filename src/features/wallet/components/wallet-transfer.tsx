@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WalletSelection } from "./wallet-selection";
 
-type WalletTransferProps = { balance: number; walletId: string; onSuccess: () => void };
+type WalletTransferProps = { balance: number; walletId: number; onSuccess: () => void };
 
 export const WalletTransfer: FC<WalletTransferProps> = ({ walletId, onSuccess }) => {
   const mutationKey = `transfer-${queryKeys.wallet}-${walletId}`;
@@ -30,7 +30,7 @@ export const WalletTransfer: FC<WalletTransferProps> = ({ walletId, onSuccess })
       {
         amount: formData.amount,
         senderWalletId: walletId,
-        receiverWalletId: formData.destinationWalletId,
+        receiverWalletId: Number(formData.destinationWalletId),
         ...(formData.description && { description: formData.description }),
       },
       {
@@ -57,7 +57,7 @@ export const WalletTransfer: FC<WalletTransferProps> = ({ walletId, onSuccess })
         title="Transfer Money"
         description="Provide necessary information to transfer money"
       >
-        <TransferWalletForm formId={mutationKey} sourceWalletId={walletId} onSubmit={handleTransferWallet} />
+        <TransferWalletForm formId={mutationKey} sourceWalletId={String(walletId)} onSubmit={handleTransferWallet} />
       </FormDialog>
     </>
   );

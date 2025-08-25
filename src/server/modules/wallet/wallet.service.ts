@@ -36,7 +36,7 @@ export class WalletService {
           })
           .returning({ id: transactionTable.id });
 
-        if (!transaction) throw new AppError("Failed to create initial transaction", 500);
+        if (!tr) throw new AppError("Failed to create initial transaction", 500);
         transaction = tr;
       }
 

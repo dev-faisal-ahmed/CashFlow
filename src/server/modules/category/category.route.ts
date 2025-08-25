@@ -45,3 +45,5 @@ export const categoryRoute = new Hono()
     await CategoryService.deleteCategory({ id: Number(id), userId: user.id });
     return ctx.json(ResponseDto.success("Category deleted successfully"));
   });
+
+export type TCategoryRoute = typeof categoryRoute;

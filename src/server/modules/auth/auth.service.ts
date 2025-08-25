@@ -3,9 +3,8 @@ import bcrypt from "bcrypt";
 import { AppError } from "@/server/core/app.error";
 import { SALT } from "@/lib/config";
 import { LoginWithCredentialsDto, LoginWithGoogleDto, SignupWithCredentialsDto } from "./auth.validation";
-import { EUserProvider } from "../user/user.interface";
 import { db } from "@/server/db";
-import { userTable } from "@/server/db/schema";
+import { EUserProvider, userTable } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
 // Types
@@ -56,32 +55,26 @@ export class AuthService {
   }
 
   static async findUserForLogin(email: string) {
-    const [user] = await db
-      .select({
-        id: userTable.id,
-        name: userTable.name,
-        email: userTable.email,
-        image: userTable.image,
-        password: userTable.password,
-        provider: userTable.provider,
-      })
-      .from(userTable)
-      .where(eq(userTable.email, email))
-      .limit(1);
+    const user = await db.query.userTable.findFirst({
+      where: eq(userTable.email, email),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        password: true,
+        provider: true,
+      },
+    });
 
     return user;
   }
 
   static async findUserFormAuthGuard(id: number) {
-    const [user] = await db
-      .select({
-        id: userTable.id,
-        name: userTable.name,
-        email: userTable.email,
-      })
-      .from(userTable)
-      .where(eq(userTable.id, id))
-      .limit(1);
+    const user = await db.query.userTable.findFirst({
+      where: eq(userTable.id, id),
+      columns: { id: true, name: true, email: true },
+    });
 
     return user;
   }

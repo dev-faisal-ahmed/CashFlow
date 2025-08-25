@@ -20,3 +20,5 @@ export const walletTable = pgTable(
   },
   (table) => [{ nameAndUserIndex: uniqueIndex("name_and_user_idx").on(table.name, table.userId) }],
 );
+
+export type TWallet = typeof walletTable.$inferSelect;

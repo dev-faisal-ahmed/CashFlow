@@ -4,9 +4,9 @@ import { authRoute } from "./modules/auth/auth.route";
 import { ResponseDto } from "./core/response.dto";
 import { handleGlobalError } from "./core/global.error.handler";
 import { walletRoute } from "./modules/wallet/wallet.route";
-import { sourceRoute } from "./modules/source/source.router";
 import { contactRoute } from "./modules/contact/contact.route";
 import { transactionRoute } from "./modules/transaction/transaction.route";
+import { categoryRoute } from "./modules/category/category.route";
 
 const app = new Hono().basePath("/api/v1");
 
@@ -19,7 +19,7 @@ app.get("/", (ctx) => {
 // routes
 app.route("/auth", authRoute);
 app.route("/wallets", walletRoute);
-app.route("/sources", sourceRoute);
+app.route("/categories", categoryRoute);
 app.route("/contacts", contactRoute);
 app.route("/transactions", transactionRoute);
 

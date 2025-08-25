@@ -1,7 +1,6 @@
 import { walletClient } from "@/lib/client";
 import { CreateWalletDto, GetAllWalletsArgs, WalletTransferDto } from "@/server/modules/wallet/wallet.validation";
 import { ToString } from "@/lib/types";
-import { IWallet } from "@/server/modules/wallet/wallet.interface";
 
 // Add
 export const addWalletApi = async (dto: CreateWalletDto) => {
@@ -12,21 +11,20 @@ export const addWalletApi = async (dto: CreateWalletDto) => {
 };
 
 // Get
-type TWalletData = Pick<IWallet, "name" | "isSaving" | "balance"> & { _id: string };
+
 export const getAllWalletListApi = async (args: ToString<GetAllWalletsArgs>) => {
-  const res = await walletClient.index.$get({ query: { getAll: "true", fields: "_id,name,isSaving,balance", ...args } });
+  const res = await walletClient.index.$get({ query: { ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  return resData.data as TWalletData[];
+  return resData.data;
 };
 
 //  Get Wallet List For Transfer
-type TWalletWithBasicInfo = Pick<IWallet, "name" | "balance"> & { _id: string };
 export const getWalletListWithBasicDataApi = async (args: ToString<GetAllWalletsArgs>) => {
-  const res = await walletClient.index.$get({ query: { fields: "_id,name,balance", getAll: "true", ...args } });
+  const res = await walletClient.index.$get({ query: { ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
-  return resData.data as TWalletWithBasicInfo[];
+  return resData.data;
 };
 
 // Delete
