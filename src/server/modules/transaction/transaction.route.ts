@@ -11,15 +11,15 @@ export const transactionRoute = new Hono()
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
     console.log(dto);
-    await TransactionService.createRegularTransaction({ dto, userId: user._id });
+    await TransactionService.createRegularTransaction({ dto, userId: user.id });
     return ctx.json(ResponseDto.success("Regular transaction created successfully"));
   })
 
   // Get Regular Transactions
-  .get("/regular", authGuard, queryValidator(transactionValidation.getTransactions), async (ctx) => {
+  .get("/regular", authGuard, queryValidator(transactionValidation.getRegularTransactions), async (ctx) => {
     const query = ctx.req.valid("query");
     const user = ctx.get("user");
-    const { transactions, meta } = await TransactionService.getRegularTransactions({ query, userId: user._id });
+    const { transactions, meta } = await TransactionService.getRegularTransactions({ query, userId: user.id });
     return ctx.json(ResponseDto.success({ message: "Transactions fetched successfully", meta, data: transactions }));
   })
 
@@ -28,7 +28,7 @@ export const transactionRoute = new Hono()
     const id = ctx.req.param("id");
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
-    await TransactionService.updateRegularTransaction({ id, userId: user._id, dto });
+    await TransactionService.updateRegularTransaction({ id, userId: user.id, dto });
     return ctx.json(ResponseDto.success("Regular transaction updated successfully"));
   });
 
