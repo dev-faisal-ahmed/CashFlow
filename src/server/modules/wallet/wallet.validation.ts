@@ -27,8 +27,8 @@ const updateWallet = z.object({
 
 const transfer = z.object({
   amount: z.number().positive("Amount can not be negative"),
-  senderWalletId: z.string().nonempty("Sender wallet id is required"),
-  receiverWalletId: z.string().nonempty("Receiver wallet id is required"),
+  senderWalletId: z.number("Sender wallet id is required"),
+  receiverWalletId: z.number("Receiver wallet id is required"),
   description: z.string().optional(),
 });
 

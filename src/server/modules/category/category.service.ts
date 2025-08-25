@@ -2,7 +2,6 @@ import { db } from "@/server/db";
 import { WithUserId } from "@/server/types";
 import { categoryTable, transactionTable } from "@/server/db/schema";
 import { GetCategoriesArgs } from "./category.validation";
-import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import { AppError } from "@/server/core/app.error";
 
@@ -20,9 +19,7 @@ export class CategoryService {
   }
 
   static async getCategories({ query, userId }: GetCategories) {
-    const { type, page, search } = query;
-    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
-    const { skip, limit } = paginationHelper.getPaginationInfo();
+    const { search, type } = query;
 
     const whereQuery = and(
       eq(categoryTable.userId, userId),
@@ -77,17 +74,9 @@ export class CategoryService {
       .leftJoin(transactionTable, eq(transactionTable.categoryId, categoryTable.id))
       .where(whereQuery)
       .groupBy(categoryTable.id)
-      .orderBy(desc(categoryTable.createdAt))
-      .limit(limit)
-      .offset(skip);
+      .orderBy(desc(categoryTable.createdAt));
 
-    const [{ count }] = await db
-      .select({ count: sql<number>`COUNT(${categoryTable.id})` })
-      .from(categoryTable)
-      .where(whereQuery);
-
-    const meta = paginationHelper.getMeta(count);
-    return { categories, meta };
+    return categories;
   }
 
   static async getCategoryList(usrId: number) {

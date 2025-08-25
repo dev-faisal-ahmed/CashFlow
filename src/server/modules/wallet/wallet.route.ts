@@ -10,7 +10,7 @@ export const walletRoute = new Hono()
   .post("/", authGuard, jsonValidator(walletValidation.createWallet), async (ctx) => {
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
-    await WalletService.createWallet({ ...dto, ownerId: user._id });
+    await WalletService.createWallet({ ...dto, userId: user.id });
     return ctx.json(ResponseDto.success("Wallet created successfully"));
   })
 
@@ -18,8 +18,8 @@ export const walletRoute = new Hono()
   .get("/", authGuard, queryValidator(walletValidation.getAllWallets), async (ctx) => {
     const query = ctx.req.valid("query");
     const user = ctx.get("user");
-    const { wallets, meta } = await WalletService.getWallets({ query, userId: user._id });
-    return ctx.json(ResponseDto.success({ message: "Wallets fetched successfully", meta, data: wallets }));
+    const wallets = await WalletService.getWallets({ query, userId: user.id });
+    return ctx.json(ResponseDto.success({ message: "Wallets fetched successfully", data: wallets }));
   })
 
   // Update Wallet
@@ -27,7 +27,7 @@ export const walletRoute = new Hono()
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
     const id = ctx.req.param("id");
-    await WalletService.updateWallet({ id, dto, userId: user._id });
+    await WalletService.updateWallet({ id: Number(id), dto, userId: user.id });
     return ctx.json(ResponseDto.success("Wallet updated successfully"));
   })
 
@@ -35,7 +35,7 @@ export const walletRoute = new Hono()
   .delete("/:id", authGuard, async (ctx) => {
     const user = ctx.get("user");
     const id = ctx.req.param("id");
-    await WalletService.deleteWallet({ id, userId: user._id });
+    await WalletService.deleteWallet({ id: Number(id), userId: user.id });
     return ctx.json(ResponseDto.success("Wallet deleted successfully"));
   })
 
@@ -43,7 +43,7 @@ export const walletRoute = new Hono()
   .post("/transfer", authGuard, jsonValidator(walletValidation.transfer), async (ctx) => {
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
-    await WalletService.walletTransfer({ dto, userId: user._id });
+    await WalletService.walletTransfer({ dto, userId: user.id });
     return ctx.json(ResponseDto.success("Wallet transfer has been successful"));
   });
 

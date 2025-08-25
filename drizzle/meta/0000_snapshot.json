@@ -1,5 +1,5 @@
 {
-  "id": "2d41040c-6808-4b1d-b9a1-2f31c7f14e71",
+  "id": "3fbf6254-1524-4855-b97e-56bbaf29d66f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -18,7 +18,7 @@
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -89,7 +89,7 @@
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -108,6 +108,20 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "given": {
+          "name": "given",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "taken": {
+          "name": "taken",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
         },
         "is_deleted": {
           "name": "is_deleted",
@@ -156,6 +170,12 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         },
         "wallet_id": {
           "name": "wallet_id",
@@ -223,6 +243,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "transactions_user_id_users_id_fk": {
+          "name": "transactions_user_id_users_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "transactions_wallet_id_wallets_id_fk": {
           "name": "transactions_wallet_id_wallets_id_fk",
           "tableFrom": "transactions",
@@ -373,6 +406,20 @@
           "primaryKey": false,
           "notNull": false,
           "default": false
+        },
+        "income": {
+          "name": "income",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "expense": {
+          "name": "expense",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
         },
         "is_deleted": {
           "name": "is_deleted",

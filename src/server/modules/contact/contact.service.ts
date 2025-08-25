@@ -1,6 +1,6 @@
 import { db } from "@/server/db";
-import { contactTable, ETransactionType, transactionTable } from "@/server/db/schema";
-import { and, asc, eq, ilike, or, sql } from "drizzle-orm";
+import { contactTable } from "@/server/db/schema";
+import { and, asc, count, eq, ilike, or } from "drizzle-orm";
 
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { GetContactsArgs } from "./contact.validation";
@@ -35,25 +35,20 @@ export class ContactService {
         name: contactTable.name,
         phone: contactTable.phone,
         address: contactTable.address,
-        totalBorrowed: sql<number>`COALESCE(SUM(CASE WHEN ${transactionTable.type} = '${ETransactionType.borrow}' THEN ${transactionTable.amount} ELSE 0 END), 0)`,
-        totalLent: sql<number>`COALESCE(SUM(CASE WHEN ${transactionTable.type} = '${ETransactionType.lend}' THEN ${transactionTable.amount} ELSE 0 END), 0)`,
+        taken: contactTable.taken,
+        given: contactTable.given,
       })
       .from(contactTable)
-      .leftJoin(transactionTable, eq(transactionTable.contactId, contactTable.id))
       .where(whereQuery)
-      .groupBy(contactTable.id)
       .orderBy(asc(contactTable.name))
       .limit(limit)
       .offset(skip);
 
     // pagination
 
-    const [{ count }] = await db
-      .select({ count: sql<number>`COUNT(${contactTable.id})` })
-      .from(contactTable)
-      .where(whereQuery);
+    const [{ count: total }] = await db.select({ count: count() }).from(contactTable).where(whereQuery);
 
-    const meta = paginationHelper.getMeta(count);
+    const meta = paginationHelper.getMeta(total);
     return { contacts, meta };
   }
 

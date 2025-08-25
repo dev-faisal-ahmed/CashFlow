@@ -18,8 +18,8 @@ export const categoryRoute = new Hono()
   .get("/", authGuard, queryValidator(categoryValidation.getCategories), async (ctx) => {
     const user = ctx.get("user");
     const query = ctx.req.valid("query");
-    const { categories, meta } = await CategoryService.getCategories({ query, userId: user.id });
-    return ctx.json(ResponseDto.success({ message: "Categories fetched successfully", meta, data: categories }));
+    const categories = await CategoryService.getCategories({ query, userId: user.id });
+    return ctx.json(ResponseDto.success({ message: "Categories fetched successfully", data: categories }));
   })
 
   // Get Category List

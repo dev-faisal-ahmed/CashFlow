@@ -1,5 +1,5 @@
 import { pgTable, uniqueIndex } from "drizzle-orm/pg-core";
-import { varchar, boolean, integer } from "drizzle-orm/pg-core";
+import { varchar, boolean, integer, numeric } from "drizzle-orm/pg-core";
 import { userTable } from "./user.table";
 import { id, isDeleted, createdAt } from "./shared";
 
@@ -13,6 +13,8 @@ export const walletTable = pgTable(
       .notNull(),
 
     isSaving: boolean("is_saving").default(false),
+    income: numeric("income", { precision: 8, scale: 2 }).notNull().default("0"),
+    expense: numeric("expense", { precision: 8, scale: 2 }).notNull().default("0"),
     isDeleted,
     createdAt,
   },
