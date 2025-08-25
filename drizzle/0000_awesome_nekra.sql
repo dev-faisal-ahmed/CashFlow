@@ -3,7 +3,7 @@ CREATE TABLE "categories" (
 	"user_id" integer NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"type" text NOT NULL,
-	"budget" json,
+	"budget" jsonb,
 	"is_deleted" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now()
 );

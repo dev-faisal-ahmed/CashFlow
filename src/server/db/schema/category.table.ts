@@ -1,23 +1,6 @@
-import { pgTable, text, varchar, integer, uniqueIndex, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, uniqueIndex, jsonb } from "drizzle-orm/pg-core";
 import { userTable } from "./user.table";
 import { id, isDeleted, createdAt } from "./shared";
-
-export const categoryTable = pgTable(
-  "categories",
-  {
-    id,
-    userId: integer("user_id")
-      .references(() => userTable.id, { onDelete: "cascade" })
-      .notNull(),
-
-    name: varchar("name", { length: 100 }).notNull(),
-    type: text("type").notNull().$type<ECategoryType>(),
-    budget: json("budget").$type<TBudget>(),
-    isDeleted,
-    createdAt,
-  },
-  (table) => [{ nameAndUserIndex: uniqueIndex("name_and_user_idx").on(table.name, table.userId) }],
-);
 
 export enum ECategoryType {
   income = "income",
@@ -34,3 +17,20 @@ export enum EBudgetInterval {
   monthly = "monthly",
   yearly = "yearly",
 }
+
+export const categoryTable = pgTable(
+  "categories",
+  {
+    id,
+    userId: integer("user_id")
+      .references(() => userTable.id, { onDelete: "cascade" })
+      .notNull(),
+
+    name: varchar("name", { length: 100 }).notNull(),
+    type: text("type").notNull().$type<ECategoryType>(),
+    budget: jsonb("budget").$type<TBudget>(),
+    isDeleted,
+    createdAt,
+  },
+  (table) => [{ nameAndUserIndex: uniqueIndex("name_and_user_idx").on(table.name, table.userId) }],
+);

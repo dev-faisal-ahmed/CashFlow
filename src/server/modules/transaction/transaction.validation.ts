@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ETransactionNature } from "./transaction.interface";
+// import { commonValidation } from "@/server/common/validation";
+import { ETransactionType } from "@/server/db/schema";
 import { commonValidation } from "@/server/common/validation";
 
 const createRegularTransaction = z.object({
@@ -7,8 +8,8 @@ const createRegularTransaction = z.object({
   description: z.string().trim().optional(),
   date: z.coerce.date().default(() => new Date()),
   sourceId: z.string("Source id is required"),
-  walletId: z.string("Wallet id is required"),
-  nature: z.enum(Object.values(ETransactionNature) as [string, ...string[]], "Invalid transaction nature"),
+  walletId: z.number("Wallet id is required"),
+  type: z.enum([ETransactionType.income, ETransactionType.expense], "Invalid transaction type"),
 });
 
 const updateRegularTransaction = z.object({
@@ -18,22 +19,24 @@ const updateRegularTransaction = z.object({
 });
 
 // Query
-const getTransactions = commonValidation.queryWithPagination.and(
+const getRegularTransactions = commonValidation.pagination.and(
   z.object({
-    nature: z.enum(Object.values(ETransactionNature), "Invalid transaction nature").optional(),
+    type: z.enum([ETransactionType.income, ETransactionType.borrow], "Invalid transaction type").optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
   }),
 );
 
 export const transactionValidation = {
+  // Json
   createRegularTransaction,
   updateRegularTransaction,
 
-  getTransactions,
+  // query
+  getRegularTransactions,
 };
 
 export type CreateRegularTransactionDto = z.infer<typeof createRegularTransaction>;
 export type UpdateRegularTransactionDto = z.infer<typeof updateRegularTransaction>;
 
-export type GetTransactionsArgs = z.infer<typeof getTransactions>;
+export type GetRegularTransactionsArgs = z.infer<typeof getRegularTransactions>;

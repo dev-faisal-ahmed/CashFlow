@@ -1,5 +1,5 @@
 {
-  "id": "3fbf6254-1524-4855-b97e-56bbaf29d66f",
+  "id": "c874eb9d-a0c8-4b63-ab74-39f4517e5e25",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -34,7 +34,7 @@
         },
         "budget": {
           "name": "budget",
-          "type": "json",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },

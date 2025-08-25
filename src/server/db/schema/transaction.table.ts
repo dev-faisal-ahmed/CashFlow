@@ -4,6 +4,7 @@ import { categoryTable } from "./category.table";
 import { contactTable } from "./contact.table";
 import { createdAt } from "./shared";
 import { userTable } from "./user.table";
+import { relations } from "drizzle-orm";
 
 export enum ETransactionType {
   initial = "initial",
@@ -53,3 +54,25 @@ export const transactionTable = pgTable("transactions", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export const transactionTableRelation = relations(transactionTable, ({ one }) => ({
+  wallet: one(walletTable, {
+    fields: [transactionTable.walletId],
+    references: [walletTable.id],
+  }),
+
+  relatedWallet: one(walletTable, {
+    fields: [transactionTable.relatedWalletId],
+    references: [walletTable.id],
+  }),
+
+  category: one(categoryTable, {
+    fields: [transactionTable.categoryId],
+    references: [categoryTable.id],
+  }),
+
+  contact: one(contactTable, {
+    fields: [transactionTable.contactId],
+    references: [contactTable.id],
+  }),
+}));

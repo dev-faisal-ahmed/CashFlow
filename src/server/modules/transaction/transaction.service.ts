@@ -1,118 +1,113 @@
-import { startSession, Types } from "mongoose";
-import { CreateRegularTransactionDto, GetTransactionsArgs, UpdateRegularTransactionDto } from "./transaction.validation";
-import { RegularTransactionModel, TransactionModel } from "./transaction.schema";
-import { ETransactionNature, ETransactionType } from "./transaction.interface";
-import { WalletModel } from "../wallet/wallet.schema";
+import { db } from "@/server/db";
+import { CreateRegularTransactionDto, GetRegularTransactionsArgs, UpdateRegularTransactionDto } from "./transaction.validation";
 import { AppError } from "@/server/core/app.error";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
-import { QueryHelper } from "@/server/helpers/query.helper";
-import { IsOwner, WithUserId } from "@/server/types";
+import { WithUserId } from "@/server/types";
+import { ETransactionType, transactionTable, walletTable } from "@/server/db/schema";
+import { and, eq, inArray, gte, lte, count } from "drizzle-orm";
 
 // Types
-type CreateRegularTransaction = { dto: CreateRegularTransactionDto; userId: Types.ObjectId };
-type GetTransactions = WithUserId<{ query: GetTransactionsArgs }>;
-type UpdateRegularTransaction = { id: string; dto: UpdateRegularTransactionDto; userId: Types.ObjectId };
+type CreateRegularTransaction = WithUserId<{ dto: CreateRegularTransactionDto }>;
+type GetTransactions = WithUserId<{ query: GetRegularTransactionsArgs }>;
+type UpdateRegularTransaction = WithUserId<{ id: string; dto: UpdateRegularTransactionDto }>;
+type DeleteRegularTransaction = WithUserId<{ id: string }>;
 
 export class TransactionService {
   static async createRegularTransaction({ dto, userId }: CreateRegularTransaction) {
-    const wallet = await WalletModel.findOne({ _id: dto.walletId }, { balance: 1 }).lean();
+    const wallet = await db.query.walletTable.findFirst({
+      where: (w, { eq, and }) => and(eq(w.userId, userId), eq(w.id, dto.walletId)),
+      columns: { id: true, income: true, expense: true },
+    });
+
     if (!wallet) throw new AppError("Wallet not found", 404);
-    if (dto.nature === ETransactionNature.expense && wallet.balance < dto.amount) throw new AppError("Insufficient balance", 400);
+    const balance = Number(wallet.income) - Number(wallet.expense);
+    if (dto.type === ETransactionType.expense && balance < dto.amount) throw new AppError("Insufficient balance", 400);
 
-    const session = await startSession();
-    session.startTransaction();
+    return db.transaction(async (tx) => {
+      const [transaction] = await tx
+        .insert(transactionTable)
+        .values({ ...dto, amount: dto.amount.toFixed(2), userId })
+        .returning();
 
-    try {
-      const [transaction] = await RegularTransactionModel.create(
-        [
-          {
-            ownerId: userId,
-            amount: dto.amount,
-            walletId: dto.walletId,
-            sourceId: dto.sourceId,
-            date: dto.date,
-            description: dto.description,
-            nature: ETransactionNature.income,
-          },
-        ],
-        { session },
-      );
+      await tx.update(walletTable).set({
+        ...(dto.type === ETransactionType.expense ? { expense: wallet.expense + dto.amount } : { income: wallet.income + dto.amount }),
+      });
 
-      if (!transaction) throw new AppError("Failed to create initial transaction", 500);
-
-      const walletUpdateResult = await WalletModel.updateOne(
-        { _id: dto.walletId },
-        { $inc: { balance: dto.nature === ETransactionNature.income ? dto.amount : -dto.amount } },
-        { session },
-      );
-
-      if (!walletUpdateResult.matchedCount) throw new AppError("Failed to update wallet balance", 500);
-
-      await session.commitTransaction();
       return transaction;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   static async getRegularTransactions({ query, userId }: GetTransactions) {
-    const { page, nature, startDate, endDate } = query;
+    const { page, type, startDate, endDate } = query;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
+    const { skip, limit } = paginationHelper.getPaginationInfo();
 
-    const dbQuery = {
-      type: ETransactionType.regular,
-      ownerId: userId,
-      ...(nature && { nature }),
-      ...((startDate || endDate) && {
-        date: {
-          ...(startDate && { $gte: startDate }),
-          ...(endDate && { $lte: endDate }),
-        },
-      }),
-    };
+    const dbQuery = and(
+      eq(transactionTable.userId, userId),
+      ...(type ? [eq(transactionTable.type, type)] : [inArray(transactionTable.type, [ETransactionType.income, ETransactionType.expense])]),
+      ...(startDate ? [gte(transactionTable.date, startDate)] : []),
+      ...(endDate ? [lte(transactionTable.date, endDate)] : []),
+    );
 
-    const { getAll, skip, limit } = paginationHelper.getPaginationInfo();
-    const allowedFields = ["_id", "ownerId", "amount", "description", "nature", "walletId", "sourceId", "date", "walletName", "sourceName"];
-    const fields = QueryHelper.selectFields(query.fields, allowedFields);
-
-    const [result] = await TransactionModel.aggregate([
-      { $match: dbQuery },
-      {
-        $facet: {
-          transactions: [
-            ...(!getAll ? [{ $skip: skip }, { $limit: limit }] : []),
-            { $lookup: { from: "wallets", localField: "walletId", foreignField: "_id", as: "wallet" } },
-            { $lookup: { from: "sources", localField: "sourceId", foreignField: "_id", as: "source" } },
-            { $unwind: "$wallet" },
-            { $unwind: "$source" },
-            { $addFields: { walletName: "$wallet.name", sourceName: "$source.name" } },
-            { $project: { wallet: 0, source: 0 } },
-            ...(fields ? [{ $project: fields }] : []),
-          ],
-          total: [{ $count: "count" }],
-        },
+    const transactions = await db.query.transactionTable.findMany({
+      where: dbQuery,
+      columns: {
+        id: true,
+        amount: true,
+        type: true,
+        date: true,
+        note: true,
       },
-    ]);
+      with: {
+        category: { columns: { id: true, name: true } },
+        wallet: { columns: { id: true, name: true } },
+      },
+      orderBy: (t, { desc }) => [desc(t.date)],
+      limit,
+      offset: skip,
+    });
 
-    const transactions = result.transactions;
-    const total = result.total[0]?.count ?? 0;
+    const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
+
     const meta = paginationHelper.getMeta(total);
-
     return { transactions, meta };
   }
 
   static async updateRegularTransaction({ id, userId, dto }: UpdateRegularTransaction) {
-    const isOwner = await this.isOwner({ id, userId });
-    if (!isOwner) throw new AppError("You are not authorized to update this transaction", 401);
-    return TransactionModel.updateOne({ _id: id }, { $set: dto });
+    const transaction = await db.query.transactionTable.findFirst({
+      where: (t, { eq }) => and(eq(t.userId, userId), eq(t.id, id)),
+    });
+
+    if (!transaction) throw new AppError("Transaction not found", 404);
+
+    return db
+      .update(transactionTable)
+      .set({ ...dto })
+      .where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)))
+      .returning();
   }
 
-  static async isOwner({ id, userId }: IsOwner) {
-    const transaction = await TransactionModel.findOne({ _id: id }, { ownerId: 1 }).lean();
-    if (!transaction) throw new AppError("Transaction not found!", 404);
-    return transaction.ownerId.equals(userId);
+  static async deleteRegularTransaction({ id, userId }: DeleteRegularTransaction) {
+    const transaction = await db.query.transactionTable.findFirst({
+      where: (w, { eq }) => and(eq(w.userId, userId), eq(w.id, id)),
+      columns: { id: true, type: true, amount: true },
+      with: { wallet: { columns: { id: true, income: true, expense: true } } },
+    });
+
+    if (!transaction) throw new AppError("Transaction not found", 404);
+
+    return db.transaction(async (tx) => {
+      tx.delete(transactionTable).where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)));
+
+      tx.update(walletTable).set({
+        ...(transaction.type === ETransactionType.expense && {
+          expense: String(Number(transaction.wallet.expense) - Number(transaction.amount)),
+        }),
+
+        ...(transaction.type === ETransactionType.income && {
+          income: String(Number(transaction.wallet.income) - Number(transaction.amount)),
+        }),
+      });
+    });
   }
 }
