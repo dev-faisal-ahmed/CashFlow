@@ -4,36 +4,36 @@ import { FC } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilLineIcon } from "lucide-react";
 import { FormDialog } from "@/components/shared/form";
-import { SourceForm } from "./source-form";
-import { EBudgetInterval, ESourceType } from "@/server/modules/source/source.interface";
 import { queryKeys } from "@/lib/query.keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePopupState } from "@/lib/hooks";
-import { updateSourceApi } from "../source.api";
-import { TSourceFormData } from "../source.schema";
+import { updateCategoryApi } from "../category.api";
+import { TCategoryFormData } from "../category.schema";
+import { EBudgetInterval, ECategoryType } from "@/server/db/schema";
+import { CategoryForm } from "./category-form";
 
-interface UpdateSourceProps {
-  _id: string;
+interface UpdateCategoryProps {
+  id: number;
   name: string;
   budget?: { amount: number; interval: EBudgetInterval };
-  type: ESourceType;
+  type: ECategoryType;
   onSuccess: () => void;
 }
 
-export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, onSuccess }) => {
-  const mutationKey = `update-${queryKeys.source}-${_id}`;
+export const UpdateCategory: FC<UpdateCategoryProps> = ({ id, name, budget, type, onSuccess }) => {
+  const mutationKey = `update-${queryKeys.category}-${id}`;
   const queryClient = useQueryClient();
 
   const { open, onOpenChange } = usePopupState();
-  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateSourceApi });
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateCategoryApi });
 
-  const handleUpdateSource = async (formData: TSourceFormData, onReset: () => void) => {
+  const handleUpdateCategory = async (formData: TCategoryFormData, onReset: () => void) => {
     mutate(
-      { id: _id, ...formData },
+      { id: id.toString(), ...formData },
       {
         onSuccess: () => {
           onReset();
-          queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.category] });
           onOpenChange(false);
           onSuccess();
         },
@@ -44,20 +44,20 @@ export const UpdateSource: FC<UpdateSourceProps> = ({ _id, name, budget, type, o
   return (
     <>
       <Button variant="ghost" className="w-full justify-start" onClick={() => onOpenChange(true)}>
-        <PencilLineIcon className="size-4" /> Update Source
+        <PencilLineIcon className="size-4" /> Update Category
       </Button>
 
       <FormDialog
         open={open}
         onOpenChange={onOpenChange}
         formId={mutationKey}
-        title="Update Source"
-        description="Fill up the form to update a source"
+        title="Update Category"
+        description="Fill up the form to update a category"
       >
-        <SourceForm
+        <CategoryForm
           formId={mutationKey}
           mode="update"
-          onSubmit={handleUpdateSource}
+          onSubmit={handleUpdateCategory}
           defaultValues={{ name, type, addBudget: !!budget, budget }}
         />
       </FormDialog>

@@ -22,6 +22,7 @@ export class CategoryService {
     const { search, type } = query;
 
     const whereQuery = and(
+      eq(categoryTable.isDeleted, false),
       eq(categoryTable.userId, userId),
       ...(type ? [eq(categoryTable.type, type)] : []),
       ...(search ? [ilike(categoryTable.name, `%${search}%`)] : []),

@@ -1,3 +1,5 @@
+"use client";
+
 import { FC } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -6,40 +8,45 @@ import { ChartNoAxesCombinedIcon, TrendingDownIcon, TrendingUpIcon } from "lucid
 import { Progress } from "@/components/ui/progress";
 import { usePopupState } from "@/lib/hooks";
 import { ActionMenu } from "@/components/shared";
-import { UpdateSource } from "./update-source";
-import { EBudgetInterval, ESourceType, ISource } from "@/server/modules/source/source.interface";
-import { DeleteSource } from "./delete-source";
+import { EBudgetInterval, ECategoryType, TCategory } from "@/server/db/schema";
+import { UpdateCategory } from "./update-category";
+import { DeleteCategory } from "./delete-category";
 
 // Main
-type TSource = Pick<ISource, "name" | "type" | "budget"> & { _id: string };
-
-type SourceCardProps = TSource & {
+type CategoryCardProps = Pick<TCategory, "id" | "name" | "type" | "budget"> & {
   income: number;
   expense: number;
 };
 
-export const SourceCard: FC<SourceCardProps> = ({ _id, name, type, income, expense, budget }) => (
+export const CategoryCard: FC<CategoryCardProps> = ({ id, name, type, income, expense, budget }) => (
   <Card>
-    <SourceCardHeader _id={_id} name={name} type={type} budget={budget} />
+    <CategoryCardHeader id={id} name={name} type={type} budget={budget} />
     <CardContent>
-      <SourceCardIncomeExpense type={type} income={income} expense={expense} budget={budget} />
+      <CategoryCardIncomeExpense type={type} income={income} expense={expense} budget={budget} />
       <Budget budget={budget} expense={expense} />
     </CardContent>
   </Card>
 );
 
 // Header
-type SourceCardHeaderProps = Pick<SourceCardProps, "_id" | "name" | "type" | "budget">;
+type CategoryCardHeaderProps = Pick<CategoryCardProps, "id" | "name" | "type" | "budget">;
 
 const headerConfig = {
-  [ESourceType.income]: { icon: TrendingUpIcon, iconClassName: "bg-emerald-500", text: "Income Source", textClassName: "bg-black/90" },
-  [ESourceType.expense]: {
+  [ECategoryType.income]: {
+    icon: TrendingUpIcon,
+    iconClassName: "bg-emerald-500",
+    text: "Income Source",
+    textClassName: "bg-black/90",
+  },
+
+  [ECategoryType.expense]: {
     icon: TrendingDownIcon,
     iconClassName: "bg-destructive",
     text: "Expense Category",
     textClassName: "bg-destructive/90",
   },
-  [ESourceType.both]: {
+
+  [ECategoryType.both]: {
     icon: ChartNoAxesCombinedIcon,
     iconClassName: "bg-orange-500",
     text: "Income/Expense",
@@ -47,7 +54,7 @@ const headerConfig = {
   },
 };
 
-const SourceCardHeader: FC<SourceCardHeaderProps> = ({ _id, name, type, budget }) => {
+const CategoryCardHeader: FC<CategoryCardHeaderProps> = ({ id, name, type, budget }) => {
   const config = headerConfig[type];
 
   return (
@@ -64,20 +71,21 @@ const SourceCardHeader: FC<SourceCardHeaderProps> = ({ _id, name, type, budget }
             {config.text}
           </Badge>
         </div>
-        <SourceCardActionMenu _id={_id} name={name} type={type} budget={budget} />
+        <CategoryCardActionMenu id={id} name={name} type={type} budget={budget} />
       </div>
     </CardHeader>
   );
 };
 
 // Income Expense
-type SourceCardIncomeExpenseProps = Pick<SourceCardProps, "type" | "income" | "expense" | "budget">;
-const SourceCardIncomeExpense: FC<SourceCardIncomeExpenseProps> = ({ type, income, expense, budget }) => {
-  const amount = type === ESourceType.income ? income : expense;
+type CategoryCardIncomeExpenseProps = Pick<CategoryCardProps, "type" | "income" | "expense" | "budget">;
+
+const CategoryCardIncomeExpense: FC<CategoryCardIncomeExpenseProps> = ({ type, income, expense, budget }) => {
+  const amount = type === ECategoryType.income ? income : expense;
   const interval = budget?.interval ?? EBudgetInterval.monthly;
 
   const period = interval === EBudgetInterval.yearly ? "Yearly" : interval === EBudgetInterval.weekly ? "Weekly" : "Monthly";
-  const description = type === ESourceType.income ? `${period} Income` : `${period} Expense`;
+  const description = type === ECategoryType.income ? `${period} Income` : `${period} Expense`;
 
   return (
     <div
@@ -91,7 +99,7 @@ const SourceCardIncomeExpense: FC<SourceCardIncomeExpenseProps> = ({ type, incom
 };
 
 // Budget
-type BudgetProps = Pick<SourceCardProps, "budget" | "expense">;
+type BudgetProps = Pick<CategoryCardProps, "budget" | "expense">;
 const Budget: FC<BudgetProps> = ({ budget, expense }) => {
   if (!budget?.amount) return null;
 
@@ -111,14 +119,14 @@ const Budget: FC<BudgetProps> = ({ budget, expense }) => {
   );
 };
 
-type SourceCardActionMenuProps = Pick<SourceCardProps, "_id" | "name" | "type" | "budget">;
-const SourceCardActionMenu: FC<SourceCardActionMenuProps> = ({ _id, name, type, budget }) => {
+type CategoryCardActionMenuProps = Pick<CategoryCardProps, "id" | "name" | "type" | "budget">;
+const CategoryCardActionMenu: FC<CategoryCardActionMenuProps> = ({ id, name, type, budget }) => {
   const { open, onOpenChange } = usePopupState();
 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
-      <UpdateSource _id={_id} name={name} type={type} budget={budget} onSuccess={() => onOpenChange(false)} />
-      <DeleteSource sourceId={_id} />
+      <UpdateCategory id={id} name={name} type={type} budget={budget ?? undefined} onSuccess={() => onOpenChange(false)} />
+      <DeleteCategory id={id} />
     </ActionMenu>
   );
 };

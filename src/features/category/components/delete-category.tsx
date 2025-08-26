@@ -6,22 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePopupState } from "@/lib/hooks";
-import { deleteSourceApi } from "../source.api";
 import { queryKeys } from "@/lib/query.keys";
+import { deleteCategoryApi } from "../category.api";
 
-type DeleteSourceProps = { sourceId: string };
+type DeleteCategoryProps = { id: number };
 
-export const DeleteSource: FC<DeleteSourceProps> = ({ sourceId }) => {
-  const mutationKey = `delete-${queryKeys.source}-${sourceId}`;
+export const DeleteCategory: FC<DeleteCategoryProps> = ({ id }) => {
+  const mutationKey = `delete-${queryKeys.category}-${id}`;
   const queryClient = useQueryClient();
 
   const { open, onOpenChange } = usePopupState();
-  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteSourceApi });
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteCategoryApi });
 
   const handleDelete = () => {
-    mutate(sourceId, {
+    mutate(id.toString(), {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.category] });
         onOpenChange(false);
       },
     });
@@ -30,7 +30,7 @@ export const DeleteSource: FC<DeleteSourceProps> = ({ sourceId }) => {
   return (
     <>
       <Button variant="destructive_ghost" className="w-full justify-start" onClick={() => onOpenChange(true)}>
-        <Trash2Icon /> Delete Source
+        <Trash2Icon /> Delete Category
       </Button>
 
       <DeleteDialog open={open} onOpenChange={onOpenChange} mutationKey={mutationKey} onDelete={handleDelete} />

@@ -1,35 +1,35 @@
 "use client";
 
-import { SourceCard } from "./source-card";
 import { ErrorMessage } from "@/components/shared";
-import { SourceListSkeleton } from "./source-loading";
 import { FC, PropsWithChildren } from "react";
 import { useSearch } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
-import { getSourceListApi } from "../source.api";
+import { getCategoryListApi } from "../category.api";
+import { CategoryListSkeleton } from "./category-loading";
+import { CategoryCard } from "./category-card";
 
-export const SourceList = () => {
+export const CategoryList = () => {
   const { value } = useSearch();
 
   const {
-    data: sourceList,
+    data: categories,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: [queryKeys.source, value],
-    queryFn: () => getSourceListApi({ search: value }),
+    queryKey: [queryKeys.category, { search: value }],
+    queryFn: () => getCategoryListApi({ search: value }),
   });
 
   if (isLoading) return <LoadingSkeleton />;
   if (isError) throw error;
-  if (!sourceList?.length) return <ErrorMessage message="No Source Found" className="my-12" />;
+  if (!categories?.length) return <ErrorMessage message="No Category Found" className="my-12" />;
 
   return (
     <Grid>
-      {sourceList.map((source) => (
-        <SourceCard key={source._id} {...source} />
+      {categories.map((category) => (
+        <CategoryCard key={category.id} {...category} />
       ))}
     </Grid>
   );
@@ -39,6 +39,6 @@ const Grid: FC<PropsWithChildren> = ({ children }) => <section className="grid g
 
 const LoadingSkeleton = () => (
   <Grid>
-    <SourceListSkeleton size={6} />
+    <CategoryListSkeleton size={6} />
   </Grid>
 );

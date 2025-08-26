@@ -2,11 +2,11 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FC } from "react";
 
-const SourceListSkeleton: FC<{ size: number }> = ({ size }) => {
-  return Array.from({ length: size }).map((_, index) => <SourceCardSkeleton key={index} />);
+export const CategoryListSkeleton: FC<{ size: number }> = ({ size }) => {
+  return Array.from({ length: size }).map((_, index) => <CategoryCardSkeleton key={index} />);
 };
 
-const SourceCardSkeleton = () => (
+export const CategoryCardSkeleton = () => (
   <Card>
     <CardHeader>
       <div className="flex items-center gap-4">
@@ -36,5 +36,3 @@ const SourceCardSkeleton = () => (
     </CardContent>
   </Card>
 );
-
-export { SourceListSkeleton, SourceCardSkeleton };

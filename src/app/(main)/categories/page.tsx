@@ -1,5 +1,5 @@
 import { Header } from "@/components/shared";
-import { AddCategory } from "@/category/components";
+import { AddCategory, CategoryList } from "@/category/components";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (
@@ -11,6 +11,8 @@ const Page = () => (
     <TopbarContent position="right">
       <AddCategory />
     </TopbarContent>
+
+    <CategoryList />
   </>
 );
 
