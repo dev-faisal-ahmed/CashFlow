@@ -13,7 +13,7 @@ import { queryKeys } from "@/lib/query.keys";
 import { getContactsApi } from "../contact.api";
 
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
-type TContact = NonNullable<TApiResponse>["contacts"][number];
+type TContact = NonNullable<TApiResponse>["data"][number];
 
 // Accessor
 const { accessor } = createColumnHelper<TContact>();
@@ -23,6 +23,10 @@ export const ContactTable = () => {
   const { data: apiResponse, isLoading } = useQuery({
     queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1 }],
     queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
+    select: (res) => ({
+      contacts: res.data,
+      meta: res.meta,
+    }),
   });
 
   const contacts = apiResponse?.contacts ?? [];
@@ -76,7 +80,7 @@ export const ContactTable = () => {
       id: "net",
       header: () => <div className="text-center">Net</div>,
       cell: ({ row }) => {
-        const net = row.original.taken - row.original.given;
+        const net = Number(row.original.taken) - Number(row.original.given);
         const status = net > 0 ? "Borrowed" : "Lent";
 
         return (
@@ -105,11 +109,11 @@ export const ContactTable = () => {
   );
 };
 
-const ContactActionMenu: FC<TContact> = ({ _id, name, phone, address }) => {
+const ContactActionMenu: FC<TContact> = ({ id, name, phone, address }) => {
   return (
     <div className="flex items-center justify-center gap-2">
-      <UpdateContact contactId={_id} name={name} phone={phone} address={address} />
-      <DeleteContact contactId={_id} />
+      <UpdateContact id={id} name={name} phone={phone} address={address} />
+      <DeleteContact id={id} />
     </div>
   );
 };

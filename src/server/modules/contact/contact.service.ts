@@ -25,6 +25,7 @@ export class ContactService {
     const { skip, limit } = paginationHelper.getPaginationInfo();
 
     const whereQuery = and(
+      eq(contactTable.isDeleted, false),
       eq(contactTable.userId, userId),
       ...(search ? [or(ilike(contactTable.name, `%${search}%`), ilike(contactTable.phone, `%${search}%`))] : []),
     );

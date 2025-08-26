@@ -9,15 +9,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePopupState } from "@/lib/hooks";
 import { deleteContactApi } from "../contact.api";
 
-export const DeleteContact: FC<{ contactId: string }> = ({ contactId }) => {
-  const mutationKey = `delete-${queryKeys.contact}-${contactId}`;
+export const DeleteContact: FC<{ id: number }> = ({ id }) => {
+  const mutationKey = `delete-${queryKeys.contact}-${id}`;
   const queryClient = useQueryClient();
 
   const { open, onOpenChange } = usePopupState();
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: deleteContactApi });
 
   const handleDeleteContact = () => {
-    mutate(contactId, {
+    mutate(id.toString(), {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
         onOpenChange(false);

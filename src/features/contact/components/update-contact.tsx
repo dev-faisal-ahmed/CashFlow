@@ -12,16 +12,12 @@ import { usePopupState } from "@/lib/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { updateContactApi } from "../contact.api";
 import { TContactFormData } from "../contact.schema";
+import { TContact } from "@/server/db/schema";
 
-type UpdateContactProps = {
-  contactId: string;
-  name: string;
-  phone: string;
-  address?: string;
-};
+type UpdateContactProps = Pick<TContact, "id" | "name" | "phone" | "address">;
 
-export const UpdateContact: FC<UpdateContactProps> = ({ contactId, name, phone, address }) => {
-  const mutationKey = `update-${queryKeys.contact}-${contactId}`;
+export const UpdateContact: FC<UpdateContactProps> = ({ id, name, phone, address }) => {
+  const mutationKey = `update-${queryKeys.contact}-${id}`;
   const queryClient = useQueryClient();
 
   const { open, onOpenChange } = usePopupState();
@@ -29,7 +25,7 @@ export const UpdateContact: FC<UpdateContactProps> = ({ contactId, name, phone, 
 
   const handleUpdateContact = (formData: TContactFormData, onReset: () => void) => {
     mutate(
-      { id: contactId, name: formData.name, address: formData.address },
+      { id: id.toString(), name: formData.name, address: formData.address },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
@@ -55,7 +51,12 @@ export const UpdateContact: FC<UpdateContactProps> = ({ contactId, name, phone, 
         title="Update Contact"
         description="Fill up the form to update a contact"
       >
-        <ContactForm formId={mutationKey} defaultValues={{ name, phone, address }} onSubmit={handleUpdateContact} mode="edit" />
+        <ContactForm
+          formId={mutationKey}
+          defaultValues={{ name, phone, address: address ?? "" }}
+          onSubmit={handleUpdateContact}
+          mode="edit"
+        />
       </FormDialog>
     </>
   );
