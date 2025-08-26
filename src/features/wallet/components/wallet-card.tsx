@@ -64,8 +64,8 @@ const WalletCardActionMenu: FC<TWalletCardActionMenuProps> = ({ id, name, isSavi
 
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
-      <UpdateWallet name={name} isSaving={!!isSaving} walletId={id} onSuccess={() => onOpenChange(false)} />
-      <WalletTransfer balance={balance} walletId={String(id)} onSuccess={() => onOpenChange(false)} />
+      <UpdateWallet name={name} isSaving={!!isSaving} id={id} onSuccess={() => onOpenChange(false)} />
+      <WalletTransfer balance={balance} walletId={id} onSuccess={() => onOpenChange(false)} />
       <DeleteWallet walletId={String(id)} />
     </ActionMenu>
   );

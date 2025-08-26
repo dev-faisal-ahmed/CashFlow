@@ -10,18 +10,19 @@ import { queryKeys } from "@/lib/query.keys";
 import { TUpdateWalletFormData, TWalletFormData } from "../wallet.schema";
 import { walletClient } from "@/lib/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { TWallet } from "@/server/db/schema";
 
-type UpdateWalletProps = { walletId: number; name: string; isSaving: boolean; onSuccess: () => void };
+type UpdateWalletProps = Pick<TWallet, "id" | "name" | "isSaving"> & { onSuccess: () => void };
 const mutationKey = `update-${queryKeys.wallet}`;
 
-export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, onSuccess }) => {
+export const UpdateWallet: FC<UpdateWalletProps> = ({ id, name, isSaving, onSuccess }) => {
+  const queryClient = useQueryClient();
   const { open, onOpenChange } = usePopupState();
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: updateWalletApi });
-  const queryClient = useQueryClient();
 
   const handleUpdateWallet = (formData: TWalletFormData, onReset: () => void) => {
     mutate(
-      { walletId, name: formData.name, isSaving: formData.isSaving },
+      { id, name: formData.name, isSaving: formData.isSaving },
       {
         onSuccess: () => {
           onReset();
@@ -46,15 +47,15 @@ export const UpdateWallet: FC<UpdateWalletProps> = ({ walletId, name, isSaving, 
         title="Update Wallet"
         description="Fill up the form to update a wallet"
       >
-        <WalletForm formId={mutationKey} mode="update" onSubmit={handleUpdateWallet} defaultValues={{ name, isSaving }} />
+        <WalletForm formId={mutationKey} mode="update" onSubmit={handleUpdateWallet} defaultValues={{ name, isSaving: !!isSaving }} />
       </FormDialog>
     </>
   );
 };
 
 // Api calling
-const updateWalletApi = async ({ walletId, ...payload }: TUpdateWalletFormData & { walletId: number }) => {
-  const res = await walletClient[":id"].$patch({ param: { id: walletId.toString() }, json: payload });
+const updateWalletApi = async ({ id, ...payload }: TUpdateWalletFormData & { id: number }) => {
+  const res = await walletClient[":id"].$patch({ param: { id: id.toString() }, json: payload });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;

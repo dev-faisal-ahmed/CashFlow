@@ -29,7 +29,7 @@ export const WalletList = () => {
   return (
     <WalletListContainer>
       {walletList.map((wallet) => (
-        <WalletCard key={wallet._id} {...wallet} />
+        <WalletCard key={wallet.id} {...wallet} />
       ))}
     </WalletListContainer>
   );
@@ -41,6 +41,6 @@ const WalletListContainer: FC<PropsWithChildren> = ({ children }) => (
 
 const LoadingSkeleton = () => (
   <WalletListContainer>
-    <WalletListSkeleton size={4} />
+    <WalletListSkeleton size={8} />
   </WalletListContainer>
 );

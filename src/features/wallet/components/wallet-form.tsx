@@ -4,7 +4,7 @@ import { FC } from "react";
 import { Form } from "@/components/ui/form";
 import { FieldForm } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TWalletFormData, walletSchema } from "../wallet.schema";
 import { useForm } from "react-hook-form";
@@ -40,7 +40,7 @@ export const WalletForm: FC<WalletFormProps> = ({ formId, mode, defaultValues, o
         <FieldForm control={form.control} name="isSaving">
           {({ field: { value, onChange } }) => (
             <div className="flex items-center gap-2">
-              <Checkbox id="isSaving" checked={!!value} onCheckedChange={onChange} className="cursor-pointer" />
+              <Switch id="isSaving" checked={!!value} onCheckedChange={onChange} className="cursor-pointer" />
               <Label htmlFor="isSaving" className="text-muted-foreground cursor-pointer">
                 Saving Wallet?
               </Label>

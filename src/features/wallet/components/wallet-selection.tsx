@@ -17,7 +17,7 @@ export const WalletSelection: FC<WalletSelectionProps> = ({ value, onChange, ski
   const { data: walletList, isLoading } = useQuery({
     queryKey: [queryKeys.wallet, "basic", { isSaving }],
     queryFn: () => getWalletListWithBasicDataApi({ ...(typeof isSaving === "boolean" && { isSaving: isSaving ? "true" : "false" }) }),
-    select: (res) => res.map((wallet) => ({ value: wallet._id, label: wallet.name })),
+    select: (res) => res.map((wallet) => ({ value: wallet.id.toString(), label: wallet.name })),
   });
 
   if (isLoading) return <Skeleton className="h-input" />;

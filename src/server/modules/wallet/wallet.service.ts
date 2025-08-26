@@ -105,9 +105,6 @@ export class WalletService {
       const balance = Number(senderWallet.income) - Number(senderWallet.expense);
       if (balance < amount) throw new AppError("Insufficient balance", 400);
 
-      await tx.update(walletTable).set({ expense: senderWallet.expense + amount });
-      await tx.update(walletTable).set({ income: receiverWallet.income + amount });
-
       const [transaction] = await tx
         .insert(transactionTable)
         .values({
@@ -121,7 +118,17 @@ export class WalletService {
         })
         .returning();
 
-      return transaction;
+      await tx
+        .update(walletTable)
+        .set({ expense: String(Number(senderWallet.expense) + amount) })
+        .where(eq(walletTable.id, senderWalletId));
+
+      await tx
+        .update(walletTable)
+        .set({ income: String(Number(receiverWallet.income) + amount) })
+        .where(eq(walletTable.id, receiverWalletId));
+
+      return { transaction };
     });
   }
 }
