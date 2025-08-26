@@ -3,6 +3,8 @@ import { varchar, boolean, integer, numeric } from "drizzle-orm/pg-core";
 import { userTable } from "./user.table";
 import { id, isDeleted, createdAt } from "./shared";
 
+export type TWallet = typeof walletTable.$inferSelect;
+
 export const walletTable = pgTable(
   "wallets",
   {
@@ -20,5 +22,3 @@ export const walletTable = pgTable(
   },
   (table) => [{ nameAndUserIndex: uniqueIndex("name_and_user_idx").on(table.name, table.userId) }],
 );
-
-export type TWallet = typeof walletTable.$inferSelect;

@@ -22,7 +22,7 @@
       "@/*": ["./src/*"],
       "@/auth/*": ["./src/features/auth/*"],
       "@/contact/*": ["./src/features/contact/*"],
-      "@/source/*": ["./src/features/source/*"],
+      "@/category/*": ["./src/features/category/*"],
       "@/wallet/*": ["./src/features/wallet/*"]
     }
   },

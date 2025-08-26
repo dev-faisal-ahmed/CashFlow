@@ -4,11 +4,11 @@ import { AppError } from "@/server/core/app.error";
 import { SALT } from "@/lib/config";
 import { LoginWithCredentialsDto, LoginWithGoogleDto, SignupWithCredentialsDto } from "./auth.validation";
 import { db } from "@/server/db";
-import { EUserProvider, userTable } from "@/server/db/schema";
+import { EUserProvider, TUser, userTable } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
 // Types
-type TLoginResponse = Pick<typeof userTable.$inferSelect, "id" | "name" | "email" | "image">;
+type TLoginResponse = Pick<TUser, "id" | "name" | "email" | "image">;
 type ComparePassword = { givenPassword: string; hashedPassword: string };
 
 export class AuthService {

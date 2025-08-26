@@ -1,18 +1,16 @@
 import { Header } from "@/components/shared";
-import { AddSource, SourceList } from "@/source/component";
+import { AddCategory } from "@/category/components";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (
   <>
     <TopbarContent position="left">
-      <Header title="My Sources" />
+      <Header title="My Categories" />
     </TopbarContent>
 
     <TopbarContent position="right">
-      <AddSource />
+      <AddCategory />
     </TopbarContent>
-
-    <SourceList />
   </>
 );
 

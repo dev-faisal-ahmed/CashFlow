@@ -1,6 +1,8 @@
 import { pgTable, varchar, text, uniqueIndex } from "drizzle-orm/pg-core";
 import { id, isDeleted, createdAt } from "./shared";
 
+export type TUser = typeof userTable.$inferSelect;
+
 export enum EUserProvider {
   google = "google",
   credentials = "credentials",

@@ -5,7 +5,7 @@ export const queryKeys = {
     session: "session",
   },
   wallet: "wallet",
-  source: "source",
+  category: "category",
   contact: "contact",
   transaction: "transaction",
 };

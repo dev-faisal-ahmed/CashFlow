@@ -6,6 +6,8 @@ import { createdAt } from "./shared";
 import { userTable } from "./user.table";
 import { relations } from "drizzle-orm";
 
+export type TTransaction = typeof transactionTable.$inferSelect;
+
 export enum ETransactionType {
   initial = "initial",
   income = "income",
@@ -22,33 +24,17 @@ export const transactionTable = pgTable("transactions", {
     .references(() => userTable.id, { onDelete: "cascade" })
     .notNull(),
 
-  // Main wallet
   walletId: integer("wallet_id")
     .notNull()
     .references(() => walletTable.id, { onDelete: "cascade" }),
 
-  // Related wallet for transfers
   relatedWalletId: integer("related_wallet_id").references(() => walletTable.id, { onDelete: "cascade" }),
-
-  // Category for regular income/expense
   categoryId: integer("category_id").references(() => categoryTable.id, { onDelete: "set null" }),
-
-  // Contact for borrow/lend
   contactId: integer("contact_id").references(() => contactTable.id, { onDelete: "set null" }),
-
-  // Transaction amount
   amount: numeric("amount", { precision: 8, scale: 2 }).notNull(),
-
-  // Type: initial, income, expense, transfer, borrow, lend
   type: text("type").notNull().$type<ETransactionType>(),
-
-  // Optional description
   note: text("note"),
-
-  // Transaction date
   date: timestamp("date").defaultNow().notNull(),
-
-  // Timestamps
   createdAt,
   updatedAt: timestamp("updated_at")
     .defaultNow()

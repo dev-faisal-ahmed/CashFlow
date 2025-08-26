@@ -2,9 +2,12 @@ import { pgTable, text, varchar, integer, uniqueIndex, jsonb } from "drizzle-orm
 import { userTable } from "./user.table";
 import { id, isDeleted, createdAt } from "./shared";
 
+export type TCategory = typeof categoryTable.$inferSelect;
+
 export enum ECategoryType {
   income = "income",
   expense = "expense",
+  both = "both",
 }
 
 export type TBudget = {

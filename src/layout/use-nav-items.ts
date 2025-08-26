@@ -11,7 +11,7 @@ export const useNavItems = () => {
     return [
       { title: "Dashboard", url: "/", icon: Grid3x3Icon, isActive: pathname === "/" },
       { title: "Wallets", url: "/wallets", icon: WalletIcon, isActive: isActive("/wallets") },
-      { title: "Sources", url: "/sources", icon: Plug2Icon, isActive: isActive("/sources") },
+      { title: "Categories", url: "/categories", icon: Plug2Icon, isActive: isActive("/categories") },
       { title: "Contacts", url: "/contacts", icon: UsersIcon, isActive: isActive("/contacts") },
       {
         title: "Transactions",

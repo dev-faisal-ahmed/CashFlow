@@ -2,6 +2,8 @@ import { pgTable, integer, numeric, varchar, uniqueIndex } from "drizzle-orm/pg-
 import { id, isDeleted, createdAt } from "./shared";
 import { userTable } from "./user.table";
 
+export type TContact = typeof contactTable.$inferSelect;
+
 export const contactTable = pgTable(
   "contacts",
   {
