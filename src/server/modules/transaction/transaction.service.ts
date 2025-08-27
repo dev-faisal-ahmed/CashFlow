@@ -107,14 +107,10 @@ export class TransactionService {
 
     if (!transaction) throw new AppError("Transaction not found", 404);
 
-    console.log(transaction);
-
     return db.transaction(async (tx) => {
       const deletedTransaction = await tx
         .delete(transactionTable)
         .where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)));
-
-      console.log(deletedTransaction);
 
       if (!deletedTransaction.rowCount) throw new AppError("Failed to delete transaction", 500);
 
