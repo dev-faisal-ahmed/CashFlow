@@ -5,7 +5,7 @@ import { commonValidation } from "@/server/common/validation";
 
 const createRegularTransaction = z.object({
   amount: z.number().positive("Amount must be greater than 0"),
-  description: z.string().trim().optional(),
+  note: z.string().trim().optional(),
   date: z.coerce.date().default(() => new Date()),
   categoryId: z.number("Category id is required"),
   walletId: z.number("Wallet id is required"),
@@ -14,7 +14,7 @@ const createRegularTransaction = z.object({
 
 const updateRegularTransaction = z.object({
   categoryId: z.number().optional(),
-  description: z.string().trim().optional(),
+  note: z.string().trim().optional(),
   date: z.coerce.date().optional(),
 });
 

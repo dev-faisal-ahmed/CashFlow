@@ -25,7 +25,7 @@ type RegularTransactionFormProps = {
   mode: "add" | "edit";
 };
 
-const natureOptions = [
+const transactionTypeOptions = [
   { label: "Income", value: ETransactionType.income },
   { label: "Expense", value: ETransactionType.expense },
 ];
@@ -56,15 +56,15 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
 
           <FieldForm control={form.control} name="type" label="Income/Expense">
             {({ field: { value, onChange } }) => (
-              <CommonSelect options={natureOptions} value={value} onChange={onChange} disabled={mode === "edit"} />
+              <CommonSelect options={transactionTypeOptions} value={value} onChange={onChange} disabled={mode === "edit"} />
             )}
           </FieldForm>
         </div>
 
-        <FieldForm control={form.control} name="categoryId" label="Source">
+        <FieldForm control={form.control} name="categoryId" label="Category">
           {({ field: { value, onChange } }) => (
             <CategorySelection
-              value={value ?? 0}
+              value={value}
               onChange={onChange}
               type={type === ETransactionType.income ? ECategoryType.income : ECategoryType.expense}
             />
@@ -86,8 +86,8 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
           {({ field: { value, onChange } }) => <DatePicker value={value} onChange={onChange} />}
         </FieldForm>
 
-        <FieldForm control={form.control} name="description" label="Description">
-          {({ field }) => <Textarea {...field} placeholder="@: Description" />}
+        <FieldForm control={form.control} name="note" label="Note">
+          {({ field }) => <Textarea {...field} placeholder="@: Bought a car" />}
         </FieldForm>
       </form>
     </Form>

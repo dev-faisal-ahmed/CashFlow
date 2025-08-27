@@ -6,19 +6,17 @@ import { FormDialog } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
-import { IRegularTransaction } from "@/server/modules/transaction/transaction.interface";
 import { PencilLine } from "lucide-react";
 import { RegularTransactionForm } from "./regular-transaction-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateRegularTransactionApi } from "../transaction.api";
 import { TRegularTransactionFormData } from "../transaction.schema";
+import { TTransaction } from "@/server/db/schema";
 
-type UpdateRegularTransactionProps = Pick<IRegularTransaction, "amount" | "walletId" | "nature" | "sourceId" | "description" | "date"> & {
-  _id: string;
-};
+type UpdateRegularTransactionProps = Pick<TTransaction, "id" | "amount" | "type" | "categoryId" | "walletId" | "note" | "date">;
 
-export const UpdateRegularTransaction: FC<UpdateRegularTransactionProps> = ({ _id, ...props }) => {
-  const mutationKey = `update-${queryKeys.transaction}-${_id}`;
+export const UpdateRegularTransaction: FC<UpdateRegularTransactionProps> = ({ id, walletId, ...props }) => {
+  const mutationKey = `update-${queryKeys.transaction}-${id}`;
   const queryClient = useQueryClient();
   const { open, onOpenChange } = usePopupState();
 
@@ -27,16 +25,17 @@ export const UpdateRegularTransaction: FC<UpdateRegularTransactionProps> = ({ _i
   const handleUpdateRegularTransaction = (formData: TRegularTransactionFormData, onReset: () => void) => {
     mutate(
       {
-        id: _id,
+        id: id,
         date: formData.date,
-        sourceId: formData.sourceId,
-        description: formData.description,
+        categoryId: formData.categoryId,
+        note: formData.note,
       },
       {
         onSuccess: () => {
           onReset();
           queryClient.invalidateQueries({ queryKey: [queryKeys.transaction] });
-          queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.category] });
+          onOpenChange(false);
         },
       },
     );
@@ -61,7 +60,15 @@ export const UpdateRegularTransaction: FC<UpdateRegularTransactionProps> = ({ _i
           mode="edit"
           formId={mutationKey}
           onSubmit={handleUpdateRegularTransaction}
-          defaultValues={{ ...props, sourceId: props.sourceId.toString(), walletId: props.walletId.toString() }}
+          defaultValues={{
+            ...props,
+            categoryId: props.categoryId ?? undefined,
+            note: props.note ?? undefined,
+            date: new Date(props.date),
+            walletId: walletId,
+            amount: Number(props.amount),
+            type: props.type as TRegularTransactionFormData["type"],
+          }}
         />
       </FormDialog>
     </>
