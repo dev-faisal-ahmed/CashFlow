@@ -53,6 +53,14 @@ export class ContactService {
     return { contacts, meta };
   }
 
+  static async getAllContacts(userId: number) {
+    return db.query.contactTable.findMany({
+      where: (c, { eq, and }) => and(eq(c.isDeleted, false), eq(c.userId, userId)),
+      columns: { id: true, name: true },
+      orderBy: (c, { asc }) => [asc(c.name)],
+    });
+  }
+
   static async updateContact({ id, dto, userId }: UpdateContact) {
     const isOwner = await this.isOwner({ id, userId });
     if (!isOwner) throw new AppError("You are not authorized to update this contact", 401);

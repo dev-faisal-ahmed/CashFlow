@@ -11,8 +11,18 @@ const regularTransaction = z.object({
   type: z.enum([ETransactionType.income, ETransactionType.expense], "Invalid transaction type"),
 });
 
+const peerTransaction = z.object({
+  amount: z.number().positive("Amount can not be negative"),
+  walletId: z.number("WalletId is required"),
+  contactId: z.number("ContactId is required"),
+  type: z.enum([ETransactionType.borrow, ETransactionType.income], "Invalid type"),
+  note: z.string().trim().optional(),
+});
+
 export const transactionSchema = {
   regularTransaction,
+  peerTransaction,
 };
 
 export type TRegularTransactionFormData = z.infer<typeof regularTransaction>;
+export type TPeerTransactionFormData = z.infer<typeof peerTransaction>;

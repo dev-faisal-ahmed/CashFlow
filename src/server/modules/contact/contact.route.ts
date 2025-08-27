@@ -22,6 +22,12 @@ export const contactRoute = new Hono()
     return ctx.json(ResponseDto.success({ message: "Contacts fetched successfully", meta, data: contacts }));
   })
 
+  .get("/list", authGuard, async (ctx) => {
+    const user = ctx.get("user");
+    const contacts = await ContactService.getAllContacts(user.id);
+    return ctx.json(ResponseDto.success({ message: "Contacts fetched successfully", data: contacts }));
+  })
+
   // Update Contact
   .patch("/:id", authGuard, jsonValidator(contactValidation.updateContact), async (ctx) => {
     const user = ctx.get("user");
