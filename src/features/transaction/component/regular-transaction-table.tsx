@@ -10,6 +10,7 @@ import { CommonAvatar } from "@/components/shared";
 import { format } from "date-fns";
 import { FC } from "react";
 import { UpdateRegularTransaction } from "./update-regular-transaction";
+import { DeleteRegularTransaction } from "./delete-regular-transaction";
 
 type TApiResponse = Awaited<ReturnType<typeof getRegularTransactionsApi>>;
 type TTransaction = TApiResponse["data"][number];
@@ -19,7 +20,7 @@ const { accessor } = createColumnHelper<TTransaction>();
 export const RegularTransactionTable = () => {
   const { pagination, setPagination } = usePagination(10);
   const { data: apiResponse, isLoading } = useQuery({
-    queryKey: [queryKeys.transaction, { page: pagination.pageIndex + 1 }],
+    queryKey: [queryKeys.transaction.regular, { page: pagination.pageIndex + 1 }],
     queryFn: () => getRegularTransactionsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
   });
 
@@ -81,8 +82,17 @@ export const RegularTransactionTable = () => {
   );
 };
 
-const RegularTransactionActionMenu: FC<TTransaction> = (transaction) => (
-  <div className="flex items-center justify-center gap-2">
-    <UpdateRegularTransaction {...transaction} categoryId={transaction.category?.id ?? null} walletId={transaction.wallet.id} />
-  </div>
-);
+const RegularTransactionActionMenu: FC<TTransaction> = (transaction) => {
+  // Convert the date string to a Date object
+  const transactionWithDate = {
+    ...transaction,
+    date: new Date(transaction.date),
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <UpdateRegularTransaction {...transactionWithDate} categoryId={transaction.category?.id ?? null} walletId={transaction.wallet.id} />
+      <DeleteRegularTransaction id={transaction.id} />
+    </div>
+  );
+};

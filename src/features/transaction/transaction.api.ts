@@ -29,3 +29,11 @@ export const updateRegularTransactionApi = async ({ id, ...dto }: UpdateRegularT
   if (!resData.success) throw new Error(resData.message);
   return resData;
 };
+
+// Delete Regular Transaction
+export const deleteRegularTransactionApi = async (id: string) => {
+  const res = await transactionClient.regular[":id"].$delete({ param: { id } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};

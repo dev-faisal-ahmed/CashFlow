@@ -12,7 +12,7 @@ export const transactionRoute = new Hono()
     const user = ctx.get("user");
     console.log(dto);
     await TransactionService.createRegularTransaction({ dto, userId: user.id });
-    return ctx.json(ResponseDto.success("Regular transaction created successfully"));
+    return ctx.json(ResponseDto.success("Transaction created successfully"));
   })
 
   // Get Regular Transactions
@@ -29,7 +29,15 @@ export const transactionRoute = new Hono()
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
     await TransactionService.updateRegularTransaction({ id, userId: user.id, dto });
-    return ctx.json(ResponseDto.success("Regular transaction updated successfully"));
+    return ctx.json(ResponseDto.success("Transaction updated successfully"));
+  })
+
+  // Delete Regular Transaction
+  .delete("/regular/:id", authGuard, async (ctx) => {
+    const id = ctx.req.param("id");
+    const user = ctx.get("user");
+    await TransactionService.deleteRegularTransaction({ id, userId: user.id });
+    return ctx.json(ResponseDto.success("Transaction deleted successfully"));
   });
 
 export type TTransactionRoute = typeof transactionRoute;

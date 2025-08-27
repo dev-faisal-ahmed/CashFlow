@@ -16,7 +16,7 @@ import { TTransaction } from "@/server/db/schema";
 type UpdateRegularTransactionProps = Pick<TTransaction, "id" | "amount" | "type" | "categoryId" | "walletId" | "note" | "date">;
 
 export const UpdateRegularTransaction: FC<UpdateRegularTransactionProps> = ({ id, walletId, ...props }) => {
-  const mutationKey = `update-${queryKeys.transaction}-${id}`;
+  const mutationKey = `update-${queryKeys.transaction.regular}-${id}`;
   const queryClient = useQueryClient();
   const { open, onOpenChange } = usePopupState();
 
@@ -33,7 +33,7 @@ export const UpdateRegularTransaction: FC<UpdateRegularTransactionProps> = ({ id
       {
         onSuccess: () => {
           onReset();
-          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction.regular] });
           queryClient.invalidateQueries({ queryKey: [queryKeys.category] });
           onOpenChange(false);
         },

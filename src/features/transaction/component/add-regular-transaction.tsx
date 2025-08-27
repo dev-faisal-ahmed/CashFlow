@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createRegularTransactionApi } from "../transaction.api";
 import { ETransactionType } from "@/server/db/schema";
 
-const mutationKey = `add-${queryKeys.transaction}`;
+const mutationKey = `add-${queryKeys.transaction.regular}`;
 
 export const AddRegularTransaction = () => {
   const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ export const AddRegularTransaction = () => {
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction.regular] });
           queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
           queryClient.invalidateQueries({ queryKey: [queryKeys.category] });
           onReset();
