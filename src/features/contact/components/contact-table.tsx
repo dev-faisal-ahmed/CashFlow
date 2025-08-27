@@ -57,7 +57,7 @@ export const ContactTable = () => {
     }),
 
     accessor("given", {
-      header: () => <div className="text-center">Lent</div>,
+      header: () => <div className="text-center">Borrowed</div>,
       cell: ({ getValue }) => (
         <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
           <MinusIcon className="size-4" />
@@ -67,7 +67,7 @@ export const ContactTable = () => {
     }),
 
     accessor("taken", {
-      header: () => <div className="text-center">Borrowed</div>,
+      header: () => <div className="text-center">Lent</div>,
       cell: ({ getValue }) => (
         <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
           <PlusIcon className="size-4" />

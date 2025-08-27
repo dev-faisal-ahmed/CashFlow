@@ -13,7 +13,9 @@ export enum ETransactionType {
   income = "income",
   expense = "expense",
   transfer = "transfer",
+  // giving money to contact
   borrow = "borrow",
+  // taking money form contact
   lend = "lend",
 }
 

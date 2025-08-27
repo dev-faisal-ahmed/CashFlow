@@ -18,6 +18,14 @@ export const getContactsApi = async (args: ToString<GetContactsArgs>) => {
   return resData;
 };
 
+// Get All Contact List
+export const getAllContactListApi = async () => {
+  const res = await contactClient.list.$get();
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};
+
 // Update Contact
 export const updateContactApi = async ({ id, ...dto }: UpdateContactDto & { id: string }) => {
   const res = await contactClient[":id"].$patch({ param: { id }, json: dto });
