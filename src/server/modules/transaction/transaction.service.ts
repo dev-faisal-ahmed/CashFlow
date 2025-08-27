@@ -30,7 +30,9 @@ export class TransactionService {
         .returning();
 
       await tx.update(walletTable).set({
-        ...(dto.type === ETransactionType.expense ? { expense: wallet.expense + dto.amount } : { income: wallet.income + dto.amount }),
+        ...(dto.type === ETransactionType.expense
+          ? { expense: String(Number(wallet.expense) + dto.amount) }
+          : { income: String(Number(wallet.income) + dto.amount) }),
       });
 
       return transaction;

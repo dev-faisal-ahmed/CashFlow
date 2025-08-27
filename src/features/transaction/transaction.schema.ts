@@ -1,14 +1,14 @@
 import z from "zod";
 
-import { ETransactionNature } from "@/server/modules/transaction/transaction.interface";
+import { ETransactionType } from "@/server/db/schema";
 
 const regularTransaction = z.object({
   amount: z.number().positive("Amount can not be negative"),
   description: z.string().optional(),
   date: z.date("Date is required"),
-  sourceId: z.string().nonempty("Source id can not be empty"),
-  walletId: z.string().nonempty("Wallet id can not be empty"),
-  nature: z.enum(Object.values(ETransactionNature), "Invalid transaction nature"),
+  categoryId: z.number("Category is required"),
+  walletId: z.number("Wallet is required"),
+  type: z.enum([ETransactionType.income, ETransactionType.expense], "Invalid transaction type"),
 });
 
 export const transactionSchema = {

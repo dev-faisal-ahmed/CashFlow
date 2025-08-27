@@ -9,8 +9,15 @@ export const addCategoryApi = async (dto: CreateCategoryDto) => {
   return resData;
 };
 
-export const getCategoryListApi = async (args: ToString<GetCategoriesArgs>) => {
+export const getAllCategoriesApi = async (args: ToString<GetCategoriesArgs>) => {
   const res = await categoryClient.index.$get({ query: { ...args } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData.data;
+};
+
+export const getCategoryListApi = async () => {
+  const res = await categoryClient.list.$get();
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData.data;

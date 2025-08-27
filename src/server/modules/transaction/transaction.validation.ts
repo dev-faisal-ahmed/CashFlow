@@ -7,13 +7,13 @@ const createRegularTransaction = z.object({
   amount: z.number().positive("Amount must be greater than 0"),
   description: z.string().trim().optional(),
   date: z.coerce.date().default(() => new Date()),
-  sourceId: z.string("Source id is required"),
+  categoryId: z.number("Category id is required"),
   walletId: z.number("Wallet id is required"),
   type: z.enum([ETransactionType.income, ETransactionType.expense], "Invalid transaction type"),
 });
 
 const updateRegularTransaction = z.object({
-  sourceId: z.string().optional(),
+  categoryId: z.number().optional(),
   description: z.string().trim().optional(),
   date: z.coerce.date().optional(),
 });
@@ -21,7 +21,7 @@ const updateRegularTransaction = z.object({
 // Query
 const getRegularTransactions = commonValidation.pagination.and(
   z.object({
-    type: z.enum([ETransactionType.income, ETransactionType.borrow], "Invalid transaction type").optional(),
+    type: z.enum([ETransactionType.income, ETransactionType.expense], "Invalid transaction type").optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
   }),

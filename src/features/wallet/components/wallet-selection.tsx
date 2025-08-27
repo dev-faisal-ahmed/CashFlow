@@ -6,8 +6,8 @@ import { CommonSelect } from "@/components/shared/form";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type WalletSelectionProps = {
-  value: string;
-  onChange: (value: string) => void;
+  value: number;
+  onChange: (value: number) => void;
   skipWalletId?: string;
   isSaving?: boolean;
   disabled?: boolean;
@@ -26,8 +26,8 @@ export const WalletSelection: FC<WalletSelectionProps> = ({ value, onChange, ski
 
   return (
     <CommonSelect
-      value={value}
-      onChange={onChange}
+      value={value?.toString() ?? ""}
+      onChange={(value) => onChange(Number(value))}
       options={filteredWalletList ?? []}
       placeholder="Select destination wallet"
       disabled={disabled}

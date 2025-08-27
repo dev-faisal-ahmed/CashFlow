@@ -5,11 +5,11 @@ import { FC, PropsWithChildren } from "react";
 import { useSearch } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
-import { getCategoryListApi } from "../category.api";
+import { getAllCategoriesApi } from "../category.api";
 import { CategoryListSkeleton } from "./category-loading";
 import { CategoryCard } from "./category-card";
 
-export const CategoryList = () => {
+export const AllCategories = () => {
   const { value } = useSearch();
 
   const {
@@ -19,7 +19,7 @@ export const CategoryList = () => {
     error,
   } = useQuery({
     queryKey: [queryKeys.category, { search: value }],
-    queryFn: () => getCategoryListApi({ search: value }),
+    queryFn: () => getAllCategoriesApi({ search: value }),
   });
 
   if (isLoading) return <LoadingSkeleton />;

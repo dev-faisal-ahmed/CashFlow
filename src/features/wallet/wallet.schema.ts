@@ -26,8 +26,7 @@ const updateWallet = z.object({
 const walletTransfer = z.object({
   amount: z.number().positive("Amount can not be negative"),
   description: z.string().optional(),
-  sourceWalletId: z.string().nonempty("Source wallet can not be empty"),
-  destinationWalletId: z.string().nonempty("Destination wallet can not be empty"),
+  destinationWalletId: z.number("Destination wallet is required"),
 });
 
 export const walletSchema = {

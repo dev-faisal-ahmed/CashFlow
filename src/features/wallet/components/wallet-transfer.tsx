@@ -30,7 +30,7 @@ export const WalletTransfer: FC<WalletTransferProps> = ({ walletId, onSuccess })
       {
         amount: formData.amount,
         senderWalletId: walletId,
-        receiverWalletId: Number(formData.destinationWalletId),
+        receiverWalletId: formData.destinationWalletId,
         ...(formData.description && { description: formData.description }),
       },
       {
@@ -72,7 +72,7 @@ type TransferWalletFormProps = {
 const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sourceWalletId }) => {
   const form = useForm<TWalletTransferFormData>({
     resolver: zodResolver(walletSchema.walletTransfer),
-    defaultValues: { amount: 0, description: "", destinationWalletId: "", sourceWalletId },
+    defaultValues: { amount: 0, description: "" },
   });
 
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));

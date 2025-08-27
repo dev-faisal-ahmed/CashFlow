@@ -1,3 +1,3 @@
 export * from "./add-category";
-export * from "./category-list";
+export * from "./all-categories";
 export * from "./category-loading";

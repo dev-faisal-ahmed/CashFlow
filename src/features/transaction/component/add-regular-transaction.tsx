@@ -7,9 +7,9 @@ import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
 import { RegularTransactionForm } from "./regular-transaction-form";
 import { TRegularTransactionFormData } from "../transaction.schema";
-import { ETransactionNature } from "@/server/modules/transaction/transaction.interface";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createRegularTransactionApi } from "../transaction.api";
+import { ETransactionType } from "@/server/db/schema";
 
 const mutationKey = `add-${queryKeys.transaction}`;
 
@@ -20,15 +20,21 @@ export const AddRegularTransaction = () => {
   const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: createRegularTransactionApi });
 
   const handleAddRegularTransaction = (formData: TRegularTransactionFormData, onReset: () => void) => {
-    mutate(formData, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [queryKeys.transaction] });
-        queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
-        queryClient.invalidateQueries({ queryKey: [queryKeys.source] });
-        onReset();
-        onOpenChange(false);
+    mutate(
+      {
+        ...formData,
+        walletId: Number(formData.walletId),
       },
-    });
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.category] });
+          onReset();
+          onOpenChange(false);
+        },
+      },
+    );
   };
 
   return (
@@ -48,7 +54,7 @@ export const AddRegularTransaction = () => {
           mode="add"
           formId={mutationKey}
           onSubmit={handleAddRegularTransaction}
-          defaultValues={{ date: new Date(), sourceId: "", walletId: "", nature: ETransactionNature.income }}
+          defaultValues={{ date: new Date(), type: ETransactionType.income }}
         />
       </FormDialog>
     </>

@@ -8,15 +8,14 @@ import { TRegularTransactionFormData } from "../transaction.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { transactionSchema } from "../transaction.schema";
 import { CommonSelect, FieldForm } from "@/components/shared/form";
-import { ETransactionNature } from "@/server/modules/transaction/transaction.interface";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
-import { getSourceListWithBasicInfoApi } from "@/features/source/source.api";
 import { WalletSelection } from "@/features/wallet/components";
 import { DatePicker } from "@/components/shared/form/date-picker";
 import { Textarea } from "@/components/ui/textarea";
-import { ESourceType } from "@/server/modules/source/source.interface";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ECategoryType, ETransactionType } from "@/server/db/schema";
+import { getCategoryListApi } from "@/features/category/category.api";
 
 // Main : Transaction Form
 type RegularTransactionFormProps = {
@@ -27,8 +26,8 @@ type RegularTransactionFormProps = {
 };
 
 const natureOptions = [
-  { label: "Income", value: ETransactionNature.income },
-  { label: "Expense", value: ETransactionNature.expense },
+  { label: "Income", value: ETransactionType.income },
+  { label: "Expense", value: ETransactionType.expense },
 ];
 
 export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId, defaultValues, onSubmit, mode }) => {
@@ -37,7 +36,7 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
     defaultValues,
   });
 
-  const nature = form.watch("nature");
+  const type = form.watch("type");
   const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
 
   return (
@@ -55,19 +54,19 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
             )}
           </FieldForm>
 
-          <FieldForm control={form.control} name="nature" label="Income/Expense">
+          <FieldForm control={form.control} name="type" label="Income/Expense">
             {({ field: { value, onChange } }) => (
               <CommonSelect options={natureOptions} value={value} onChange={onChange} disabled={mode === "edit"} />
             )}
           </FieldForm>
         </div>
 
-        <FieldForm control={form.control} name="sourceId" label="Source">
+        <FieldForm control={form.control} name="categoryId" label="Source">
           {({ field: { value, onChange } }) => (
-            <SourceSelection
-              value={value}
+            <CategorySelection
+              value={value ?? 0}
               onChange={onChange}
-              type={nature === ETransactionNature.income ? ESourceType.income : ESourceType.expense}
+              type={type === ETransactionType.income ? ECategoryType.income : ECategoryType.expense}
             />
           )}
         </FieldForm>
@@ -78,7 +77,7 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
               value={value}
               onChange={onChange}
               disabled={mode === "edit"}
-              {...(nature === ETransactionNature.expense && { isSaving: false })}
+              {...(type === ETransactionType.expense && { isSaving: false })}
             />
           )}
         </FieldForm>
@@ -95,20 +94,24 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
   );
 };
 
-type SourceSelectionProps = {
-  value: string;
-  onChange: (value: string) => void;
-  type?: ESourceType;
+type CategorySelectionProps = {
+  value: number;
+  onChange: (value: number) => void;
+  type?: ECategoryType;
 };
 
-export const SourceSelection: FC<SourceSelectionProps> = ({ value, onChange, type }) => {
-  const { data: sourceList, isLoading } = useQuery({
-    queryKey: [queryKeys.source, "for-transaction", { type }],
-    queryFn: () => getSourceListWithBasicInfoApi({ ...(type && { type }) }),
-    select: (res) => res.map(({ _id, name }) => ({ label: name, value: _id })),
+export const CategorySelection: FC<CategorySelectionProps> = ({ value, onChange, type }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: [queryKeys.category, "for-transaction"],
+    queryFn: getCategoryListApi,
   });
+
+  const categories =
+    typeof type !== undefined
+      ? data?.filter((category) => category.type === type)?.map(({ id, name }) => ({ label: name, value: id.toString() }))
+      : data?.map(({ id, name }) => ({ label: name, value: id.toString() }));
 
   if (isLoading) return <Skeleton className="h-input" />;
 
-  return <CommonSelect value={value} onChange={onChange} options={sourceList ?? []} />;
+  return <CommonSelect value={value?.toString() ?? ""} onChange={(value) => onChange(Number(value))} options={categories ?? []} />;
 };
