@@ -9,5 +9,6 @@ export const queryKeys = {
   contact: "contact",
   transaction: {
     regular: "regular-transaction",
+    peer: "peer-transaction",
   },
 };

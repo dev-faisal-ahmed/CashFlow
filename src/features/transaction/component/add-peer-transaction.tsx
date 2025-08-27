@@ -1,43 +1,91 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { TPeerTransactionFormData, transactionSchema } from "../transaction.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "@/components/ui/form";
-import { CommonSelect, FieldForm } from "@/components/shared/form";
-import { Input } from "@/components/ui/input";
-import { ETransactionType } from "@/server/db/schema";
+import { FC } from "react";
+import { TooltipContainer } from "@/components/shared";
+import { Button } from "@/components/ui/button";
+import { usePopupState } from "@/lib/hooks";
+import { useMutation } from "@tanstack/react-query";
+import { PlugIcon, PlusIcon } from "lucide-react";
+import { createPeerTransactionApi } from "../transaction.api";
+import { queryKeys } from "@/lib/query.keys";
+import { useQueryClient } from "@tanstack/react-query";
+import { TPeerTransactionFormData } from "../transaction.schema";
+import { FormDialog } from "@/components/shared/form";
+import { PeerTransactionForm } from "./peer-transaction-form";
 
-type AddPeerTransactionProps = {
-  formId: string;
-  defaultValues?: Partial<TPeerTransactionFormData>;
-  onSubmit: (data: TPeerTransactionFormData, onReset: () => void) => void;
-};
+// consts
+const mutationKey = `add-${queryKeys.transaction.peer}`;
 
-const transactionTypeOptions = [
-  { label: "Borrow", value: ETransactionType.borrow },
-  { label: "Income", value: ETransactionType.income },
-];
-
-export const AddPeerTransaction = ({ formId, defaultValues, onSubmit }: AddPeerTransactionProps) => {
-  const form = useForm<TPeerTransactionFormData>({ resolver: zodResolver(transactionSchema.peerTransaction), defaultValues });
-  const handleSubmit = form.handleSubmit((formData) => onSubmit(formData, form.reset));
+export const AddPeerTransactionFromContact: FC<{ contactId: number }> = ({ contactId }) => {
+  const { open, onOpenChange, handleCreatePeerTransaction } = useAddPeerTransaction();
 
   return (
-    <Form {...form}>
-      <form id={formId} onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <FieldForm control={form.control} name="amount" label="Amount">
-            {({ field: { value, onChange } }) => (
-              <Input value={value ?? ""} onChange={(e) => onChange(Number(e.target.value))} placeholder="@: 100" />
-            )}
-          </FieldForm>
+    <>
+      <TooltipContainer label="Add Peer Transaction">
+        <Button variant="outline" size="icon" onClick={() => onOpenChange(true)}>
+          <PlugIcon className="size-4" />
+        </Button>
+      </TooltipContainer>
 
-          <FieldForm control={form.control} name="type" label="Type">
-            {({ field: { value, onChange } }) => <CommonSelect options={transactionTypeOptions} value={value} onChange={onChange} />}
-          </FieldForm>
-        </div>
-      </form>
-    </Form>
+      <FormDialog formId={mutationKey} title="Add Peer Transaction" open={open} onOpenChange={onOpenChange}>
+        <PeerTransactionForm
+          formId={mutationKey}
+          mode="add-form-contact"
+          onSubmit={handleCreatePeerTransaction}
+          defaultValues={{ contactId: contactId, date: new Date() }}
+        />
+      </FormDialog>
+    </>
   );
+};
+
+export const AddPeerTransactionFromTransaction = () => {
+  const { open, onOpenChange, handleCreatePeerTransaction } = useAddPeerTransaction();
+
+  return (
+    <>
+      <Button onClick={() => onOpenChange(true)}>
+        <PlusIcon className="size-4" />
+        Add Peer Transaction
+      </Button>
+
+      <FormDialog formId={mutationKey} title="Add Peer Transaction" open={open} onOpenChange={onOpenChange}>
+        <PeerTransactionForm
+          formId={mutationKey}
+          mode="add-form-transaction"
+          onSubmit={handleCreatePeerTransaction}
+          defaultValues={{ date: new Date() }}
+        />
+      </FormDialog>
+    </>
+  );
+};
+
+// Hook
+const useAddPeerTransaction = () => {
+  const queryClient = useQueryClient();
+
+  const { open, onOpenChange } = usePopupState();
+  const { mutate } = useMutation({ mutationKey: [mutationKey], mutationFn: createPeerTransactionApi });
+
+  const handleCreatePeerTransaction = (formData: TPeerTransactionFormData, onReset: () => void) => {
+    mutate(
+      { ...formData },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction.peer] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.contact] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+          onReset();
+          onOpenChange(false);
+        },
+      },
+    );
+  };
+
+  return {
+    open,
+    onOpenChange,
+    handleCreatePeerTransaction,
+  };
 };

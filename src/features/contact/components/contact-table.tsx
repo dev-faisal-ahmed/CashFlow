@@ -11,6 +11,7 @@ import { usePagination } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { getContactsApi } from "../contact.api";
+import { AddPeerTransactionFromContact } from "@/features/transaction/component";
 
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
 type TContact = NonNullable<TApiResponse>["data"][number];
@@ -114,6 +115,7 @@ const ContactActionMenu: FC<TContact> = ({ id, name, phone, address }) => {
     <div className="flex items-center justify-center gap-2">
       <UpdateContact id={id} name={name} phone={phone} address={address} />
       <DeleteContact id={id} />
+      <AddPeerTransactionFromContact contactId={id} />
     </div>
   );
 };

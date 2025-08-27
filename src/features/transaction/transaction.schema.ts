@@ -15,7 +15,7 @@ const peerTransaction = z.object({
   amount: z.number().positive("Amount can not be negative"),
   walletId: z.number("WalletId is required"),
   contactId: z.number("ContactId is required"),
-  type: z.enum([ETransactionType.borrow, ETransactionType.income], "Invalid type"),
+  type: z.enum([ETransactionType.borrow, ETransactionType.lend], "Invalid type"),
   date: z.date("Date is required"),
   note: z.string().trim().optional(),
 });

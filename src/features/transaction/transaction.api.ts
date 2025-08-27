@@ -1,4 +1,5 @@
 import {
+  CreatePeerTransactionDto,
   CreateRegularTransactionDto,
   GetRegularTransactionsArgs,
   UpdateRegularTransactionDto,
@@ -10,6 +11,13 @@ import { ToString } from "@/lib/types";
 // Create Regular Transaction
 export const createRegularTransactionApi = async (dto: CreateRegularTransactionDto) => {
   const res = await transactionClient.regular.$post({ json: dto });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};
+
+export const createPeerTransactionApi = async (dto: CreatePeerTransactionDto) => {
+  const res = await transactionClient.peer.$post({ json: dto });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;

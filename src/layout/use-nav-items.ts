@@ -19,7 +19,7 @@ export const useNavItems = () => {
         isActive: isActive("/transactions"),
         items: [
           { title: "Regular", url: "/transactions/regular", isActive: isActive("/transactions/regular") },
-          { title: "Borrow", url: "/transactions/borrow", isActive: isActive("/transactions/borrow") },
+          { title: "Peer to Peer", url: "/transactions/peer", isActive: isActive("/transactions/peer") },
         ],
       },
     ];

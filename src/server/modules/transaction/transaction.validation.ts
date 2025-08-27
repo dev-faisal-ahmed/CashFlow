@@ -21,7 +21,6 @@ const updateRegularTransaction = z.object({
 const createPeerTransaction = z.object({
   amount: z.number().positive("Amount must be positive"),
   walletId: z.number("Wallet Id is required"),
-  userId: z.number("UserId is required"),
   contactId: z.number("Contact Id is required"),
   type: z.enum([ETransactionType.lend, ETransactionType.borrow], "Invalid transaction type"),
   note: z.string().trim().optional(),

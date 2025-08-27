@@ -24,7 +24,7 @@ type PeerTransactionFormProps = {
 
 const transactionTypeOptions = [
   { label: "Borrow", value: ETransactionType.borrow },
-  { label: "Income", value: ETransactionType.income },
+  { label: "Lend", value: ETransactionType.lend },
 ];
 
 export const PeerTransactionForm: FC<PeerTransactionFormProps> = ({ formId, defaultValues, onSubmit, mode }) => {
