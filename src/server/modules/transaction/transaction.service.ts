@@ -1,13 +1,20 @@
+import {
+  CreatePeerTransactionDto,
+  CreateRegularTransactionDto,
+  GetRegularTransactionsArgs,
+  UpdateRegularTransactionDto,
+} from "./transaction.validation";
+
 import { db } from "@/server/db";
 import { WithUserId } from "@/server/types";
-import { CreateRegularTransactionDto, GetRegularTransactionsArgs, UpdateRegularTransactionDto } from "./transaction.validation";
 import { AppError } from "@/server/core/app.error";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
-import { ETransactionType, transactionTable, walletTable } from "@/server/db/schema";
+import { contactTable, ETransactionType, transactionTable, walletTable } from "@/server/db/schema";
 import { and, eq, inArray, gte, lte, count } from "drizzle-orm";
 
 // Types
 type CreateRegularTransaction = WithUserId<{ dto: CreateRegularTransactionDto }>;
+type CreatePeerTransaction = WithUserId<{ dto: CreatePeerTransactionDto }>;
 type GetTransactions = WithUserId<{ query: GetRegularTransactionsArgs }>;
 type UpdateRegularTransaction = WithUserId<{ id: string; dto: UpdateRegularTransactionDto }>;
 type DeleteRegularTransaction = WithUserId<{ id: string }>;
@@ -29,14 +36,70 @@ export class TransactionService {
         .values({ ...dto, amount: dto.amount.toFixed(2), userId })
         .returning();
 
-      await tx
+      const [updatedWallet] = await tx
         .update(walletTable)
         .set({
           ...(dto.type === ETransactionType.expense
             ? { expense: String(Number(wallet.expense) + dto.amount) }
             : { income: String(Number(wallet.income) + dto.amount) }),
         })
-        .where(and(eq(walletTable.id, dto.walletId), eq(walletTable.userId, userId)));
+        .where(and(eq(walletTable.id, dto.walletId), eq(walletTable.userId, userId)))
+        .returning();
+
+      if (!updatedWallet.id) throw new AppError("Failed to update wallet balance", 500);
+
+      return transaction;
+    });
+  }
+
+  static async CreatePeerTransaction({ dto, userId }: CreatePeerTransaction) {
+    const [wallet, contact] = await Promise.all([
+      db.query.walletTable.findFirst({
+        where: (w, { eq }) => eq(w.id, dto.walletId),
+        columns: { id: true, income: true, expense: true },
+      }),
+
+      db.query.contactTable.findFirst({
+        where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId)),
+        columns: { id: true, given: true, taken: true },
+      }),
+    ]);
+
+    if (!wallet) throw new AppError("Wallet not found", 404);
+    if (!contact) throw new AppError("Contact not found", 404);
+
+    const balance = Number(wallet.income) - Number(wallet.expense);
+    if (dto.type === ETransactionType.lend && balance < dto.amount) throw new AppError("Insufficient balance", 400);
+
+    return db.transaction(async (tx) => {
+      const [[transaction], [updatedWallet], [updatedContact]] = await Promise.all([
+        tx
+          .insert(transactionTable)
+          .values({ ...dto, amount: dto.amount.toFixed(2), userId })
+          .returning(),
+        tx
+          .update(walletTable)
+          .set({
+            ...(dto.type === ETransactionType.lend
+              ? { expense: String(Number(wallet.expense) + dto.amount) }
+              : { income: String(Number(wallet.income) + dto.amount) }),
+          })
+          .where(eq(walletTable.id, dto.walletId))
+          .returning(),
+
+        tx
+          .update(contactTable)
+          .set({
+            ...(dto.type === ETransactionType.borrow ? { taken: String(Number(contact.taken) + dto.amount) } : {}),
+            ...(dto.type === ETransactionType.lend ? { given: String(Number(contact.given) + dto.amount) } : {}),
+          })
+          .where(eq(contactTable.id, dto.contactId))
+          .returning(),
+      ]);
+
+      if (!transaction.id) throw new AppError("Failed to create transaction", 500);
+      if (!updatedContact.id) throw new AppError("Failed to update contact balance", 500);
+      if (!updatedWallet.id) throw new AppError("Failed to update wallet balance", 500);
 
       return transaction;
     });
@@ -100,7 +163,7 @@ export class TransactionService {
 
   static async deleteRegularTransaction({ id, userId }: DeleteRegularTransaction) {
     const transaction = await db.query.transactionTable.findFirst({
-      where: (w, { eq }) => and(eq(w.userId, userId), eq(w.id, id)),
+      where: (w, { eq }) => eq(w.id, id),
       columns: { id: true, type: true, amount: true },
       with: { wallet: { columns: { id: true, income: true, expense: true } } },
     });
@@ -108,29 +171,28 @@ export class TransactionService {
     if (!transaction) throw new AppError("Transaction not found", 404);
 
     return db.transaction(async (tx) => {
-      const deletedTransaction = await tx
-        .delete(transactionTable)
-        .where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)));
+      const [deletedTransaction, [wallet]] = await Promise.all([
+        tx.delete(transactionTable).where(eq(transactionTable.id, id)),
+
+        tx
+          .update(walletTable)
+          .set({
+            ...(transaction.type === ETransactionType.expense && {
+              expense: String(Number(transaction.wallet.expense) - Number(transaction.amount)),
+            }),
+
+            ...(transaction.type === ETransactionType.income && {
+              income: String(Number(transaction.wallet.income) - Number(transaction.amount)),
+            }),
+          })
+          .where(and(eq(walletTable.id, transaction.wallet.id), eq(walletTable.userId, userId)))
+          .returning(),
+      ]);
 
       if (!deletedTransaction.rowCount) throw new AppError("Failed to delete transaction", 500);
-
-      const [wallet] = await tx
-        .update(walletTable)
-        .set({
-          ...(transaction.type === ETransactionType.expense && {
-            expense: String(Number(transaction.wallet.expense) - Number(transaction.amount)),
-          }),
-
-          ...(transaction.type === ETransactionType.income && {
-            income: String(Number(transaction.wallet.income) - Number(transaction.amount)),
-          }),
-        })
-        .where(and(eq(walletTable.id, transaction.wallet.id), eq(walletTable.userId, userId)))
-        .returning();
-
       if (!wallet.id) throw new AppError("Failed to update wallet balance", 500);
 
-      return wallet;
+      return deletedTransaction;
     });
   }
 }
