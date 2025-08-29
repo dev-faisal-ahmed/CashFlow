@@ -36,6 +36,14 @@ const getRegularTransactions = commonValidation.pagination.and(
   }),
 );
 
+const getPeerTransactions = commonValidation.queryWithPagination.and(
+  z.object({
+    type: z.enum([ETransactionType.borrow, ETransactionType.lend], "Invalid transaction type"),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+  }),
+);
+
 export const transactionValidation = {
   // Json
   createRegularTransaction,
@@ -44,6 +52,7 @@ export const transactionValidation = {
 
   // query
   getRegularTransactions,
+  getPeerTransactions,
 };
 
 export type CreateRegularTransactionDto = z.infer<typeof createRegularTransaction>;
@@ -51,3 +60,4 @@ export type UpdateRegularTransactionDto = z.infer<typeof updateRegularTransactio
 export type CreatePeerTransactionDto = z.infer<typeof createPeerTransaction>;
 
 export type GetRegularTransactionsArgs = z.infer<typeof getRegularTransactions>;
+export type GetPeerTransactionsArgs = z.infer<typeof getPeerTransactions>;

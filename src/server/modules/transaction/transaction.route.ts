@@ -19,7 +19,7 @@ export const transactionRoute = new Hono()
   .post("/peer", authGuard, jsonValidator(transactionValidation.createPeerTransaction), async (ctx) => {
     const dto = ctx.req.valid("json");
     const user = ctx.get("user");
-    await TransactionService.CreatePeerTransaction({ dto, userId: user.id });
+    await TransactionService.createPeerTransaction({ dto, userId: user.id });
     return ctx.json(ResponseDto.success("Transaction created successfully"));
   })
 

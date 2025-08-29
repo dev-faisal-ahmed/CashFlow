@@ -1,6 +1,7 @@
 import {
   CreatePeerTransactionDto,
   CreateRegularTransactionDto,
+  GetPeerTransactionsArgs,
   GetRegularTransactionsArgs,
   UpdateRegularTransactionDto,
 } from "./transaction.validation";
@@ -10,12 +11,13 @@ import { WithUserId } from "@/server/types";
 import { AppError } from "@/server/core/app.error";
 import { PaginationHelper } from "@/server/helpers/pagination.helper";
 import { contactTable, ETransactionType, transactionTable, walletTable } from "@/server/db/schema";
-import { and, eq, inArray, gte, lte, count } from "drizzle-orm";
+import { and, eq, inArray, gte, lte, count, or, ilike } from "drizzle-orm";
 
 // Types
 type CreateRegularTransaction = WithUserId<{ dto: CreateRegularTransactionDto }>;
 type CreatePeerTransaction = WithUserId<{ dto: CreatePeerTransactionDto }>;
-type GetTransactions = WithUserId<{ query: GetRegularTransactionsArgs }>;
+type GetRegularTransactions = WithUserId<{ query: GetRegularTransactionsArgs }>;
+type GetPeerTransactions = WithUserId<{ query: GetPeerTransactionsArgs }>;
 type UpdateRegularTransaction = WithUserId<{ id: string; dto: UpdateRegularTransactionDto }>;
 type DeleteRegularTransaction = WithUserId<{ id: string }>;
 
@@ -52,7 +54,7 @@ export class TransactionService {
     });
   }
 
-  static async CreatePeerTransaction({ dto, userId }: CreatePeerTransaction) {
+  static async createPeerTransaction({ dto, userId }: CreatePeerTransaction) {
     const [wallet, contact] = await Promise.all([
       db.query.walletTable.findFirst({
         where: (w, { eq }) => eq(w.id, dto.walletId),
@@ -105,7 +107,7 @@ export class TransactionService {
     });
   }
 
-  static async getRegularTransactions({ query, userId }: GetTransactions) {
+  static async getRegularTransactions({ query, userId }: GetRegularTransactions) {
     const { page, type, startDate, endDate } = query;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
     const { skip, limit } = paginationHelper.getPaginationInfo();
@@ -137,6 +139,41 @@ export class TransactionService {
 
     const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
 
+    const meta = paginationHelper.getMeta(total);
+    return { transactions, meta };
+  }
+
+  static async getPeerTransactions({ query, userId }: GetPeerTransactions) {
+    const { page, type, startDate, endDate, search } = query;
+    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
+    const { skip, limit } = paginationHelper.getPaginationInfo();
+
+    const dbQuery = and(
+      eq(transactionTable.userId, userId),
+      ...(search ? [or(ilike(transactionTable.note, `%${search}%`), ilike(contactTable.name, `%${search}%`))] : []),
+      ...(type ? [eq(transactionTable.type, type)] : [inArray(transactionTable.type, [ETransactionType.borrow, ETransactionType.lend])]),
+      ...(startDate ? [gte(transactionTable.date, startDate)] : []),
+      ...(endDate ? [lte(transactionTable.date, endDate)] : []),
+    );
+
+    const transactions = await db.query.transactionTable.findMany({
+      where: dbQuery,
+      columns: {
+        id: true,
+        amount: true,
+        type: true,
+        date: true,
+        note: true,
+      },
+      with: {
+        contact: { columns: { id: true, name: true } },
+      },
+      orderBy: (t, { desc }) => [desc(t.date)],
+      limit,
+      offset: skip,
+    });
+
+    const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
     const meta = paginationHelper.getMeta(total);
     return { transactions, meta };
   }
