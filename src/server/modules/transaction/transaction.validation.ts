@@ -38,7 +38,7 @@ const getRegularTransactions = commonValidation.pagination.and(
 
 const getPeerTransactions = commonValidation.queryWithPagination.and(
   z.object({
-    type: z.enum([ETransactionType.borrow, ETransactionType.lend], "Invalid transaction type"),
+    type: z.enum([ETransactionType.borrow, ETransactionType.lend], "Invalid transaction type").optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
   }),

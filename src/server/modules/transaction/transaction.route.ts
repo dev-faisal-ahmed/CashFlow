@@ -31,6 +31,14 @@ export const transactionRoute = new Hono()
     return ctx.json(ResponseDto.success({ message: "Transactions fetched successfully", meta, data: transactions }));
   })
 
+  // Get Peer Transactions
+  .get("/peer", authGuard, queryValidator(transactionValidation.getPeerTransactions), async (ctx) => {
+    const query = ctx.req.valid("query");
+    const user = ctx.get("user");
+    const { transactions, meta } = await TransactionService.getPeerTransactions({ query, userId: user.id });
+    return ctx.json(ResponseDto.success({ message: "Transactions fetched successfully", meta, data: transactions }));
+  })
+
   // Update Regular Transaction
   .patch("/regular/:id", authGuard, jsonValidator(transactionValidation.updateRegularTransaction), async (ctx) => {
     const id = ctx.req.param("id");

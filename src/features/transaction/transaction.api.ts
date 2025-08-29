@@ -1,6 +1,7 @@
 import {
   CreatePeerTransactionDto,
   CreateRegularTransactionDto,
+  GetPeerTransactionsArgs,
   GetRegularTransactionsArgs,
   UpdateRegularTransactionDto,
 } from "@/server/modules/transaction/transaction.validation";
@@ -16,6 +17,7 @@ export const createRegularTransactionApi = async (dto: CreateRegularTransactionD
   return resData;
 };
 
+// Create Peer Transaction
 export const createPeerTransactionApi = async (dto: CreatePeerTransactionDto) => {
   const res = await transactionClient.peer.$post({ json: dto });
   const resData = await res.json();
@@ -23,8 +25,17 @@ export const createPeerTransactionApi = async (dto: CreatePeerTransactionDto) =>
   return resData;
 };
 
+// Get Regular Transactions
 export const getRegularTransactionsApi = async (args: ToString<GetRegularTransactionsArgs>) => {
   const res = await transactionClient.regular.$get({ query: { ...args } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};
+
+// Get Peer Transactions
+export const getPeerTransactionsApi = async (args: ToString<GetPeerTransactionsArgs>) => {
+  const res = await transactionClient.peer.$get({ query: { ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;
