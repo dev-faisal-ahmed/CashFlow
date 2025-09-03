@@ -54,59 +54,6 @@ export class TransactionService {
     });
   }
 
-  static async createPeerTransaction({ dto, userId }: CreatePeerTransaction) {
-    const [wallet, contact] = await Promise.all([
-      db.query.walletTable.findFirst({
-        where: (w, { eq }) => eq(w.id, dto.walletId),
-        columns: { id: true, income: true, expense: true },
-      }),
-
-      db.query.contactTable.findFirst({
-        where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId)),
-        columns: { id: true, given: true, taken: true },
-      }),
-    ]);
-
-    if (!wallet) throw new AppError("Wallet not found", 404);
-    if (!contact) throw new AppError("Contact not found", 404);
-
-    const balance = Number(wallet.income) - Number(wallet.expense);
-    if (dto.type === ETransactionType.lend && balance < dto.amount) throw new AppError("Insufficient balance", 400);
-
-    return db.transaction(async (tx) => {
-      const [[transaction], [updatedWallet], [updatedContact]] = await Promise.all([
-        tx
-          .insert(transactionTable)
-          .values({ ...dto, amount: dto.amount.toFixed(2), userId })
-          .returning(),
-        tx
-          .update(walletTable)
-          .set({
-            ...(dto.type === ETransactionType.lend
-              ? { expense: String(Number(wallet.expense) + dto.amount) }
-              : { income: String(Number(wallet.income) + dto.amount) }),
-          })
-          .where(eq(walletTable.id, dto.walletId))
-          .returning(),
-
-        tx
-          .update(contactTable)
-          .set({
-            ...(dto.type === ETransactionType.borrow ? { taken: String(Number(contact.taken) + dto.amount) } : {}),
-            ...(dto.type === ETransactionType.lend ? { given: String(Number(contact.given) + dto.amount) } : {}),
-          })
-          .where(eq(contactTable.id, dto.contactId))
-          .returning(),
-      ]);
-
-      if (!transaction.id) throw new AppError("Failed to create transaction", 500);
-      if (!updatedContact.id) throw new AppError("Failed to update contact balance", 500);
-      if (!updatedWallet.id) throw new AppError("Failed to update wallet balance", 500);
-
-      return transaction;
-    });
-  }
-
   static async getRegularTransactions({ query, userId }: GetRegularTransactions) {
     const { page, type, startDate, endDate } = query;
     const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
@@ -139,41 +86,6 @@ export class TransactionService {
 
     const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
 
-    const meta = paginationHelper.getMeta(total);
-    return { transactions, meta };
-  }
-
-  static async getPeerTransactions({ query, userId }: GetPeerTransactions) {
-    const { page, type, startDate, endDate, search } = query;
-    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
-    const { skip, limit } = paginationHelper.getPaginationInfo();
-
-    const dbQuery = and(
-      eq(transactionTable.userId, userId),
-      ...(search ? [or(ilike(transactionTable.note, `%${search}%`), ilike(contactTable.name, `%${search}%`))] : []),
-      ...(type ? [eq(transactionTable.type, type)] : [inArray(transactionTable.type, [ETransactionType.borrow, ETransactionType.lend])]),
-      ...(startDate ? [gte(transactionTable.date, startDate)] : []),
-      ...(endDate ? [lte(transactionTable.date, endDate)] : []),
-    );
-
-    const transactions = await db.query.transactionTable.findMany({
-      where: dbQuery,
-      columns: {
-        id: true,
-        amount: true,
-        type: true,
-        date: true,
-        note: true,
-      },
-      with: {
-        contact: { columns: { id: true, name: true } },
-      },
-      orderBy: (t, { desc }) => [desc(t.date)],
-      limit,
-      offset: skip,
-    });
-
-    const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
     const meta = paginationHelper.getMeta(total);
     return { transactions, meta };
   }
@@ -231,5 +143,93 @@ export class TransactionService {
 
       return deletedTransaction;
     });
+  }
+
+  static async createPeerTransaction({ dto, userId }: CreatePeerTransaction) {
+    const [wallet, contact] = await Promise.all([
+      db.query.walletTable.findFirst({
+        where: (w, { eq }) => eq(w.id, dto.walletId),
+        columns: { id: true, income: true, expense: true },
+      }),
+
+      db.query.contactTable.findFirst({
+        where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId)),
+        columns: { id: true, given: true, taken: true },
+      }),
+    ]);
+
+    if (!wallet) throw new AppError("Wallet not found", 404);
+    if (!contact) throw new AppError("Contact not found", 404);
+
+    const balance = Number(wallet.income) - Number(wallet.expense);
+    if (dto.type === ETransactionType.lend && balance < dto.amount) throw new AppError("Insufficient balance", 400);
+
+    return db.transaction(async (tx) => {
+      const [[transaction], [updatedWallet], [updatedContact]] = await Promise.all([
+        tx
+          .insert(transactionTable)
+          .values({ ...dto, amount: dto.amount.toFixed(2), userId })
+          .returning(),
+        tx
+          .update(walletTable)
+          .set({
+            ...(dto.type === ETransactionType.lend
+              ? { expense: String(Number(wallet.expense) + dto.amount) }
+              : { income: String(Number(wallet.income) + dto.amount) }),
+          })
+          .where(eq(walletTable.id, dto.walletId))
+          .returning(),
+
+        tx
+          .update(contactTable)
+          .set({
+            ...(dto.type === ETransactionType.borrow ? { taken: String(Number(contact.taken) + dto.amount) } : {}),
+            ...(dto.type === ETransactionType.lend ? { given: String(Number(contact.given) + dto.amount) } : {}),
+          })
+          .where(eq(contactTable.id, dto.contactId))
+          .returning(),
+      ]);
+
+      if (!transaction.id) throw new AppError("Failed to create transaction", 500);
+      if (!updatedContact.id) throw new AppError("Failed to update contact balance", 500);
+      if (!updatedWallet.id) throw new AppError("Failed to update wallet balance", 500);
+
+      return transaction;
+    });
+  }
+
+  static async getPeerTransactions({ query, userId }: GetPeerTransactions) {
+    const { page, type, startDate, endDate, search } = query;
+    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
+    const { skip, limit } = paginationHelper.getPaginationInfo();
+
+    const dbQuery = and(
+      eq(transactionTable.userId, userId),
+      ...(search ? [or(ilike(transactionTable.note, `%${search}%`), ilike(contactTable.name, `%${search}%`))] : []),
+      ...(type ? [eq(transactionTable.type, type)] : [inArray(transactionTable.type, [ETransactionType.borrow, ETransactionType.lend])]),
+      ...(startDate ? [gte(transactionTable.date, startDate)] : []),
+      ...(endDate ? [lte(transactionTable.date, endDate)] : []),
+    );
+
+    const transactions = await db.query.transactionTable.findMany({
+      where: dbQuery,
+      columns: {
+        id: true,
+        amount: true,
+        type: true,
+        date: true,
+        note: true,
+      },
+      with: {
+        contact: { columns: { id: true, name: true } },
+      },
+      orderBy: (t, { desc }) => [desc(t.date)],
+      limit,
+      offset: skip,
+    });
+
+    const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
+    const meta = paginationHelper.getMeta(total);
+    return { transactions, meta };
   }
 }
