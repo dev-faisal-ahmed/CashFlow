@@ -3,6 +3,7 @@ import {
   CreateRegularTransactionDto,
   GetPeerTransactionsArgs,
   GetRegularTransactionsArgs,
+  UpdatePeerTransactionDto,
   UpdateRegularTransactionDto,
 } from "@/server/modules/transaction/transaction.validation";
 
@@ -52,6 +53,14 @@ export const updateRegularTransactionApi = async ({ id, ...dto }: UpdateRegularT
 // Delete Regular Transaction
 export const deleteRegularTransactionApi = async (id: string) => {
   const res = await transactionClient.regular[":id"].$delete({ param: { id } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};
+
+// Update Peer Transaction
+export const updatePeerTransactionApi = async ({ id, ...dto }: UpdatePeerTransactionDto & { id: string }) => {
+  const res = await transactionClient.peer[":id"].$patch({ param: { id }, json: dto });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;

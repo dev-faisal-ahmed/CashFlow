@@ -10,6 +10,8 @@ import { CommonAvatar } from "@/components/shared";
 import { format } from "date-fns";
 import { ETransactionType } from "@/server/db/schema";
 import { cn } from "@/lib/utils";
+import { FC } from "react";
+import { UpdatePeerTransaction } from "./update-peer-transaction";
 
 type TApiResponse = Awaited<ReturnType<typeof getPeerTransactionsApi>>;
 type TTransaction = TApiResponse["data"][number];
@@ -71,6 +73,10 @@ export const PeerTransactionTable = () => {
       header: "Date",
       cell: ({ getValue }) => <p className="text-sm">{format(getValue(), "PPP")}</p>,
     }),
+    {
+      id: "action",
+      cell: ({ row }) => <PeerTransactionActionMenu {...row.original} />,
+    },
   ] as ColumnDef<TTransaction>[];
 
   return (
@@ -82,5 +88,19 @@ export const PeerTransactionTable = () => {
       pagination={pagination}
       onPaginationChange={setPagination}
     />
+  );
+};
+
+const PeerTransactionActionMenu: FC<TTransaction> = (transaction) => {
+  // Convert the date string to a Date object
+  const transactionWithDate = {
+    ...transaction,
+    date: new Date(transaction.date),
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <UpdatePeerTransaction {...transactionWithDate} contactId={transaction.contact?.id ?? null} />
+    </div>
   );
 };

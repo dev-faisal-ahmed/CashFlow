@@ -27,6 +27,12 @@ const createPeerTransaction = z.object({
   date: z.coerce.date().default(() => new Date()),
 });
 
+const updatePeerTransaction = z.object({
+  note: z.string().trim().optional(),
+  date: z.coerce.date().optional(),
+  contactId: z.number().optional(),
+});
+
 // Query
 const getRegularTransactions = commonValidation.pagination.and(
   z.object({
@@ -49,6 +55,7 @@ export const transactionValidation = {
   createRegularTransaction,
   updateRegularTransaction,
   createPeerTransaction,
+  updatePeerTransaction,
 
   // query
   getRegularTransactions,
@@ -58,6 +65,7 @@ export const transactionValidation = {
 export type CreateRegularTransactionDto = z.infer<typeof createRegularTransaction>;
 export type UpdateRegularTransactionDto = z.infer<typeof updateRegularTransaction>;
 export type CreatePeerTransactionDto = z.infer<typeof createPeerTransaction>;
+export type UpdatePeerTransactionDto = z.infer<typeof updatePeerTransaction>;
 
 export type GetRegularTransactionsArgs = z.infer<typeof getRegularTransactions>;
 export type GetPeerTransactionsArgs = z.infer<typeof getPeerTransactions>;

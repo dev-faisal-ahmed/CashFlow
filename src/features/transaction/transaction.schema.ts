@@ -20,9 +20,16 @@ const peerTransaction = z.object({
   note: z.string().trim().optional(),
 });
 
+const updatePeerTransaction = z.object({
+  note: z.string().trim().optional(),
+  date: z.date().optional(),
+  contactId: z.number().optional(),
+});
+
 export const transactionSchema = {
   regularTransaction,
   peerTransaction,
+  updatePeerTransaction,
 };
 
 export type TRegularTransactionFormData = z.infer<typeof regularTransaction>;

@@ -3,6 +3,7 @@ import {
   CreateRegularTransactionDto,
   GetPeerTransactionsArgs,
   GetRegularTransactionsArgs,
+  UpdatePeerTransactionDto,
   UpdateRegularTransactionDto,
 } from "./transaction.validation";
 
@@ -19,6 +20,7 @@ type CreatePeerTransaction = WithUserId<{ dto: CreatePeerTransactionDto }>;
 type GetRegularTransactions = WithUserId<{ query: GetRegularTransactionsArgs }>;
 type GetPeerTransactions = WithUserId<{ query: GetPeerTransactionsArgs }>;
 type UpdateRegularTransaction = WithUserId<{ id: string; dto: UpdateRegularTransactionDto }>;
+type UpdatePeerTransaction = WithUserId<{ id: string; dto: UpdatePeerTransactionDto }>;
 type DeleteRegularTransaction = WithUserId<{ id: string }>;
 
 export class TransactionService {
@@ -231,5 +233,29 @@ export class TransactionService {
     const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
     const meta = paginationHelper.getMeta(total);
     return { transactions, meta };
+  }
+
+  static async updatePeerTransaction({ id, userId, dto }: UpdatePeerTransaction) {
+    const transaction = await db.query.transactionTable.findFirst({
+      where: (t, { eq }) => and(eq(t.userId, userId), eq(t.id, id)),
+      columns: { id: true, contactId: true },
+    });
+
+    if (!transaction) throw new AppError("Transaction not found", 404);
+
+    if (dto.contactId && transaction.contactId !== dto.contactId) {
+      const contact = await db.query.contactTable.findFirst({
+        where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId!)),
+        columns: { id: true },
+      });
+
+      if (!contact) throw new AppError("Contact not found", 404);
+    }
+
+    return db
+      .update(transactionTable)
+      .set(dto)
+      .where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)))
+      .returning();
   }
 }

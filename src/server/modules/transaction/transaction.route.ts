@@ -54,6 +54,15 @@ export const transactionRoute = new Hono()
     const user = ctx.get("user");
     await TransactionService.deleteRegularTransaction({ id, userId: user.id });
     return ctx.json(ResponseDto.success("Transaction deleted successfully"));
+  })
+
+  // Update Peer Transaction
+  .patch("/peer/:id", authGuard, jsonValidator(transactionValidation.updatePeerTransaction), async (ctx) => {
+    const id = ctx.req.param("id");
+    const dto = ctx.req.valid("json");
+    const user = ctx.get("user");
+    await TransactionService.updatePeerTransaction({ id, userId: user.id, dto });
+    return ctx.json(ResponseDto.success("Transaction updated successfully"));
   });
 
 export type TTransactionRoute = typeof transactionRoute;
