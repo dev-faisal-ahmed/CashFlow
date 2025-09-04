@@ -8,6 +8,13 @@
       "when": 1756148350538,
       "tag": "0000_awesome_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1756978247322,
+      "tag": "0001_common_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }

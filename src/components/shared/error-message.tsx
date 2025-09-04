@@ -4,7 +4,7 @@ import { MdError } from "react-icons/md";
 
 export const ErrorMessage: FC<{ message: string; className?: string }> = ({ message, className }) => (
   <div className={cn("my-6 flex w-full items-center justify-center gap-2 text-center text-sm font-semibold", className)}>
-    <MdError className="text-white size-4" />
+    <MdError className="size-4 text-white" />
     {message}
   </div>
 );

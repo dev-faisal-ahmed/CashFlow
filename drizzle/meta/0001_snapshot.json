@@ -1,6 +1,6 @@
 {
-  "id": "c874eb9d-a0c8-4b63-ab74-39f4517e5e25",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "d6fcd9cd-1219-49f2-9664-18ef5bddafc7",
+  "prevId": "c874eb9d-a0c8-4b63-ab74-39f4517e5e25",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -105,15 +105,15 @@
           "primaryKey": false,
           "notNull": false
         },
-        "given": {
-          "name": "given",
+        "amount_owned_by_me": {
+          "name": "amount_owned_by_me",
           "type": "numeric(8, 2)",
           "primaryKey": false,
           "notNull": true,
           "default": "'0'"
         },
-        "taken": {
-          "name": "taken",
+        "amount_owned_to_me": {
+          "name": "amount_owned_to_me",
           "type": "numeric(8, 2)",
           "primaryKey": false,
           "notNull": true,

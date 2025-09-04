@@ -157,7 +157,7 @@ export class TransactionService {
 
       db.query.contactTable.findFirst({
         where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId)),
-        columns: { id: true, given: true, taken: true },
+        columns: { id: true, amountOwedByMe: true, amountOwedToMe: true },
       }),
     ]);
 
@@ -186,8 +186,8 @@ export class TransactionService {
         tx
           .update(contactTable)
           .set({
-            ...(dto.type === ETransactionType.borrow ? { taken: String(Number(contact.taken) + dto.amount) } : {}),
-            ...(dto.type === ETransactionType.lend ? { given: String(Number(contact.given) + dto.amount) } : {}),
+            ...(dto.type === ETransactionType.borrow ? { amountOwedToMe: String(Number(contact.amountOwedToMe) + dto.amount) } : {}),
+            ...(dto.type === ETransactionType.lend ? { amountOwedByMe: String(Number(contact.amountOwedByMe) + dto.amount) } : {}),
           })
           .where(eq(contactTable.id, dto.contactId))
           .returning(),
@@ -257,7 +257,7 @@ export class TransactionService {
       columns: { id: true, type: true, amount: true, contactId: true, walletId: true },
       with: {
         wallet: { columns: { id: true, income: true, expense: true } },
-        contact: { columns: { id: true, given: true, taken: true } },
+        contact: { columns: { id: true, amountOwedByMe: true, amountOwedToMe: true } },
       },
     });
 
@@ -288,11 +288,11 @@ export class TransactionService {
           .update(contactTable)
           .set({
             ...(transaction.type === ETransactionType.lend && {
-              given: String(Number(contact.given) - Number(transaction.amount)),
+              amountOwedByMe: String(Number(contact.amountOwedByMe) - Number(transaction.amount)),
             }),
 
             ...(transaction.type === ETransactionType.borrow && {
-              taken: String(Number(contact.taken) - Number(transaction.amount)),
+              amountOwedToMe: String(Number(contact.amountOwedToMe) - Number(transaction.amount)),
             }),
           })
           .where(and(eq(contactTable.id, contact.id), eq(contactTable.userId, userId)))

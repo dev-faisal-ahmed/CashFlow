@@ -57,7 +57,7 @@ export const ContactTable = () => {
       cell: ({ getValue }) => <span className="text-muted-foreground">{getValue()}</span>,
     }),
 
-    accessor("given", {
+    accessor("amountOwedByMe", {
       header: () => <div className="text-center">Borrowed</div>,
       cell: ({ getValue }) => (
         <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
@@ -67,7 +67,7 @@ export const ContactTable = () => {
       ),
     }),
 
-    accessor("taken", {
+    accessor("amountOwedToMe", {
       header: () => <div className="text-center">Lent</div>,
       cell: ({ getValue }) => (
         <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
@@ -81,14 +81,9 @@ export const ContactTable = () => {
       id: "net",
       header: () => <div className="text-center">Net</div>,
       cell: ({ row }) => {
-        const net = Number(row.original.taken) - Number(row.original.given);
-        const status = net > 0 ? "Borrowed" : "Lent";
-
-        return (
-          <div data-status={status} className="flex items-center justify-center gap-2 text-center text-base font-semibold">
-            {net} {!!net && <span className="text-muted-foreground text-sm font-medium">({status})</span>}
-          </div>
-        );
+        const net = Number(row.original.amountOwedToMe) - Number(row.original.amountOwedByMe);
+        const isOwed = net > 0;
+        return <div className={`text-center ${isOwed ? "text-emerald-500" : "text-destructive"}`}>{net.toFixed(2)}</div>;
       },
     },
 
