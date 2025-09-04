@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { FC } from "react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { getPeerTransactionsApi } from "../transaction.api";
 import { useQuery } from "@tanstack/react-query";
@@ -9,8 +11,6 @@ import { DataTable } from "@/components/shared/data-table/data-table";
 import { CommonAvatar } from "@/components/shared";
 import { format } from "date-fns";
 import { ETransactionType } from "@/server/db/schema";
-import { cn } from "@/lib/utils";
-import { FC } from "react";
 import { UpdatePeerTransaction } from "./update-peer-transaction";
 import { DeletePeerTransaction } from "./delete-peer-transaction";
 
@@ -54,14 +54,14 @@ export const PeerTransactionTable = () => {
       cell: ({ row }) => {
         const amount = row.original.amount;
         const type = row.original.type;
-        const sign = type === ETransactionType.borrow ? "-" : "+";
+        const sign = type === ETransactionType.borrow ? "+" : "-";
 
         return (
           <p
             className={cn(
               "font-medium",
-              type === ETransactionType.borrow && "text-destructive",
-              type === ETransactionType.lend && "text-emerald-500",
+              type === ETransactionType.lend && "text-destructive",
+              type === ETransactionType.borrow && "text-emerald-500",
             )}
           >
             {sign} {Number(amount).toLocaleString("id-ID")}

@@ -36,8 +36,8 @@ export class ContactService {
         name: contactTable.name,
         phone: contactTable.phone,
         address: contactTable.address,
-        amountOwedToMe: contactTable.amountOwedToMe,
-        amountOwedByMe: contactTable.amountOwedByMe,
+        amountBorrowed: contactTable.amountBorrowed,
+        amountLent: contactTable.amountLent,
       })
       .from(contactTable)
       .where(whereQuery)

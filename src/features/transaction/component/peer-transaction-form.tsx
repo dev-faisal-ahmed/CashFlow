@@ -66,7 +66,7 @@ export const PeerTransactionForm: FC<PeerTransactionFormProps> = ({ formId, defa
             <WalletSelection
               value={value}
               onChange={onChange}
-              {...(type === ETransactionType.borrow && { isSaving: false })}
+              {...(type === ETransactionType.lend && { isSaving: false })}
               disabled={mode === "edit"}
               placeholder="Select wallet"
             />

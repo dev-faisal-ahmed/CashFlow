@@ -157,7 +157,7 @@ export class TransactionService {
 
       db.query.contactTable.findFirst({
         where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId)),
-        columns: { id: true, amountOwedByMe: true, amountOwedToMe: true },
+        columns: { id: true, amountBorrowed: true, amountLent: true },
       }),
     ]);
 
@@ -176,9 +176,8 @@ export class TransactionService {
         tx
           .update(walletTable)
           .set({
-            ...(dto.type === ETransactionType.lend
-              ? { expense: String(Number(wallet.expense) + dto.amount) }
-              : { income: String(Number(wallet.income) + dto.amount) }),
+            ...(dto.type === ETransactionType.lend && { expense: String(Number(wallet.expense) + dto.amount) }),
+            ...(dto.type === ETransactionType.borrow && { income: String(Number(wallet.income) + dto.amount) }),
           })
           .where(eq(walletTable.id, dto.walletId))
           .returning(),
@@ -186,8 +185,8 @@ export class TransactionService {
         tx
           .update(contactTable)
           .set({
-            ...(dto.type === ETransactionType.borrow ? { amountOwedToMe: String(Number(contact.amountOwedToMe) + dto.amount) } : {}),
-            ...(dto.type === ETransactionType.lend ? { amountOwedByMe: String(Number(contact.amountOwedByMe) + dto.amount) } : {}),
+            ...(dto.type === ETransactionType.borrow && { amountBorrowed: String(Number(contact.amountBorrowed) + dto.amount) }),
+            ...(dto.type === ETransactionType.lend && { amountLent: String(Number(contact.amountLent) + dto.amount) }),
           })
           .where(eq(contactTable.id, dto.contactId))
           .returning(),
@@ -257,7 +256,7 @@ export class TransactionService {
       columns: { id: true, type: true, amount: true, contactId: true, walletId: true },
       with: {
         wallet: { columns: { id: true, income: true, expense: true } },
-        contact: { columns: { id: true, amountOwedByMe: true, amountOwedToMe: true } },
+        contact: { columns: { id: true, amountBorrowed: true, amountLent: true } },
       },
     });
 
@@ -288,11 +287,11 @@ export class TransactionService {
           .update(contactTable)
           .set({
             ...(transaction.type === ETransactionType.lend && {
-              amountOwedByMe: String(Number(contact.amountOwedByMe) - Number(transaction.amount)),
+              amountLent: String(Number(contact.amountLent) - Number(transaction.amount)),
             }),
 
             ...(transaction.type === ETransactionType.borrow && {
-              amountOwedToMe: String(Number(contact.amountOwedToMe) - Number(transaction.amount)),
+              amountBorrowed: String(Number(contact.amountBorrowed) - Number(transaction.amount)),
             }),
           })
           .where(and(eq(contactTable.id, contact.id), eq(contactTable.userId, userId)))

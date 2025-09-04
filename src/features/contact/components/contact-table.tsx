@@ -57,21 +57,22 @@ export const ContactTable = () => {
       cell: ({ getValue }) => <span className="text-muted-foreground">{getValue()}</span>,
     }),
 
-    accessor("amountOwedByMe", {
-      header: () => <div className="text-center">Borrowed</div>,
+    accessor("amountBorrowed", {
+      header: () => <div className="text-center">I Borrowed</div>,
       cell: ({ getValue }) => (
-        <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
-          <MinusIcon className="size-4" />
+        <div className="flex items-center justify-center gap-2 text-center font-semibold">
+          <PlusIcon className="size-4" />
           {getValue()}
         </div>
       ),
     }),
 
-    accessor("amountOwedToMe", {
-      header: () => <div className="text-center">Lent</div>,
+    accessor("amountLent", {
+      header: () => <div className="text-center">I Lent</div>,
       cell: ({ getValue }) => (
-        <div className="flex items-center justify-center gap-2 text-center text-base font-semibold">
-          <PlusIcon className="size-4" />
+        <div className="flex items-center justify-center gap-2 text-center font-semibold">
+          <MinusIcon className="size-4" />
+
           {getValue()}
         </div>
       ),
@@ -81,9 +82,9 @@ export const ContactTable = () => {
       id: "net",
       header: () => <div className="text-center">Net</div>,
       cell: ({ row }) => {
-        const net = Number(row.original.amountOwedToMe) - Number(row.original.amountOwedByMe);
-        const isOwed = net > 0;
-        return <div className={`text-center ${isOwed ? "text-emerald-500" : "text-destructive"}`}>{net.toFixed(2)}</div>;
+        const net = Number(row.original.amountLent) - Number(row.original.amountBorrowed);
+        const isInDebt = net < 0;
+        return <div className={`text-center ${isInDebt ? "text-emerald-500" : "text-destructive"}`}>{net.toFixed(2)}</div>;
       },
     },
 
