@@ -5,6 +5,7 @@ import {
   GetRegularTransactionsArgs,
   UpdatePeerTransactionDto,
   UpdateRegularTransactionDto,
+  CreateTransferTransactionDto,
 } from "./transaction.validation";
 
 import { db } from "@/server/db";
@@ -303,6 +304,55 @@ export class TransactionService {
       if (!contactInfo.id) throw new AppError("Failed to update contact balance", 500);
 
       return deletedTransaction;
+    });
+  }
+
+  static async createTransferTransaction({ dto, userId }: WithUserId<{ dto: CreateTransferTransactionDto }>) {
+    const { amount, senderWalletId, receiverWalletId, description, fee } = dto;
+    if (receiverWalletId === senderWalletId) throw new AppError("Sender and receiver wallet cannot be the same", 400);
+
+    return db.transaction(async (tx) => {
+      const wallets = await tx.query.walletTable.findMany({
+        where: (w, { and, eq, inArray }) => and(eq(w.userId, userId), inArray(w.id, [receiverWalletId, senderWalletId])),
+        columns: { id: true, income: true, expense: true },
+      });
+
+      if (wallets.length < 2) throw new AppError("Wallet not found", 404);
+
+      const senderWallet = wallets.find((w) => w.id === senderWalletId);
+      const receiverWallet = wallets.find((w) => w.id === receiverWalletId);
+
+      if (!senderWallet || !receiverWallet) throw new AppError("Wallet not found", 404);
+
+      const totalAmount = amount + (fee || 0);
+      const balance = Number(senderWallet.income) - Number(senderWallet.expense);
+      if (balance < totalAmount) throw new AppError("Insufficient balance", 400);
+
+      const [transaction] = await tx
+        .insert(transactionTable)
+        .values({
+          amount: amount.toFixed(2),
+          type: ETransactionType.transfer,
+          userId,
+          walletId: senderWalletId,
+          relatedWalletId: receiverWalletId,
+          date: new Date(),
+          note: description,
+          fee: fee?.toFixed(2),
+        })
+        .returning();
+
+      await tx
+        .update(walletTable)
+        .set({ expense: String(Number(senderWallet.expense) + totalAmount) })
+        .where(eq(walletTable.id, senderWalletId));
+
+      await tx
+        .update(walletTable)
+        .set({ income: String(Number(receiverWallet.income) + amount) })
+        .where(eq(walletTable.id, receiverWalletId));
+
+      return { transaction };
     });
   }
 }

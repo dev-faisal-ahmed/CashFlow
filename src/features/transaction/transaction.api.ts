@@ -1,3 +1,4 @@
+import { CreateTransferTransactionDto } from "@/server/modules/transaction/transaction.validation";
 import {
   CreatePeerTransactionDto,
   CreateRegularTransactionDto,
@@ -21,6 +22,14 @@ export const createRegularTransactionApi = async (dto: CreateRegularTransactionD
 // Create Peer Transaction
 export const createPeerTransactionApi = async (dto: CreatePeerTransactionDto) => {
   const res = await transactionClient.peer.$post({ json: dto });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};
+
+// Create Transfer Transaction
+export const createTransferTransactionApi = async (dto: CreateTransferTransactionDto) => {
+  const res = await transactionClient.transfer.$post({ json: dto });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;

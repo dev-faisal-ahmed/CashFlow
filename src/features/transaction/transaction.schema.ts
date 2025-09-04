@@ -26,11 +26,21 @@ const updatePeerTransaction = z.object({
   contactId: z.number().optional(),
 });
 
+const transferTransaction = z.object({
+  amount: z.number().positive("Amount can not be negative"),
+  fee: z.number().nonnegative("Fee can not be negative").optional().default(0),
+  description: z.string().optional(),
+  sourceWalletId: z.number("Source wallet is required"),
+  destinationWalletId: z.number("Destination wallet is required"),
+});
+
 export const transactionSchema = {
   regularTransaction,
   peerTransaction,
   updatePeerTransaction,
+  transferTransaction,
 };
 
 export type TRegularTransactionFormData = z.infer<typeof regularTransaction>;
 export type TPeerTransactionFormData = z.infer<typeof peerTransaction>;
+export type TTransferTransactionFormData = z.infer<typeof transferTransaction>;

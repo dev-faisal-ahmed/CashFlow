@@ -23,6 +23,14 @@ export const transactionRoute = new Hono()
     return ctx.json(ResponseDto.success("Transaction created successfully"));
   })
 
+  // Create Transfer Transaction
+  .post("/transfer", authGuard, jsonValidator(transactionValidation.createTransferTransaction), async (ctx) => {
+    const dto = ctx.req.valid("json");
+    const user = ctx.get("user");
+    await TransactionService.createTransferTransaction({ dto, userId: user.id });
+    return ctx.json(ResponseDto.success("Transaction created successfully"));
+  })
+
   // Get Regular Transactions
   .get("/regular", authGuard, queryValidator(transactionValidation.getRegularTransactions), async (ctx) => {
     const query = ctx.req.valid("query");

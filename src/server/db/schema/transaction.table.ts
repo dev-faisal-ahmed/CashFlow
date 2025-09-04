@@ -13,9 +13,7 @@ export enum ETransactionType {
   income = "income",
   expense = "expense",
   transfer = "transfer",
-  // giving money to contact
   borrow = "borrow",
-  // taking money form contact
   lend = "lend",
 }
 
@@ -37,6 +35,7 @@ export const transactionTable = pgTable("transactions", {
   type: text("type").notNull().$type<ETransactionType>(),
   note: text("note"),
   date: timestamp("date").defaultNow().notNull(),
+  fee: numeric("fee", { precision: 8, scale: 2 }).default("0.00").notNull(),
   createdAt,
   updatedAt: timestamp("updated_at")
     .defaultNow()
