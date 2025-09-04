@@ -30,7 +30,6 @@ const createPeerTransaction = z.object({
 const updatePeerTransaction = z.object({
   note: z.string().trim().optional(),
   date: z.coerce.date().optional(),
-  contactId: z.number().optional(),
 });
 
 // Query

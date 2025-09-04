@@ -36,7 +36,7 @@ export const WalletList = () => {
 };
 
 const WalletListContainer: FC<PropsWithChildren> = ({ children }) => (
-  <section className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{children}</section>
+  <section className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">{children}</section>
 );
 
 const LoadingSkeleton = () => (

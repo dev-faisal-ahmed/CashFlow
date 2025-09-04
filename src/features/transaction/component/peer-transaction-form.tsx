@@ -57,7 +57,7 @@ export const PeerTransactionForm: FC<PeerTransactionFormProps> = ({ formId, defa
 
         <FieldForm control={form.control} name="contactId" label="Contact">
           {({ field: { value, onChange } }) => (
-            <ContactSelection value={value} onChange={onChange} disabled={mode === "add-form-contact"} />
+            <ContactSelection value={value} onChange={onChange} disabled={mode !== "add-form-transaction"} />
           )}
         </FieldForm>
 

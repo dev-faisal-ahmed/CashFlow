@@ -22,6 +22,7 @@ type GetPeerTransactions = WithUserId<{ query: GetPeerTransactionsArgs }>;
 type UpdateRegularTransaction = WithUserId<{ id: string; dto: UpdateRegularTransactionDto }>;
 type UpdatePeerTransaction = WithUserId<{ id: string; dto: UpdatePeerTransactionDto }>;
 type DeleteRegularTransaction = WithUserId<{ id: string }>;
+type DeletePeerTransaction = WithUserId<{ id: string }>;
 
 export class TransactionService {
   static async createRegularTransaction({ dto, userId }: CreateRegularTransaction) {
@@ -239,24 +240,70 @@ export class TransactionService {
   static async updatePeerTransaction({ id, userId, dto }: UpdatePeerTransaction) {
     const transaction = await db.query.transactionTable.findFirst({
       where: (t, { eq }) => and(eq(t.userId, userId), eq(t.id, id)),
-      columns: { id: true, contactId: true },
     });
 
     if (!transaction) throw new AppError("Transaction not found", 404);
-
-    if (dto.contactId && transaction.contactId !== dto.contactId) {
-      const contact = await db.query.contactTable.findFirst({
-        where: (c, { and, eq }) => and(eq(c.userId, userId), eq(c.id, dto.contactId!)),
-        columns: { id: true },
-      });
-
-      if (!contact) throw new AppError("Contact not found", 404);
-    }
 
     return db
       .update(transactionTable)
       .set(dto)
       .where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)))
       .returning();
+  }
+
+  static async deletePeerTransaction({ id, userId }: DeletePeerTransaction) {
+    const transaction = await db.query.transactionTable.findFirst({
+      where: (w, { eq }) => eq(w.id, id),
+      columns: { id: true, type: true, amount: true, contactId: true, walletId: true },
+      with: {
+        wallet: { columns: { id: true, income: true, expense: true } },
+        contact: { columns: { id: true, given: true, taken: true } },
+      },
+    });
+
+    if (!transaction) throw new AppError("Transaction not found", 404);
+    if (!transaction.contact) throw new AppError("Contact not found", 404);
+
+    const contact = transaction.contact;
+
+    return db.transaction(async (tx) => {
+      const [deletedTransaction, [wallet], [contactInfo]] = await Promise.all([
+        tx.delete(transactionTable).where(eq(transactionTable.id, id)),
+
+        tx
+          .update(walletTable)
+          .set({
+            ...(transaction.type === ETransactionType.lend && {
+              expense: String(Number(transaction.wallet.expense) - Number(transaction.amount)),
+            }),
+
+            ...(transaction.type === ETransactionType.borrow && {
+              income: String(Number(transaction.wallet.income) - Number(transaction.amount)),
+            }),
+          })
+          .where(and(eq(walletTable.id, transaction.wallet.id), eq(walletTable.userId, userId)))
+          .returning(),
+
+        tx
+          .update(contactTable)
+          .set({
+            ...(transaction.type === ETransactionType.lend && {
+              given: String(Number(contact.given) - Number(transaction.amount)),
+            }),
+
+            ...(transaction.type === ETransactionType.borrow && {
+              taken: String(Number(contact.taken) - Number(transaction.amount)),
+            }),
+          })
+          .where(and(eq(contactTable.id, contact.id), eq(contactTable.userId, userId)))
+          .returning(),
+      ]);
+
+      if (!deletedTransaction.rowCount) throw new AppError("Failed to delete transaction", 500);
+      if (!wallet.id) throw new AppError("Failed to update wallet balance", 500);
+      if (!contactInfo.id) throw new AppError("Failed to update contact balance", 500);
+
+      return deletedTransaction;
+    });
   }
 }

@@ -12,6 +12,7 @@ import { ETransactionType } from "@/server/db/schema";
 import { cn } from "@/lib/utils";
 import { FC } from "react";
 import { UpdatePeerTransaction } from "./update-peer-transaction";
+import { DeletePeerTransaction } from "./delete-peer-transaction";
 
 type TApiResponse = Awaited<ReturnType<typeof getPeerTransactionsApi>>;
 type TTransaction = TApiResponse["data"][number];
@@ -100,6 +101,7 @@ const PeerTransactionActionMenu: FC<TTransaction> = (transaction) => {
         contactId={transaction.contact?.id ?? null}
         walletId={transaction.walletId}
       />
+      <DeletePeerTransaction id={transaction.id} />
     </div>
   );
 };

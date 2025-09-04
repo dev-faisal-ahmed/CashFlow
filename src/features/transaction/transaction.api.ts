@@ -65,3 +65,11 @@ export const updatePeerTransactionApi = async ({ id, ...dto }: UpdatePeerTransac
   if (!resData.success) throw new Error(resData.message);
   return resData;
 };
+
+// Delete Peer Transaction
+export const deletePeerTransactionApi = async (id: string) => {
+  const res = await transactionClient.peer[":id"].$delete({ param: { id } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};
