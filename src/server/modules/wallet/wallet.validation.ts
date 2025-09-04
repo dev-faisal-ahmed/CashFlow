@@ -25,13 +25,6 @@ const updateWallet = z.object({
   isSaving: z.boolean().optional(),
 });
 
-const transfer = z.object({
-  amount: z.number().positive("Amount can not be negative"),
-  senderWalletId: z.number("Sender wallet id is required"),
-  receiverWalletId: z.number("Receiver wallet id is required"),
-  description: z.string().optional(),
-});
-
 // query
 const getAllWallets = commonValidation.queryWithPagination.and(
   z.object({
@@ -43,7 +36,6 @@ export const walletValidation = {
   // json
   createWallet,
   updateWallet,
-  transfer,
 
   // query
   getAllWallets,
@@ -51,6 +43,5 @@ export const walletValidation = {
 
 export type CreateWalletDto = z.infer<typeof createWallet>;
 export type UpdateWalletDto = z.infer<typeof updateWallet>;
-export type WalletTransferDto = z.infer<typeof transfer>;
 
 export type GetAllWalletsArgs = z.infer<typeof getAllWallets>;

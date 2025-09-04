@@ -1,4 +1,3 @@
-import { CreateTransferTransactionDto } from "@/server/modules/transaction/transaction.validation";
 import {
   CreatePeerTransactionDto,
   CreateRegularTransactionDto,
@@ -8,6 +7,7 @@ import {
   UpdateRegularTransactionDto,
 } from "@/server/modules/transaction/transaction.validation";
 
+import { CreateTransferTransactionDto } from "@/server/modules/transaction/transaction.validation";
 import { transactionClient } from "@/lib/client";
 import { ToString } from "@/lib/types";
 

@@ -1,5 +1,5 @@
 import { walletClient } from "@/lib/client";
-import { CreateWalletDto, GetAllWalletsArgs, WalletTransferDto } from "@/server/modules/wallet/wallet.validation";
+import { CreateWalletDto, GetAllWalletsArgs } from "@/server/modules/wallet/wallet.validation";
 import { ToString } from "@/lib/types";
 
 // Add
@@ -30,14 +30,6 @@ export const getWalletListWithBasicDataApi = async (args: ToString<GetAllWallets
 // Delete
 export const deleteWalletApi = async (walletId: string) => {
   const res = await walletClient[":id"].$delete({ param: { id: walletId } });
-  const resData = await res.json();
-  if (!resData.success) throw new Error(resData.message);
-  return resData;
-};
-
-// Transfer Wallet
-export const transferWalletApi = async (payload: WalletTransferDto) => {
-  const res = await walletClient.transfer.$post({ json: payload });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);
   return resData;

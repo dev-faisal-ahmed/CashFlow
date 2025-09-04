@@ -37,14 +37,6 @@ export const walletRoute = new Hono()
     const id = ctx.req.param("id");
     await WalletService.deleteWallet({ id: Number(id), userId: user.id });
     return ctx.json(ResponseDto.success("Wallet deleted successfully"));
-  })
-
-  // Transfer Money
-  .post("/transfer", authGuard, jsonValidator(walletValidation.transfer), async (ctx) => {
-    const dto = ctx.req.valid("json");
-    const user = ctx.get("user");
-    await WalletService.walletTransfer({ dto, userId: user.id });
-    return ctx.json(ResponseDto.success("Wallet transfer has been successful"));
   });
 
 export type TWalletRoute = typeof walletRoute;

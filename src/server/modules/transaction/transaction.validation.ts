@@ -55,7 +55,6 @@ const createTransferTransaction = z.object({
   description: z.string().trim().optional(),
   senderWalletId: z.number("Sender wallet id is required"),
   receiverWalletId: z.number("Receiver wallet id is required"),
-  date: z.coerce.date().default(() => new Date()),
 });
 
 export const transactionValidation = {

@@ -10,8 +10,8 @@ import { ActionMenu } from "@/components/shared";
 import { usePopupState } from "@/lib/hooks";
 import { UpdateWallet } from "./update-wallet";
 import { DeleteWallet } from "./delete-wallet";
-import { WalletTransfer } from "./wallet-transfer";
 import { TWallet } from "@/server/db/schema";
+import { CreateTransferTransaction } from "@/features/transaction/component/create-transfer-transaction";
 
 // Shared Types
 
@@ -65,7 +65,7 @@ const WalletCardActionMenu: FC<TWalletCardActionMenuProps> = ({ id, name, isSavi
   return (
     <ActionMenu open={open} onOpenChange={onOpenChange} triggerClassName="ml-auto">
       <UpdateWallet name={name} isSaving={!!isSaving} id={id} onSuccess={() => onOpenChange(false)} />
-      <WalletTransfer balance={balance} walletId={id} onSuccess={() => onOpenChange(false)} />
+      <CreateTransferTransaction balance={balance} walletId={id} onSuccess={() => onOpenChange(false)} />
       <DeleteWallet walletId={String(id)} />
     </ActionMenu>
   );

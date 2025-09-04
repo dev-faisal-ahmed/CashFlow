@@ -28,9 +28,8 @@ const updatePeerTransaction = z.object({
 
 const transferTransaction = z.object({
   amount: z.number().positive("Amount can not be negative"),
-  fee: z.number().nonnegative("Fee can not be negative").optional().default(0),
+  fee: z.number().nonnegative("Fee can not be negative").optional(),
   description: z.string().optional(),
-  sourceWalletId: z.number("Source wallet is required"),
   destinationWalletId: z.number("Destination wallet is required"),
 });
 
