@@ -78,6 +78,7 @@ export const RegularTransactionForm: FC<RegularTransactionFormProps> = ({ formId
               onChange={onChange}
               disabled={mode === "edit"}
               {...(type === ETransactionType.expense && { isSaving: false })}
+              placeholder="Select wallet"
             />
           )}
         </FieldForm>

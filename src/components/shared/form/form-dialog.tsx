@@ -33,7 +33,7 @@ export const FormDialog: FC<FormDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0" showCloseButton={false}>
-        <ScrollArea className="max-h-[100dvh] px-6 sm:max-h-[100vh]">
+        <ScrollArea className="max-h-[95dvh] px-6 sm:max-h-[90vh]">
           <DialogHeader className="mb-6 pt-6">
             <section className="flex items-center justify-between">
               <DialogTitle>{title}</DialogTitle>

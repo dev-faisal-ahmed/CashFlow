@@ -221,6 +221,7 @@ export class TransactionService {
         type: true,
         date: true,
         note: true,
+        walletId: true,
       },
       with: {
         contact: { columns: { id: true, name: true } },

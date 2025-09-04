@@ -88,7 +88,9 @@ const TransferWalletForm: FC<TransferWalletFormProps> = ({ formId, onSubmit, sou
 
         <Suspense fallback={<WalletSelectionSKeleton />}>
           <FieldForm control={form.control} name="destinationWalletId" label="Destination Wallet">
-            {({ field: { value, onChange } }) => <WalletSelection skipWalletId={sourceWalletId} value={value} onChange={onChange} />}
+            {({ field: { value, onChange } }) => (
+              <WalletSelection skipWalletId={sourceWalletId} value={value} onChange={onChange} placeholder="Select destination wallet" />
+            )}
           </FieldForm>
         </Suspense>
 

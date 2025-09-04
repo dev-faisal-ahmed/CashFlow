@@ -92,15 +92,14 @@ export const PeerTransactionTable = () => {
 };
 
 const PeerTransactionActionMenu: FC<TTransaction> = (transaction) => {
-  // Convert the date string to a Date object
-  const transactionWithDate = {
-    ...transaction,
-    date: new Date(transaction.date),
-  };
-
   return (
     <div className="flex items-center justify-center gap-2">
-      <UpdatePeerTransaction {...transactionWithDate} contactId={transaction.contact?.id ?? null} />
+      <UpdatePeerTransaction
+        {...transaction}
+        date={new Date(transaction.date)}
+        contactId={transaction.contact?.id ?? null}
+        walletId={transaction.walletId}
+      />
     </div>
   );
 };

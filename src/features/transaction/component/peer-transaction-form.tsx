@@ -57,7 +57,7 @@ export const PeerTransactionForm: FC<PeerTransactionFormProps> = ({ formId, defa
 
         <FieldForm control={form.control} name="contactId" label="Contact">
           {({ field: { value, onChange } }) => (
-            <ContactSelection value={value} onChange={onChange} disabled={mode !== "add-form-transaction"} />
+            <ContactSelection value={value} onChange={onChange} disabled={mode === "add-form-contact"} />
           )}
         </FieldForm>
 
@@ -68,6 +68,7 @@ export const PeerTransactionForm: FC<PeerTransactionFormProps> = ({ formId, defa
               onChange={onChange}
               {...(type === ETransactionType.borrow && { isSaving: false })}
               disabled={mode === "edit"}
+              placeholder="Select wallet"
             />
           )}
         </FieldForm>
