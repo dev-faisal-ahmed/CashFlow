@@ -12,12 +12,12 @@ const Layout: FC<PropsWithChildren> = async ({ children }) => {
   if (user) redirect("/");
 
   return (
-    <main className="flex h-dvh items-center md:h-screen">
-      <section className="hidden h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
+    <main className="flex min-h-dvh items-center md:min-h-screen">
+      <section className="hidden min-h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
         <Link href="/">
           <AppLogo descriptionClassName="text-white/70" />
         </Link>
-        <div className="mt-20">
+        <div className="mt-20 mb-10">
           <h1 className="text-4xl leading-12 font-semibold tracking-wider">Track, analyze, and control your money effortlessly.</h1>
           <p className="mt-6 font-thin">
             From daily expenses to income insights, borrowing and lending to category-based analytics — manage your entire financial life

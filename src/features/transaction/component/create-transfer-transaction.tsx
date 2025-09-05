@@ -45,6 +45,7 @@ export const CreateTransferTransaction: FC<CreateTransferTransactionProps> = ({ 
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [queryKeys.wallet] });
+          queryClient.invalidateQueries({ queryKey: [queryKeys.transaction.transfer] });
           onReset();
           onOpenChange(false);
           onSuccess?.();
