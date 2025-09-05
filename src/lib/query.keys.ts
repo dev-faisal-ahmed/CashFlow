@@ -10,5 +10,6 @@ export const queryKeys = {
   transaction: {
     regular: "regular-transaction",
     peer: "peer-transaction",
+    transfer: "transfer-transaction",
   },
 };

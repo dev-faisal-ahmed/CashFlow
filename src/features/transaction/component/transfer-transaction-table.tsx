@@ -1,79 +1,94 @@
 "use client";
 
-import { FC } from "react";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { getTransferTransactionsApi } from "../transaction.api";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query.keys";
+import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
-import { TTransferTransaction } from "@/server/db/schema";
-import { useGetTransferTransactions } from "../transaction.hook";
+import { CommonAvatar } from "@/components/shared";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
-type TransferTransactionTableProps = {};
 
-export const TransferTransactionTable: FC<TransferTransactionTableProps> = () => {
-  const { data, isLoading } = useGetTransferTransactions();
+type TApiResponse = Awaited<ReturnType<typeof getTransferTransactionsApi>>;
+type TTransaction = TApiResponse["data"][number];
 
-  const columns: ColumnDef<TTransferTransaction>[] = [
-    {
-      accessorKey: "date",
-      header: "Date",
-      cell: ({ row }) => format(row.getValue("date"), "PPP"),
-    },
-    {
-      accessorKey: "note",
-      header: "Note",
-      cell: ({ row }) => row.getValue("note") || "-",
-    },
-    {
-      accessorKey: "amount",
-      header: "Amount",
-      cell: ({ row }) => `$${row.getValue("amount")}`,
-    },
-    {
-      accessorKey: "fee",
-      header: "Fee",
-      cell: ({ row }) => `$${row.getValue("fee") || 0}`,
-    },
-    {
-      accessorKey: "wallet",
+const { accessor } = createColumnHelper<TTransaction>();
+
+export const TransferTransactionTable = () => {
+  const { pagination, setPagination } = usePagination(10);
+  const { data: apiResponse, isLoading } = useQuery({
+    queryKey: [queryKeys.transaction.transfer, { page: pagination.pageIndex + 1 }],
+    queryFn: () => getTransferTransactionsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
+  });
+
+  const transactions = apiResponse?.data ?? [];
+
+  const column = [
+    accessor("wallet.name", {
       header: "Sender Wallet",
-      cell: ({ row }) => {
-        const wallet: any = row.getValue("wallet");
-        return wallet?.name;
-      },
-    },
-    {
-      accessorKey: "relatedWallet",
-      header: "Receiver Wallet",
-      cell: ({ row }) => {
-        const relatedWallet: any = row.getValue("relatedWallet");
-        return relatedWallet?.name;
-      },
-    },
-    {
-      accessorKey: "type",
-      header: "Type",
-      cell: ({ row }) => (
-        <Badge
-          className={cn(
-            "capitalize",
-            row.getValue("type") === "income" && "bg-green-500",
-            row.getValue("type") === "expense" && "bg-red-500",
-          )}
-        >
-          {row.getValue("type")}
-        </Badge>
+      cell: ({ getValue }) => (
+        <div className="flex items-center gap-3">
+          <CommonAvatar name={getValue()} containerClassName="rounded-full" fallbackClassName="bg-primary text-white text-base" size="SM" />
+          <h2 className="font-semibold">{getValue()}</h2>
+        </div>
       ),
+    }),
+    accessor("relatedWallet.name", {
+      header: "Receiver Wallet",
+      cell: ({ getValue }) => (
+        <div className="flex items-center gap-3">
+          <CommonAvatar name={getValue()} containerClassName="rounded-full" fallbackClassName="bg-primary text-white text-base" size="SM" />
+          <h2 className="font-semibold">{getValue()}</h2>
+        </div>
+      ),
+    }),
+
+    accessor("note", {
+      header: "Note",
+      cell: ({ getValue }) => <p className="text-sm">{getValue()}</p>,
+    }),
+
+    {
+      id: "amount",
+      header: "Amount",
+      cell: ({ row }) => {
+        const amount = row.original.amount;
+
+        return (
+          <p className="text-emerald-500">
+            {Number(amount).toLocaleString("id-ID")}
+          </p>
+        );
+      },
     },
-  ];
+    {
+      id: "fee",
+      header: "Fee",
+      cell: ({ row }) => {
+        const fee = row.original.fee;
+
+        return (
+          <p className="text-destructive">
+            {Number(fee).toLocaleString("id-ID")}
+          </p>
+        );
+      },
+    },
+    accessor("date", {
+      header: "Date",
+      cell: ({ getValue }) => <p className="text-sm">{format(getValue(), "PPP")}</p>,
+    }),
+  ] as ColumnDef<TTransaction>[];
 
   return (
     <DataTable
-      columns={columns}
-      data={data?.transactions || []}
+      columns={column}
+      data={transactions}
       isLoading={isLoading}
-      pagination={data?.meta}
+      pageCount={apiResponse?.meta?.totalPage ?? 0}
+      pagination={pagination}
+      onPaginationChange={setPagination}
     />
   );
 };

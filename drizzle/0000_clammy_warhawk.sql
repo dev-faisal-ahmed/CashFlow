@@ -14,8 +14,8 @@ CREATE TABLE "contacts" (
 	"name" varchar(100) NOT NULL,
 	"phone" varchar(20) NOT NULL,
 	"address" varchar(255),
-	"given" numeric(8, 2) DEFAULT '0' NOT NULL,
-	"taken" numeric(8, 2) DEFAULT '0' NOT NULL,
+	"amount_borrowed" numeric(8, 2) DEFAULT '0' NOT NULL,
+	"amount_lent" numeric(8, 2) DEFAULT '0' NOT NULL,
 	"is_deleted" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now()
 );
@@ -31,6 +31,7 @@ CREATE TABLE "transactions" (
 	"type" text NOT NULL,
 	"note" text,
 	"date" timestamp DEFAULT now() NOT NULL,
+	"fee" numeric(8, 2) DEFAULT '0.00' NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

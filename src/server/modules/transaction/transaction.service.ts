@@ -365,6 +365,7 @@ export class TransactionService {
     const { skip, limit } = paginationHelper.getPaginationInfo();
 
     const dbQuery = and(
+      eq(transactionTable.type, ETransactionType.transfer),
       eq(transactionTable.userId, userId),
       ...(startDate ? [gte(transactionTable.date, startDate)] : []),
       ...(endDate ? [lte(transactionTable.date, endDate)] : []),

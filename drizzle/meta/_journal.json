@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1756148350538,
-      "tag": "0000_awesome_nekra",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1756978247322,
-      "tag": "0001_common_major_mapleleaf",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1756978820602,
-      "tag": "0002_luxuriant_scarlet_spider",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1756979061438,
-      "tag": "0003_soft_vision",
+      "when": 1757085351436,
+      "tag": "0000_clammy_warhawk",
       "breakpoints": true
     }
   ]

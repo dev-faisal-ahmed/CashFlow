@@ -1,5 +1,5 @@
 {
-  "id": "c874eb9d-a0c8-4b63-ab74-39f4517e5e25",
+  "id": "d1b3345d-6679-41df-8074-96c4b53e929f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -59,8 +59,12 @@
           "name": "categories_user_id_users_id_fk",
           "tableFrom": "categories",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -105,15 +109,15 @@
           "primaryKey": false,
           "notNull": false
         },
-        "given": {
-          "name": "given",
+        "amount_borrowed": {
+          "name": "amount_borrowed",
           "type": "numeric(8, 2)",
           "primaryKey": false,
           "notNull": true,
           "default": "'0'"
         },
-        "taken": {
-          "name": "taken",
+        "amount_lent": {
+          "name": "amount_lent",
           "type": "numeric(8, 2)",
           "primaryKey": false,
           "notNull": true,
@@ -140,8 +144,12 @@
           "name": "contacts_user_id_users_id_fk",
           "tableFrom": "contacts",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -218,6 +226,13 @@
           "notNull": true,
           "default": "now()"
         },
+        "fee": {
+          "name": "fee",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0.00'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -239,8 +254,12 @@
           "name": "transactions_user_id_users_id_fk",
           "tableFrom": "transactions",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -248,8 +267,12 @@
           "name": "transactions_wallet_id_wallets_id_fk",
           "tableFrom": "transactions",
           "tableTo": "wallets",
-          "columnsFrom": ["wallet_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "wallet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -257,8 +280,12 @@
           "name": "transactions_related_wallet_id_wallets_id_fk",
           "tableFrom": "transactions",
           "tableTo": "wallets",
-          "columnsFrom": ["related_wallet_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "related_wallet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -266,8 +293,12 @@
           "name": "transactions_category_id_categories_id_fk",
           "tableFrom": "transactions",
           "tableTo": "categories",
-          "columnsFrom": ["category_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -275,8 +306,12 @@
           "name": "transactions_contact_id_contacts_id_fk",
           "tableFrom": "transactions",
           "tableTo": "contacts",
-          "columnsFrom": ["contact_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -414,8 +449,12 @@
           "name": "wallets_user_id_users_id_fk",
           "tableFrom": "wallets",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
