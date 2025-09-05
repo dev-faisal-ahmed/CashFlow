@@ -49,6 +49,13 @@ const getPeerTransactions = commonValidation.queryWithPagination.and(
   }),
 );
 
+const getTransferTransactions = commonValidation.queryWithPagination.and(
+  z.object({
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+  }),
+);
+
 const createTransferTransaction = z.object({
   amount: z.number().positive("Amount must be greater than 0"),
   fee: z.number().nonnegative("Fee can not be negative").optional(),
@@ -68,6 +75,7 @@ export const transactionValidation = {
   // query
   getRegularTransactions,
   getPeerTransactions,
+  getTransferTransactions,
 };
 
 export type CreateRegularTransactionDto = z.infer<typeof createRegularTransaction>;
@@ -78,3 +86,4 @@ export type CreateTransferTransactionDto = z.infer<typeof createTransferTransact
 
 export type GetRegularTransactionsArgs = z.infer<typeof getRegularTransactions>;
 export type GetPeerTransactionsArgs = z.infer<typeof getPeerTransactions>;
+export type GetTransferTransactionsArgs = z.infer<typeof getTransferTransactions>;

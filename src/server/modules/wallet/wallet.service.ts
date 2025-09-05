@@ -1,7 +1,7 @@
 import { db } from "@/server/db";
 import { WithUserId } from "@/server/types";
 import { and, eq, ilike } from "drizzle-orm";
-import { GetAllWalletsArgs, UpdateWalletDto, WalletTransferDto } from "./wallet.validation";
+import { GetAllWalletsArgs, UpdateWalletDto } from "./wallet.validation";
 import { ETransactionType, transactionTable, walletTable } from "@/server/db/schema";
 import { AppError } from "@/server/core/app.error";
 
@@ -10,7 +10,6 @@ type CreateWallet = typeof walletTable.$inferInsert & { initialBalance?: number 
 type GetWallets = WithUserId<{ query: GetAllWalletsArgs }>;
 type UpdateWallet = WithUserId<{ id: number; dto: UpdateWalletDto }>;
 type DeleteWallet = WithUserId<{ id: number }>;
-type WalletTransfer = WithUserId<{ dto: WalletTransferDto }>;
 
 export class WalletService {
   static async createWallet({ initialBalance, ...dto }: CreateWallet) {
@@ -83,52 +82,5 @@ export class WalletService {
 
     if (!wallet) throw new AppError("Failed to update wallet", 403);
     return wallet;
-  }
-
-  static async walletTransfer({ dto, userId }: WalletTransfer) {
-    const { amount, receiverWalletId, senderWalletId, description } = dto;
-    if (receiverWalletId === senderWalletId) throw new AppError("Sender and receiver wallet cannot be the same", 400);
-
-    return db.transaction(async (tx) => {
-      const wallets = await tx.query.walletTable.findMany({
-        where: (w, { and, eq, inArray }) => and(eq(w.userId, userId), inArray(w.id, [receiverWalletId, senderWalletId])),
-        columns: { id: true, income: true, expense: true },
-      });
-
-      if (!wallets.length) throw new AppError("Wallet not found", 404);
-
-      const senderWallet = wallets.find((w) => w.id === senderWalletId);
-      const receiverWallet = wallets.find((w) => w.id === receiverWalletId);
-
-      if (!senderWallet || !receiverWallet) throw new AppError("Wallet not found", 404);
-
-      const balance = Number(senderWallet.income) - Number(senderWallet.expense);
-      if (balance < amount) throw new AppError("Insufficient balance", 400);
-
-      const [transaction] = await tx
-        .insert(transactionTable)
-        .values({
-          amount: amount.toFixed(2),
-          type: ETransactionType.transfer,
-          userId,
-          walletId: senderWalletId,
-          relatedWalletId: receiverWalletId,
-          date: new Date(),
-          note: description,
-        })
-        .returning();
-
-      await tx
-        .update(walletTable)
-        .set({ expense: String(Number(senderWallet.expense) + amount) })
-        .where(eq(walletTable.id, senderWalletId));
-
-      await tx
-        .update(walletTable)
-        .set({ income: String(Number(receiverWallet.income) + amount) })
-        .where(eq(walletTable.id, receiverWalletId));
-
-      return { transaction };
-    });
   }
 }

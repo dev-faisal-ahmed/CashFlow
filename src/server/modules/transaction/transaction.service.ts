@@ -6,6 +6,7 @@ import {
   UpdatePeerTransactionDto,
   UpdateRegularTransactionDto,
   CreateTransferTransactionDto,
+  GetTransferTransactionsArgs,
 } from "./transaction.validation";
 
 import { db } from "@/server/db";
@@ -24,6 +25,7 @@ type UpdateRegularTransaction = WithUserId<{ id: string; dto: UpdateRegularTrans
 type UpdatePeerTransaction = WithUserId<{ id: string; dto: UpdatePeerTransactionDto }>;
 type DeleteRegularTransaction = WithUserId<{ id: string }>;
 type DeletePeerTransaction = WithUserId<{ id: string }>;
+type GetTransferTransactions = WithUserId<{ query: GetTransferTransactionsArgs }>;
 
 export class TransactionService {
   static async createRegularTransaction({ dto, userId }: CreateRegularTransaction) {
@@ -233,6 +235,7 @@ export class TransactionService {
     });
 
     const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
+
     const meta = paginationHelper.getMeta(total);
     return { transactions, meta };
   }
@@ -354,5 +357,41 @@ export class TransactionService {
 
       return { transaction };
     });
+  }
+
+  static async getTransferTransactions({ query, userId }: GetTransferTransactions) {
+    const { page, startDate, endDate } = query;
+    const paginationHelper = new PaginationHelper(page, query.limit, query.getAll);
+    const { skip, limit } = paginationHelper.getPaginationInfo();
+
+    const dbQuery = and(
+      eq(transactionTable.userId, userId),
+      ...(startDate ? [gte(transactionTable.date, startDate)] : []),
+      ...(endDate ? [lte(transactionTable.date, endDate)] : []),
+    );
+
+    const transactions = await db.query.transactionTable.findMany({
+      where: dbQuery,
+      columns: {
+        id: true,
+        amount: true,
+        type: true,
+        date: true,
+        note: true,
+        fee: true,
+      },
+      with: {
+        wallet: { columns: { id: true, name: true } },
+        relatedWallet: { columns: { id: true, name: true } },
+      },
+      orderBy: (t, { desc }) => [desc(t.date)],
+      limit,
+      offset: skip,
+    });
+
+    const [{ count: total }] = await db.select({ count: count() }).from(transactionTable).where(dbQuery);
+
+    const meta = paginationHelper.getMeta(total);
+    return { transactions, meta };
   }
 }

@@ -47,6 +47,14 @@ export const transactionRoute = new Hono()
     return ctx.json(ResponseDto.success({ message: "Transactions fetched successfully", meta, data: transactions }));
   })
 
+  // Get Transfer Transactions
+  .get("/transfer", authGuard, queryValidator(transactionValidation.getTransferTransactions), async (ctx) => {
+    const query = ctx.req.valid("query");
+    const user = ctx.get("user");
+    const { transactions, meta } = await TransactionService.getTransferTransactions({ query, userId: user.id });
+    return ctx.json(ResponseDto.success({ message: "Transactions fetched successfully", meta, data: transactions }));
+  })
+
   // Update Regular Transaction
   .patch("/regular/:id", authGuard, jsonValidator(transactionValidation.updateRegularTransaction), async (ctx) => {
     const id = ctx.req.param("id");
