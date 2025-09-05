@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { getTransferTransactionsApi } from "../transaction.api";
 import { useQuery } from "@tanstack/react-query";
@@ -7,8 +8,7 @@ import { queryKeys } from "@/lib/query.keys";
 import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
 import { CommonAvatar } from "@/components/shared";
-import { format } from "date-fns";
-
+import { DeleteTransferTransaction } from "./delete-transfer-transaction";
 
 type TApiResponse = Awaited<ReturnType<typeof getTransferTransactionsApi>>;
 type TTransaction = TApiResponse["data"][number];
@@ -34,6 +34,7 @@ export const TransferTransactionTable = () => {
         </div>
       ),
     }),
+
     accessor("relatedWallet.name", {
       header: "Receiver Wallet",
       cell: ({ getValue }) => (
@@ -55,30 +56,29 @@ export const TransferTransactionTable = () => {
       cell: ({ row }) => {
         const amount = row.original.amount;
 
-        return (
-          <p className="text-emerald-500">
-            {Number(amount).toLocaleString("id-ID")}
-          </p>
-        );
+        return <p className="text-emerald-500">{Number(amount).toLocaleString("id-ID")}</p>;
       },
     },
+
     {
       id: "fee",
       header: "Fee",
       cell: ({ row }) => {
         const fee = row.original.fee;
 
-        return (
-          <p className="text-destructive">
-            {Number(fee).toLocaleString("id-ID")}
-          </p>
-        );
+        return <p className="text-destructive">{Number(fee).toLocaleString("id-ID")}</p>;
       },
     },
+
     accessor("date", {
       header: "Date",
       cell: ({ getValue }) => <p className="text-sm">{format(getValue(), "PPP")}</p>,
     }),
+
+    {
+      id: "action",
+      cell: ({ row }) => <DeleteTransferTransaction id={row.original.id} />,
+    },
   ] as ColumnDef<TTransaction>[];
 
   return (

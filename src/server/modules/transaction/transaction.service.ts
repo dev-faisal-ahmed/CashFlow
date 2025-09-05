@@ -26,6 +26,7 @@ type UpdatePeerTransaction = WithUserId<{ id: string; dto: UpdatePeerTransaction
 type DeleteRegularTransaction = WithUserId<{ id: string }>;
 type DeletePeerTransaction = WithUserId<{ id: string }>;
 type GetTransferTransactions = WithUserId<{ query: GetTransferTransactionsArgs }>;
+type DeleteTransferTransaction = WithUserId<{ id: string }>;
 
 export class TransactionService {
   static async createRegularTransaction({ dto, userId }: CreateRegularTransaction) {
@@ -394,5 +395,55 @@ export class TransactionService {
 
     const meta = paginationHelper.getMeta(total);
     return { transactions, meta };
+  }
+
+  static async deleteTransferTransaction({ id, userId }: DeleteTransferTransaction) {
+    const transaction = await db.query.transactionTable.findFirst({
+      where: (w, { eq }) => and(eq(w.id, id), eq(w.userId, userId)),
+      columns: { id: true, amount: true, fee: true, walletId: true, relatedWalletId: true },
+    });
+
+    if (!transaction) throw new AppError("Transaction not found", 404);
+
+    const wallets = await db.query.walletTable.findMany({
+      where: (w, { and, eq, inArray }) =>
+        and(eq(w.userId, userId), inArray(w.id, [transaction.walletId, transaction.relatedWalletId as number])),
+      columns: { id: true, income: true, expense: true },
+    });
+
+    if (wallets.length < 2) throw new AppError("Wallet not found", 404);
+
+    const senderWallet = wallets.find((w) => w.id === transaction.walletId);
+    const receiverWallet = wallets.find((w) => w.id === transaction.relatedWalletId);
+
+    if (!senderWallet || !receiverWallet) throw new AppError("Wallet not found", 404);
+
+    return db.transaction(async (tx) => {
+      const deletedTransaction = await tx
+        .delete(transactionTable)
+        .where(and(eq(transactionTable.id, id), eq(transactionTable.userId, userId)));
+
+      if (!deletedTransaction.rowCount) throw new AppError("Failed to delete transaction", 500);
+
+      const [[updatedSenderWallet], [updatedReceiverWallet]] = await Promise.all([
+        tx
+          .update(walletTable)
+          .set({ expense: String(Number(senderWallet.expense) - (Number(transaction.amount) + Number(transaction.fee))) })
+          .where(eq(walletTable.id, senderWallet.id))
+          .returning(),
+
+        tx
+          .update(walletTable)
+          .set({ income: String(Number(receiverWallet.income) - Number(transaction.amount)) })
+          .where(eq(walletTable.id, receiverWallet.id))
+          .returning(),
+      ]);
+
+      if (!deletedTransaction.rowCount) throw new AppError("Failed to delete transaction", 500);
+      if (!updatedSenderWallet.id) throw new AppError("Failed to update sender wallet balance", 500);
+      if (!updatedReceiverWallet.id) throw new AppError("Failed to update receiver wallet balance", 500);
+
+      return deletedTransaction;
+    });
   }
 }

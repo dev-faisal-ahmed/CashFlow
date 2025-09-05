@@ -36,6 +36,7 @@ export const RegularTransactionTable = () => {
         </div>
       ),
     }),
+
     accessor("category.name", {
       header: "Source",
       cell: ({ getValue }) => <p className="font-medium">{getValue()}</p>,
@@ -60,10 +61,12 @@ export const RegularTransactionTable = () => {
         );
       },
     },
+
     accessor("date", {
       header: "Date",
       cell: ({ getValue }) => <p className="text-sm">{format(getValue(), "PPP")}</p>,
     }),
+
     {
       id: "action",
       cell: ({ row }) => <RegularTransactionActionMenu {...row.original} />,

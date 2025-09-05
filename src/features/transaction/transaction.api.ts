@@ -91,3 +91,11 @@ export const deletePeerTransactionApi = async (id: string) => {
   if (!resData.success) throw new Error(resData.message);
   return resData;
 };
+
+// Delete Transfer Transaction
+export const deleteTransferTransactionApi = async (id: string) => {
+  const res = await transactionClient.transfer[":id"].$delete({ param: { id } });
+  const resData = await res.json();
+  if (!resData.success) throw new Error(resData.message);
+  return resData;
+};

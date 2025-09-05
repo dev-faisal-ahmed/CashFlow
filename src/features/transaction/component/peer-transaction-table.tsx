@@ -74,6 +74,7 @@ export const PeerTransactionTable = () => {
       header: "Date",
       cell: ({ getValue }) => <p className="text-sm">{format(getValue(), "PPP")}</p>,
     }),
+
     {
       id: "action",
       cell: ({ row }) => <PeerTransactionActionMenu {...row.original} />,

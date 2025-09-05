@@ -87,6 +87,14 @@ export const transactionRoute = new Hono()
     const user = ctx.get("user");
     await TransactionService.deletePeerTransaction({ id, userId: user.id });
     return ctx.json(ResponseDto.success("Transaction deleted successfully"));
+  })
+
+  // Delete Transfer Transaction
+  .delete("/transfer/:id", authGuard, async (ctx) => {
+    const id = ctx.req.param("id");
+    const user = ctx.get("user");
+    await TransactionService.deleteTransferTransaction({ id, userId: user.id });
+    return ctx.json(ResponseDto.success("Transaction deleted successfully"));
   });
 
 export type TTransactionRoute = typeof transactionRoute;
