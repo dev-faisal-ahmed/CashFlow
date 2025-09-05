@@ -34,7 +34,8 @@ export const AddWallet = () => {
   return (
     <>
       <Button onClick={() => onOpenChange(true)}>
-        <PlusIcon className="size-4" /> Add Wallet
+        <PlusIcon className="size-4" />
+        <span className="hidden md:block">Add Wallet</span>
       </Button>
 
       <FormDialog

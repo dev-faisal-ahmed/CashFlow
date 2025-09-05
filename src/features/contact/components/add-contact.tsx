@@ -34,7 +34,8 @@ export const AddContact = () => {
   return (
     <>
       <Button onClick={() => onOpenChange(true)}>
-        <PlusIcon className="size-4" /> Add Contact
+        <PlusIcon className="size-4" />
+        <span className="hidden md:block">Add Contact</span>
       </Button>
 
       <FormDialog

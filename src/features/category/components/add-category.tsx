@@ -34,7 +34,8 @@ export const AddCategory = () => {
   return (
     <>
       <Button onClick={() => onOpenChange(true)}>
-        <PlusIcon className="size-4" /> Add Category
+        <PlusIcon className="size-4" />
+        <span className="hidden md:block">Add Category</span>
       </Button>
 
       <FormDialog

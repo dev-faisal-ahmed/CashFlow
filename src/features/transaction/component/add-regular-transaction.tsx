@@ -40,7 +40,8 @@ export const AddRegularTransaction = () => {
   return (
     <>
       <Button onClick={() => onOpenChange(true)}>
-        <PlusIcon className="size-4" /> Add Transaction
+        <PlusIcon className="size-4" />
+        <span className="hidden md:block">Add Transaction</span>
       </Button>
 
       <FormDialog

@@ -46,7 +46,7 @@ export const AddPeerTransactionFromTransaction = () => {
     <>
       <Button onClick={() => onOpenChange(true)}>
         <PlusIcon className="size-4" />
-        Add Peer Transaction
+        <span className="hidden md:block">Add Peer Transaction</span>
       </Button>
 
       <FormDialog formId={mutationKey} title="Add Peer Transaction" open={open} onOpenChange={onOpenChange}>
