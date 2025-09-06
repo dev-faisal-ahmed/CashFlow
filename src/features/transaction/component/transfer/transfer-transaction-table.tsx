@@ -7,8 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
-import { CommonAvatar } from "@/components/shared";
+import { CommonAvatar, TooltipContainer } from "@/components/shared";
 import { DeleteTransferTransaction } from "./delete-transfer-transaction";
+import { TransferTransactionFilter } from "./transfer-transaction-filter";
+import { TTransferTransactionFilterFormData } from "../../transaction.schema";
+import { Button } from "@/components/ui/button";
+import { FunnelXIcon } from "lucide-react";
+import { useState } from "react";
 
 type TApiResponse = Awaited<ReturnType<typeof getTransferTransactionsApi>>;
 type TTransaction = TApiResponse["data"][number];
@@ -17,9 +22,17 @@ const { accessor } = createColumnHelper<TTransaction>();
 
 export const TransferTransactionTable = () => {
   const { pagination, setPagination } = usePagination(10);
+  const [filter, setFilter] = useState<TTransferTransactionFilterFormData>({});
+
   const { data: apiResponse, isLoading } = useQuery({
-    queryKey: [queryKeys.transaction.transfer, { page: pagination.pageIndex + 1 }],
-    queryFn: () => getTransferTransactionsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
+    queryKey: [queryKeys.transaction.transfer, { page: pagination.pageIndex + 1, ...filter }],
+    queryFn: () =>
+      getTransferTransactionsApi({
+        page: String(pagination.pageIndex + 1),
+        limit: String(pagination.pageSize),
+        ...(filter.startDate && { startDate: filter.startDate.toISOString() }),
+        ...(filter.endDate && { endDate: filter.endDate.toISOString() }),
+      }),
   });
 
   const transactions = apiResponse?.data ?? [];
@@ -89,6 +102,28 @@ export const TransferTransactionTable = () => {
       pageCount={apiResponse?.meta?.totalPage ?? 0}
       pagination={pagination}
       onPaginationChange={setPagination}
+      header={<TransferTransactionTableHead filter={filter} onFilterChange={setFilter} />}
     />
   );
 };
+
+type TransferTransactionTableHeadProps = {
+  filter?: TTransferTransactionFilterFormData;
+  onFilterChange: (data: TTransferTransactionFilterFormData) => void;
+};
+
+const TransferTransactionTableHead: React.FC<TransferTransactionTableHeadProps> = ({ filter, onFilterChange }) => (
+  <div className="flex items-center gap-2">
+    <h2 className="mr-auto text-lg font-semibold">All Transactions</h2>
+
+    {!!Object.keys(filter ?? {}).length && (
+      <TooltipContainer label="Reset Filter">
+        <Button variant="destructive_outline" onClick={() => onFilterChange({})}>
+          <FunnelXIcon className="size-4" />
+        </Button>
+      </TooltipContainer>
+    )}
+
+    <TransferTransactionFilter filter={filter} onFilterChange={onFilterChange} />
+  </div>
+);
