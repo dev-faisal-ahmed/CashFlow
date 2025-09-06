@@ -9,8 +9,8 @@ import { queryKeys } from "@/lib/query.keys";
 import { PencilLine } from "lucide-react";
 import { RegularTransactionForm } from "./regular-transaction-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateRegularTransactionApi } from "../transaction.api";
-import { TRegularTransactionFormData } from "../transaction.schema";
+import { updateRegularTransactionApi } from "../../transaction.api";
+import { TRegularTransactionFormData } from "../../transaction.schema";
 import { TTransaction } from "@/server/db/schema";
 
 type UpdateRegularTransactionProps = Pick<TTransaction, "id" | "amount" | "type" | "categoryId" | "walletId" | "note" | "date">;

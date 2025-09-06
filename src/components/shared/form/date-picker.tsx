@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { usePopupState } from "@/lib/hooks";
 
 type DatePickerProps = {
-  value: Date;
+  value?: Date;
   onChange: (value: Date) => void;
 };
 

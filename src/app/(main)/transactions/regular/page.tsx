@@ -1,5 +1,5 @@
 import { Header } from "@/components/shared";
-import { AddRegularTransaction, RegularTransactionTable } from "@/features/transaction/component";
+import { AddRegularTransaction, RegularTransactionTable } from "@/features/transaction/component/regular-transaction";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (

@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { usePopupState } from "@/lib/hooks";
 import { queryKeys } from "@/lib/query.keys";
 import { RegularTransactionForm } from "./regular-transaction-form";
-import { TRegularTransactionFormData } from "../transaction.schema";
+import { TRegularTransactionFormData } from "../../transaction.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createRegularTransactionApi } from "../transaction.api";
+import { createRegularTransactionApi } from "../../transaction.api";
 import { ETransactionType } from "@/server/db/schema";
 
 const mutationKey = `add-${queryKeys.transaction.regular}`;

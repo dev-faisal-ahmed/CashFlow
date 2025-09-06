@@ -4,9 +4,7 @@ import { FC } from "react";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { TRegularTransactionFormData } from "../transaction.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { transactionSchema } from "../transaction.schema";
 import { CommonSelect, FieldForm } from "@/components/shared/form";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
@@ -16,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ECategoryType, ETransactionType } from "@/server/db/schema";
 import { getCategoryListApi } from "@/features/category/category.api";
+import { transactionSchema, TRegularTransactionFormData } from "../../transaction.schema";
 
 // Main : Transaction Form
 type RegularTransactionFormProps = {

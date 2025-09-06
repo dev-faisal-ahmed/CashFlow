@@ -3,7 +3,7 @@
 import { FC } from "react";
 import { queryKeys } from "@/lib/query.keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteRegularTransactionApi } from "../transaction.api";
+import { deleteRegularTransactionApi } from "../../transaction.api";
 import { usePopupState } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";

@@ -35,11 +35,13 @@ export const FormSheet: FC<FormSheetProps> = ({
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
         <ScrollArea className="grow px-6">{children}</ScrollArea>
-        <SheetFooter className="px-6 pb-6">
+        <SheetFooter className="flex-row items-center gap-4 px-6 pb-6">
           <SheetClose asChild>
-            <Button variant="destructive">Cancel</Button>
+            <Button className="flex-1" variant="outline">
+              Cancel
+            </Button>
           </SheetClose>
-          <Button form={formId} type="submit" isLoading={!!isMutating}>
+          <Button form={formId} type="submit" isLoading={!!isMutating} className="flex-1">
             {isMutating ? submitLoadingTitle || "Submitting..." : submitButtonTitle || "Submit"}
           </Button>
         </SheetFooter>

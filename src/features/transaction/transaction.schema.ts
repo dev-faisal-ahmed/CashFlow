@@ -33,13 +33,32 @@ const transferTransaction = z.object({
   destinationWalletId: z.number("Destination wallet is required"),
 });
 
+// filter forms
+const regularTransactionFilterForm = z
+  .object({
+    type: z.enum([ETransactionType.income, ETransactionType.expense]).optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+  })
+  .superRefine((val, ctx) => {
+    const { startDate, endDate } = val;
+    if (startDate && endDate && startDate > endDate) {
+      ctx.addIssue({ code: "custom", message: "Start date can not be greater than end date", path: ["endDate"] });
+    }
+  });
+
 export const transactionSchema = {
   regularTransaction,
   peerTransaction,
   updatePeerTransaction,
   transferTransaction,
+  // Filter Forms
+  regularTransactionFilterForm,
 };
 
 export type TRegularTransactionFormData = z.infer<typeof regularTransaction>;
 export type TPeerTransactionFormData = z.infer<typeof peerTransaction>;
 export type TTransferTransactionFormData = z.infer<typeof transferTransaction>;
+
+// Filter Form
+export type TRegularTransactionFilterFormData = z.infer<typeof regularTransactionFilterForm>;
