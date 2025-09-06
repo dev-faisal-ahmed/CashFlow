@@ -34,7 +34,7 @@ export const WalletList = () => {
 
       {filterWalletList?.length ? (
         <WalletListContainer>
-          {filterWalletList?.map((wallet) => (
+          {filterWalletList.map((wallet) => (
             <WalletCard key={wallet.id} {...wallet} />
           ))}
         </WalletListContainer>
