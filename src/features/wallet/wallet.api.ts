@@ -11,8 +11,7 @@ export const addWalletApi = async (dto: CreateWalletDto) => {
 };
 
 // Get
-
-export const getAllWalletListApi = async (args: ToString<GetAllWalletsArgs>) => {
+export const getAllWalletListApi = async (args: ToString<GetAllWalletsArgs> = {}) => {
   const res = await walletClient.index.$get({ query: { ...args } });
   const resData = await res.json();
   if (!resData.success) throw new Error(resData.message);

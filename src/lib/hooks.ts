@@ -43,13 +43,13 @@ export const useDebounce = <TValue>(value: TValue, delay = 300): TValue => {
 
 export const useDebouncedSearch = () => {
   const [value, setValue] = useState("");
-  const searchTerm = useDebounce(value);
-  return { value, searchTerm, onSearchChange: (value: string) => setValue(value) };
+  const search = useDebounce(value);
+  return { value, search, onSearchChange: setValue };
 };
 
 export const useSearch = () => {
   const [value, setValue] = useState("");
-  return { value, onSearchChange: (value: string) => setValue(value) };
+  return { value, onSearchChange: setValue };
 };
 
 export const usePagination = (limit = 10) => {

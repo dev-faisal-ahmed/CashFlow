@@ -8,9 +8,10 @@ import { useSearch } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { getAllWalletListApi } from "../wallet.api";
+import { SearchInput } from "@/components/shared/form";
 
 export const WalletList = () => {
-  const { value } = useSearch();
+  const { value, onSearchChange } = useSearch();
 
   const {
     data: walletList,
@@ -19,19 +20,28 @@ export const WalletList = () => {
     error,
   } = useQuery({
     queryKey: [queryKeys.wallet],
-    queryFn: () => getAllWalletListApi({ search: value }),
+    queryFn: () => getAllWalletListApi(),
   });
 
   if (isLoading) return <LoadingSkeleton />;
   if (isError) throw error;
-  if (!walletList?.length) return <ErrorMessage message="No Wallet Found" className="my-12" />;
+
+  const filterWalletList = value ? walletList?.filter((wallet) => wallet.name.toLowerCase().includes(value.toLowerCase())) : walletList;
 
   return (
-    <WalletListContainer>
-      {walletList.map((wallet) => (
-        <WalletCard key={wallet.id} {...wallet} />
-      ))}
-    </WalletListContainer>
+    <>
+      <SearchInput className="mx-auto mb-6 w-full" value={value} onChange={onSearchChange} placeholder="Search Wallet" />
+
+      {filterWalletList?.length ? (
+        <WalletListContainer>
+          {filterWalletList?.map((wallet) => (
+            <WalletCard key={wallet.id} {...wallet} />
+          ))}
+        </WalletListContainer>
+      ) : (
+        <ErrorMessage message="No Wallet Found" className="my-12" />
+      )}
+    </>
   );
 };
 
