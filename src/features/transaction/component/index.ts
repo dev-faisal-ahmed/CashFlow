@@ -1,2 +1,1 @@
-export * from "./add-peer-transaction";
-export * from "./peer-transaction-table";
+export * from "./peer-transaction/peer-transaction-table";

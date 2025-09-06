@@ -47,6 +47,19 @@ const regularTransactionFilterForm = z
     }
   });
 
+const peerTransactionFilterForm = z
+  .object({
+    type: z.enum([ETransactionType.borrow, ETransactionType.lend]).optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+  })
+  .superRefine((val, ctx) => {
+    const { startDate, endDate } = val;
+    if (startDate && endDate && startDate > endDate) {
+      ctx.addIssue({ code: "custom", message: "Start date can not be greater than end date", path: ["endDate"] });
+    }
+  });
+
 export const transactionSchema = {
   regularTransaction,
   peerTransaction,
@@ -54,6 +67,7 @@ export const transactionSchema = {
   transferTransaction,
   // Filter Forms
   regularTransactionFilterForm,
+  peerTransactionFilterForm,
 };
 
 export type TRegularTransactionFormData = z.infer<typeof regularTransaction>;
@@ -62,3 +76,4 @@ export type TTransferTransactionFormData = z.infer<typeof transferTransaction>;
 
 // Filter Form
 export type TRegularTransactionFilterFormData = z.infer<typeof regularTransactionFilterForm>;
+export type TPeerTransactionFilterFormData = z.infer<typeof peerTransactionFilterForm>;

@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { useForm } from "react-hook-form";
-import { TPeerTransactionFormData, transactionSchema } from "../transaction.schema";
+import { TPeerTransactionFormData, transactionSchema } from "../../transaction.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { CommonSelect, FieldForm } from "@/components/shared/form";

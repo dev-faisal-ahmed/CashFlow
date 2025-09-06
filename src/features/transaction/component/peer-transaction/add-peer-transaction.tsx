@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { usePopupState } from "@/lib/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { PlugIcon, PlusIcon } from "lucide-react";
-import { createPeerTransactionApi } from "../transaction.api";
 import { queryKeys } from "@/lib/query.keys";
 import { useQueryClient } from "@tanstack/react-query";
-import { TPeerTransactionFormData } from "../transaction.schema";
 import { FormDialog } from "@/components/shared/form";
 import { PeerTransactionForm } from "./peer-transaction-form";
+import { createPeerTransactionApi } from "../../transaction.api";
+import { TPeerTransactionFormData } from "../../transaction.schema";
 
 // consts
 const mutationKey = `add-${queryKeys.transaction.peer}`;

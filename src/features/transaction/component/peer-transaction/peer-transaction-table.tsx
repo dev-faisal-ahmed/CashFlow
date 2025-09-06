@@ -1,18 +1,22 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { getPeerTransactionsApi } from "../transaction.api";
+import { getPeerTransactionsApi } from "../../transaction.api";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { usePagination } from "@/lib/hooks";
 import { DataTable } from "@/components/shared/data-table/data-table";
-import { CommonAvatar } from "@/components/shared";
+import { CommonAvatar, TooltipContainer } from "@/components/shared";
 import { format } from "date-fns";
 import { ETransactionType } from "@/server/db/schema";
 import { UpdatePeerTransaction } from "./update-peer-transaction";
 import { DeletePeerTransaction } from "./delete-peer-transaction";
+import { PeerTransactionFilter } from "./peer-transaction-filter";
+import { TPeerTransactionFilterFormData } from "../../transaction.schema";
+import { Button } from "@/components/ui/button";
+import { FunnelXIcon } from "lucide-react";
 
 type TApiResponse = Awaited<ReturnType<typeof getPeerTransactionsApi>>;
 type TTransaction = TApiResponse["data"][number];
@@ -21,12 +25,17 @@ const { accessor } = createColumnHelper<TTransaction>();
 
 export const PeerTransactionTable = () => {
   const { pagination, setPagination } = usePagination(10);
+  const [filter, setFilter] = useState<TPeerTransactionFilterFormData>({});
+
   const { data: apiResponse, isLoading } = useQuery({
-    queryKey: [queryKeys.transaction.peer, { page: pagination.pageIndex + 1 }],
+    queryKey: [queryKeys.transaction.peer, { page: pagination.pageIndex + 1, ...filter }],
     queryFn: () =>
       getPeerTransactionsApi({
         page: String(pagination.pageIndex + 1),
         limit: String(pagination.pageSize),
+        ...(filter.type && { type: filter.type }),
+        ...(filter.startDate && { startDate: filter.startDate.toISOString() }),
+        ...(filter.endDate && { endDate: filter.endDate.toISOString() }),
       }),
   });
 
@@ -89,6 +98,7 @@ export const PeerTransactionTable = () => {
       pageCount={apiResponse?.meta?.totalPage ?? 0}
       pagination={pagination}
       onPaginationChange={setPagination}
+      header={<PeerTransactionTableHead filter={filter} onFilterChange={setFilter} />}
     />
   );
 };
@@ -106,3 +116,24 @@ const PeerTransactionActionMenu: FC<TTransaction> = (transaction) => {
     </div>
   );
 };
+
+type PeerTransactionTableHeadProps = {
+  filter?: TPeerTransactionFilterFormData;
+  onFilterChange: (data: TPeerTransactionFilterFormData) => void;
+};
+
+const PeerTransactionTableHead: FC<PeerTransactionTableHeadProps> = ({ filter, onFilterChange }) => (
+  <div className="flex items-center gap-2">
+    <h2 className="mr-auto text-lg font-semibold">All Transactions</h2>
+
+    {!!Object.keys(filter ?? {}).length && (
+      <TooltipContainer label="Reset Filter">
+        <Button className="" variant="destructive_outline" onClick={() => onFilterChange({})}>
+          <FunnelXIcon className="size-4" />
+        </Button>
+      </TooltipContainer>
+    )}
+
+    <PeerTransactionFilter filter={filter} onFilterChange={onFilterChange} />
+  </div>
+);

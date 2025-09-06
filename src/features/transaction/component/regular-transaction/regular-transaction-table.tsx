@@ -119,20 +119,18 @@ type RegularTransactionTableHeader = {
   onFilterChange: (data: TRegularTransactionFilterFormData) => void;
 };
 
-const RegularTransactionTableHeader: FC<RegularTransactionTableHeader> = ({ filter, onFilterChange }) => {
-  return (
-    <div className="flex items-center gap-2">
-      <h2 className="mr-auto text-lg font-semibold">All Transactions</h2>
+const RegularTransactionTableHeader: FC<RegularTransactionTableHeader> = ({ filter, onFilterChange }) => (
+  <div className="flex items-center gap-2">
+    <h2 className="mr-auto text-lg font-semibold">All Transactions</h2>
 
-      {!!Object.keys(filter ?? {}).length && (
-        <TooltipContainer label="Reset Filter">
-          <Button className="" variant="destructive_outline" onClick={() => onFilterChange({})}>
-            <FunnelXIcon className="size-4" />
-          </Button>
-        </TooltipContainer>
-      )}
+    {!!Object.keys(filter ?? {}).length && (
+      <TooltipContainer label="Reset Filter">
+        <Button className="" variant="destructive_outline" onClick={() => onFilterChange({})}>
+          <FunnelXIcon className="size-4" />
+        </Button>
+      </TooltipContainer>
+    )}
 
-      <RegularTransactionFilter filter={filter} onFilterChange={onFilterChange} />
-    </div>
-  );
-};
+    <RegularTransactionFilter filter={filter} onFilterChange={onFilterChange} />
+  </div>
+);

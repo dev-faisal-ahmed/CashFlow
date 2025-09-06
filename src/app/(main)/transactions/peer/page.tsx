@@ -1,5 +1,5 @@
 import { Header } from "@/components/shared";
-import { AddPeerTransactionFromTransaction, PeerTransactionTable } from "@/features/transaction/component";
+import { AddPeerTransactionFromTransaction, PeerTransactionTable } from "@/features/transaction/component/peer-transaction";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (

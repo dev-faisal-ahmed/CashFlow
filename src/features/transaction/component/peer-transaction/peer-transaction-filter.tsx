@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { useForm } from "react-hook-form";
-import { TRegularTransactionFilterFormData } from "../../transaction.schema";
+import { TPeerTransactionFilterFormData } from "../../transaction.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { transactionSchema } from "../../transaction.schema";
 import { Form } from "@/components/ui/form";
@@ -14,14 +14,14 @@ import { TooltipContainer } from "@/components/shared";
 import { queryKeys } from "@/lib/query.keys";
 import { FunnelIcon } from "lucide-react";
 
-type RegularTransactionFilterProps = {
-  filter?: TRegularTransactionFilterFormData;
-  onFilterChange: (data: TRegularTransactionFilterFormData) => void;
+type PeerTransactionFilterProps = {
+  filter?: TPeerTransactionFilterFormData;
+  onFilterChange: (data: TPeerTransactionFilterFormData) => void;
 };
 
-const formId = `${queryKeys.transaction.regular}-filter`;
+const formId = `${queryKeys.transaction.peer}-filter`;
 
-export const RegularTransactionFilter: FC<RegularTransactionFilterProps> = ({ filter, onFilterChange }) => {
+export const PeerTransactionFilter: FC<PeerTransactionFilterProps> = ({ filter, onFilterChange }) => {
   const { open, onOpenChange } = usePopupState();
 
   return (
@@ -33,24 +33,24 @@ export const RegularTransactionFilter: FC<RegularTransactionFilterProps> = ({ fi
       </TooltipContainer>
 
       <FormSheet formId={formId} title="Filter" open={open} onOpenChange={onOpenChange}>
-        <RegularTransactionFilterForm filter={filter} onFilterChange={onFilterChange} onOpenChange={onOpenChange} />
+        <PeerTransactionFilterForm filter={filter} onFilterChange={onFilterChange} onOpenChange={onOpenChange} />
       </FormSheet>
     </>
   );
 };
 
-type RegularTransactionFilterFormProps = RegularTransactionFilterProps & {
+type PeerTransactionFilterFormProps = PeerTransactionFilterProps & {
   onOpenChange: (open: boolean) => void;
 };
 
 const typeOptions = [
-  { label: "Income", value: ETransactionType.income },
-  { label: "Expense", value: ETransactionType.expense },
+  { label: "Lend", value: ETransactionType.lend },
+  { label: "Borrow", value: ETransactionType.borrow },
 ];
 
-const RegularTransactionFilterForm: FC<RegularTransactionFilterFormProps> = ({ filter, onFilterChange, onOpenChange }) => {
-  const form = useForm<TRegularTransactionFilterFormData>({
-    resolver: zodResolver(transactionSchema.regularTransactionFilterForm),
+const PeerTransactionFilterForm: FC<PeerTransactionFilterFormProps> = ({ filter, onFilterChange, onOpenChange }) => {
+  const form = useForm<TPeerTransactionFilterFormData>({
+    resolver: zodResolver(transactionSchema.peerTransactionFilterForm),
     defaultValues: filter,
   });
 

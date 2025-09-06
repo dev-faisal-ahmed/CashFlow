@@ -9,8 +9,8 @@ import { queryKeys } from "@/lib/query.keys";
 import { PencilLine } from "lucide-react";
 import { PeerTransactionForm } from "./peer-transaction-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updatePeerTransactionApi } from "../transaction.api";
-import { TPeerTransactionFormData } from "../transaction.schema";
+import { updatePeerTransactionApi } from "../../transaction.api";
+import { TPeerTransactionFormData } from "../../transaction.schema";
 import { TTransaction } from "@/server/db/schema";
 
 type UpdatePeerTransactionProps = Pick<TTransaction, "id" | "amount" | "type" | "contactId" | "walletId" | "note" | "date">;
@@ -27,7 +27,6 @@ export const UpdatePeerTransaction: FC<UpdatePeerTransactionProps> = ({ id, wall
       {
         id: id,
         date: formData.date,
-        contactId: formData.contactId,
         note: formData.note,
       },
       {
