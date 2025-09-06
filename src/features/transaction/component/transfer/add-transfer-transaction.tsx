@@ -12,13 +12,13 @@ import { createTransferTransactionApi } from "@/features/transaction/transaction
 import { TransferTransactionForm } from "./transfer-transaction-form";
 import { toast } from "sonner";
 
-type CreateTransferTransactionProps = {
+type AddTransferTransactionProps = {
   walletId: number;
   balance: number;
   onSuccess?: () => void;
 };
 
-export const CreateTransferTransaction: FC<CreateTransferTransactionProps> = ({ walletId, balance, onSuccess }) => {
+export const AddTransferTransaction: FC<AddTransferTransactionProps> = ({ walletId, balance, onSuccess }) => {
   const mutationKey = `transfer-${queryKeys.wallet}-${walletId}`;
   const queryClient = useQueryClient();
   const { open, onOpenChange } = usePopupState();

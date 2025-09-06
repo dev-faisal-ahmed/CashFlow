@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { getTransferTransactionsApi } from "../transaction.api";
+import { getTransferTransactionsApi } from "../../transaction.api";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { usePagination } from "@/lib/hooks";

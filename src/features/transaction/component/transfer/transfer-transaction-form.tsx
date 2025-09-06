@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TTransferTransactionFormData, transactionSchema } from "../transaction.schema";
+import { TTransferTransactionFormData, transactionSchema } from "../../transaction.schema";
 import { WalletSelection } from "@/features/wallet/components/wallet-selection";
 
 type TransferTransactionFormProps = {

@@ -11,7 +11,7 @@ import { useDebouncedSearch, usePagination } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { getContactsApi } from "../contact.api";
-import { AddPeerTransactionFromContact } from "@/features/transaction/component/peer-transaction";
+import { AddPeerTransactionFromContact } from "@/features/transaction/component/peer";
 import { SearchInput } from "@/components/shared/form";
 
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
