@@ -7,6 +7,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "../error-message";
 import { TablePagination } from "./table-pagination";
+import { ReactNode } from "react";
 
 // type
 type DataTableProps<TData, TValue> = {
@@ -17,6 +18,7 @@ type DataTableProps<TData, TValue> = {
   pagination?: PaginationState;
   pageCount: number;
   onPaginationChange: OnChangeFn<PaginationState>;
+  header?: ReactNode;
 };
 
 export const DataTable = <TData, TValue>({
@@ -27,6 +29,7 @@ export const DataTable = <TData, TValue>({
   pageCount,
   pagination,
   onPaginationChange,
+  header,
 }: DataTableProps<TData, TValue>) => {
   const tableData = isLoading ? (Array(10).fill({}) as TData[]) : data || [];
   const tableColumns = isLoading ? columns.map((column) => ({ ...column, cell: () => <Skeleton className="h-4" /> })) : columns;
@@ -47,6 +50,7 @@ export const DataTable = <TData, TValue>({
   return (
     <ScrollArea disableScrollbar fixedLayout>
       <div className={cn("w-full overflow-hidden rounded-md border", className)}>
+        {header && <div className="px-4 py-3">{header}</div>}
         <Table>
           <TableHeader className="dark:bg-card border-b bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (

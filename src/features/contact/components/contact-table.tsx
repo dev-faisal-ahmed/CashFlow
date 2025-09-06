@@ -7,11 +7,12 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/shared/data-table/data-table";
 import { UpdateContact } from "./update-contact";
 import { DeleteContact } from "./delete-contact";
-import { usePagination } from "@/lib/hooks";
+import { useDebouncedSearch, usePagination } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query.keys";
 import { getContactsApi } from "../contact.api";
 import { AddPeerTransactionFromContact } from "@/features/transaction/component";
+import { SearchInput } from "@/components/shared/form";
 
 type TApiResponse = Awaited<ReturnType<typeof getContactsApi>>;
 type TContact = NonNullable<TApiResponse>["data"][number];
@@ -20,10 +21,11 @@ type TContact = NonNullable<TApiResponse>["data"][number];
 const { accessor } = createColumnHelper<TContact>();
 
 export const ContactTable = () => {
+  const { value, search, onSearchChange } = useDebouncedSearch();
   const { pagination, setPagination } = usePagination(10);
   const { data: apiResponse, isLoading } = useQuery({
-    queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1 }],
-    queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize) }),
+    queryKey: [queryKeys.contact, { page: pagination.pageIndex + 1, search }],
+    queryFn: () => getContactsApi({ page: String(pagination.pageIndex + 1), limit: String(pagination.pageSize), search }),
     select: (res) => ({
       contacts: res.data,
       meta: res.meta,
@@ -95,23 +97,25 @@ export const ContactTable = () => {
   ] as ColumnDef<TContact>[];
 
   return (
-    <DataTable
-      columns={column}
-      data={contacts}
-      isLoading={isLoading}
-      pageCount={apiResponse?.meta?.totalPage ?? 0}
-      pagination={pagination}
-      onPaginationChange={setPagination}
-    />
+    <>
+      <SearchInput value={value} onChange={onSearchChange} placeholder="Search contact" className="mb-4 w-full" />
+
+      <DataTable
+        columns={column}
+        data={contacts}
+        isLoading={isLoading}
+        pageCount={apiResponse?.meta?.totalPage ?? 0}
+        pagination={pagination}
+        onPaginationChange={setPagination}
+      />
+    </>
   );
 };
 
-const ContactActionMenu: FC<TContact> = ({ id, name, phone, address }) => {
-  return (
-    <div className="flex items-center justify-center gap-2">
-      <UpdateContact id={id} name={name} phone={phone} address={address} />
-      <DeleteContact id={id} />
-      <AddPeerTransactionFromContact contactId={id} />
-    </div>
-  );
-};
+const ContactActionMenu: FC<TContact> = ({ id, name, phone, address }) => (
+  <div className="flex items-center justify-center gap-2">
+    <UpdateContact id={id} name={name} phone={phone} address={address} />
+    <DeleteContact id={id} />
+    <AddPeerTransactionFromContact contactId={id} />
+  </div>
+);
