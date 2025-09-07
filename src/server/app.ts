@@ -7,6 +7,7 @@ import { walletRoute } from "./modules/wallet/wallet.route";
 import { contactRoute } from "./modules/contact/contact.route";
 import { transactionRoute } from "./modules/transaction/transaction.route";
 import { categoryRoute } from "./modules/category/category.route";
+import { analyticsRoute } from "./modules/analytics/analytics.route";
 
 const app = new Hono().basePath("/api/v1");
 
@@ -22,9 +23,9 @@ app.route("/wallets", walletRoute);
 app.route("/categories", categoryRoute);
 app.route("/contacts", contactRoute);
 app.route("/transactions", transactionRoute);
+app.route("/analytics", analyticsRoute);
 
 // Error Handler
-
 app.onError(handleGlobalError);
 
 export { app };
