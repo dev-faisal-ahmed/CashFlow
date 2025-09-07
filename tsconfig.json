@@ -21,8 +21,10 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/auth/*": ["./src/features/auth/*"],
+      "@/analytics/*": ["./src/features/analytics/*"],
       "@/contact/*": ["./src/features/contact/*"],
       "@/category/*": ["./src/features/category/*"],
+      "@/transaction/*": ["./src/features/transaction/*"],
       "@/wallet/*": ["./src/features/wallet/*"]
     }
   },

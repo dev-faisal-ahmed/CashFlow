@@ -1,5 +1,5 @@
 import { Header } from "@/components/shared";
-import { TransferTransactionTable } from "@/features/transaction/component/transfer";
+import { TransferTransactionTable } from "@/transaction/component/transfer";
 import { TopbarContent } from "@/layout";
 
 const Page = () => (
