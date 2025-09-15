@@ -27,7 +27,7 @@ const Page = () => {
         <Header title="Dashboard" />
       </TopbarContent>
 
-      <div className="flex-1 space-y-6 overflow-auto p-4 md:p-6">
+      <div className="flex-1 space-y-6 overflow-auto md:p-6">
         {/* Financial Overview Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="border-primary border-l-4">
