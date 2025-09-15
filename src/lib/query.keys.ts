@@ -12,4 +12,7 @@ export const queryKeys = {
     peer: "peer-transaction",
     transfer: "transfer-transaction",
   },
+  analytics: {
+    overview: "overview-analytics",
+  },
 };

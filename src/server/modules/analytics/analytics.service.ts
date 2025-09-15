@@ -14,6 +14,7 @@ export class AnalyticsService {
         where: (c, { eq }) => eq(c.userId, userId),
         columns: { id: true, income: true, expense: true },
       }),
+
       db.query.transactionTable.findMany({
         where: (c, { eq, lte, and, gte }) => and(eq(c.userId, userId), lte(c.date, todayEnd), gte(c.date, firstDay)),
       }),
