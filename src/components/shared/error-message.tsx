@@ -20,11 +20,11 @@ type AlertErrorMessageProps = ErrorMessageProps & {
 };
 
 export const AlertErrorMessage: FC<AlertErrorMessageProps> = ({ message, title, className }) => (
-  <div className={cn("bg-card p-4", className)}>
-    <TerminalIcon className="size-4" />
-    <div className="flex flex-col">
+  <div className={cn("bg-card flex flex-col items-center gap-2 rounded-md border p-6", className)}>
+    <div className="text-destructive flex gap-2">
+      <TerminalIcon className="size-4" />
       <h2 className="font-semibold">{title}</h2>
-      <p>{message}</p>
     </div>
+    <p className="text-muted-foreground text-sm">{message}</p>
   </div>
 );
