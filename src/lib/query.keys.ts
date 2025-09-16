@@ -8,11 +8,12 @@ export const queryKeys = {
   category: "category",
   contact: "contact",
   transaction: {
-    regular: "regular-transaction",
-    peer: "peer-transaction",
-    transfer: "transfer-transaction",
+    regular: "transaction-regular",
+    peer: "transaction-peer",
+    transfer: "transaction-transfer",
   },
   analytics: {
-    overview: "overview-analytics",
+    overview: "analytics-overview",
+    expenseDayByDay: "analytics-expense-day-by-day",
   },
 };

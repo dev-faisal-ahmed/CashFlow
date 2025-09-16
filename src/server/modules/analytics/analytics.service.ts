@@ -46,4 +46,25 @@ export class AnalyticsService {
 
     return { balance: totalIncome - totalExpense, income, expense, borrow, lend };
   }
+
+  static async getMonthlyExpenseDayByDay(userId: number) {
+    const now = new Date();
+    const startDate = startOfMonth(now);
+    const endDate = endOfDay(now);
+
+    const transactions = await db.query.transactionTable.findMany({
+      where: (c, { eq, lte, and, gte }) =>
+        and(eq(c.userId, userId), eq(c.type, ETransactionType.expense), lte(c.date, endDate), gte(c.date, startDate)),
+      columns: { id: true, date: true, amount: true },
+      orderBy: (c, { asc }) => [asc(c.date)],
+    });
+
+    const expenseByDay = transactions.reduce((acc: { [key: string]: number }, transaction) => {
+      const day = transaction.date.getDate();
+      acc[day] = (acc[day] || 0) + Number(transaction.amount);
+      return acc;
+    }, {});
+
+    return expenseByDay;
+  }
 }
