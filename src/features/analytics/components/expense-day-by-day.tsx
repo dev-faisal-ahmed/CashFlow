@@ -6,65 +6,90 @@ import { getExpenseDayByDayApi } from "../analytics.api";
 import { AlertErrorMessage } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Area, AreaChart } from "recharts";
+import { useMemo } from "react";
 
 export const ExpenseDayByDay = () => {
-  const { data, isLoading, error, isError } = useQuery({ queryKey: [queryKeys.analytics.expenseDayByDay], queryFn: getExpenseDayByDayApi });
+  const {
+    data: expenses,
+    isLoading,
+    error,
+    isError,
+  } = useQuery({
+    queryKey: [queryKeys.analytics.expenseDayByDay],
+    queryFn: getExpenseDayByDayApi,
+    select: (res) =>
+      Object.keys(res.data ?? {}).map((key) => ({
+        day: key,
+        amount: res.data[key] || 0,
+      })),
+  });
 
-  if (isLoading) return <Skeleton className="h-input" />;
-  if (isError) return <AlertErrorMessage title="Error While fetching data" message={error?.message || "Something went wrong"} />;
-  if (!data) return <AlertErrorMessage title="Error While fetching data" message="No data found" />;
+  const hasData = useMemo(() => expenses && expenses.length > 0, [expenses]);
+
+  if (isLoading) return <Skeleton className="h-72 w-full rounded-xl" />;
+  if (isError) return <AlertErrorMessage title="Error fetching data" message={error?.message || "Something went wrong"} />;
+
+  if (!hasData)
+    return (
+      <Card className="flex h-72 items-center justify-center">
+        <p className="text-muted-foreground text-sm">No expense data available for this month</p>
+      </Card>
+    );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Monthly Expenses</CardTitle>
+    <Card className="border-border/60 border shadow-sm">
+      <CardHeader className="pb-1">
+        <CardTitle className="text-foreground text-lg font-semibold tracking-tight">
+          Monthly <span className="text-destructive">Expenses</span>
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        
+
+      <CardContent className="pt-0">
+        <div className="h-72 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={expenses}>
+              <defs>
+                <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--destructive)" stopOpacity={0.45} />
+                  <stop offset="70%" stopColor="var(--destructive)" stopOpacity={0.1} />
+                  <stop offset="100%" stopColor="var(--background)" stopOpacity={0.15} />
+                </linearGradient>
+              </defs>
+
+              {/*<CartesianGrid strokeDasharray="3 3" stroke={gridColor} />*/}
+              <XAxis dataKey="day" tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
+              <YAxis width={40} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
+
+              {/* Tooltip */}
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--popover)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "0.5rem",
+                  color: "var(--foreground)",
+                }}
+                labelStyle={{ fontWeight: "600" }}
+                formatter={(value: number) => [`৳${value}`, "Amount"]}
+              />
+
+              {/* Legend */}
+              <Legend verticalAlign="top" height={30} formatter={(value) => (value === "amount" ? "Amount" : value)} />
+
+              <Area
+                type="monotone"
+                dataKey="amount"
+                stroke="var(--destructive)"
+                name="Amount"
+                fill="url(#expenseGradient)"
+                fillOpacity={1}
+                isAnimationActive={true}
+                animationDuration={800}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );
 };
-
-{
-  /* <Card className="border-0 bg-white/80 shadow-2xl shadow-slate-200/50 backdrop-blur-sm dark:bg-slate-800/80 dark:shadow-slate-900/50">
-  <CardHeader className="pb-6">
-    <CardTitle className="text-xl">Weekly Spending Trend</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={spendingTrend} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
-          <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} />
-          <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} tickFormatter={(value) => `$${value}`} />
-          <Tooltip
-            formatter={(value) => [`$${value}`, "Spent"]}
-            contentStyle={{
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              border: "none",
-              borderRadius: "12px",
-              boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="amount"
-            stroke="url(#weeklyGradient)"
-            strokeWidth={4}
-            dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
-            activeDot={{ r: 8, fill: "#1d4ed8", strokeWidth: 2 }}
-          />
-          <defs>
-            <linearGradient id="weeklyGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="50%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#06b6d4" />
-            </linearGradient>
-          </defs>
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  </CardContent>
-</Card>; */
-}

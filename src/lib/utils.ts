@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { toast } from "sonner";
@@ -17,8 +16,7 @@ export const capitalize = (value: string) => {
 // Error Handling
 export const errorMessageGen = (error: unknown, defaultMessage: string = "Something went wrong") => {
   let message = defaultMessage;
-  if (error instanceof AxiosError) message = error.response?.data?.message;
-  else if (error instanceof Error) message = error.message;
+  if (error instanceof Error) message = error.message;
   return message;
 };
 

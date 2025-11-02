@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Wallet, Clock, ArrowRightLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FinancialOverview } from "@/analytics/components";
+import { ExpenseDayByDay } from "@/features/analytics/components/expense-day-by-day";
 
 const recentTransactions = [
   { id: 1, description: "Grocery Store", amount: -125.75, category: "Food", date: "2025-09-06" },
@@ -22,6 +23,9 @@ const Page = () => {
 
       <section className="flex flex-col gap-4">
         <FinancialOverview />
+        <div className="grid grid-cols-2 gap-2">
+          <ExpenseDayByDay />
+        </div>
 
         <div className="">
           {/* Financial Overview Cards */}

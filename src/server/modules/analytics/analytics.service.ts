@@ -1,6 +1,6 @@
 import { db } from "@/server/db";
 import { ETransactionType } from "@/server/db/schema";
-import { endOfDay, startOfMonth } from "date-fns";
+import { endOfDay, endOfMonth, startOfMonth } from "date-fns";
 
 export class AnalyticsService {
   static async getFinancialOverview(userId: number) {
@@ -50,7 +50,7 @@ export class AnalyticsService {
   static async getMonthlyExpenseDayByDay(userId: number) {
     const now = new Date();
     const startDate = startOfMonth(now);
-    const endDate = endOfDay(now);
+    const endDate = endOfMonth(now);
 
     const transactions = await db.query.transactionTable.findMany({
       where: (c, { eq, lte, and, gte }) =>
