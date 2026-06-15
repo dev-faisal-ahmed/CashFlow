@@ -13,7 +13,7 @@ const Layout: FC<PropsWithChildren> = async ({ children }) => {
 
   return (
     <main className="flex min-h-dvh items-center md:min-h-screen">
-      <section className="hidden min-h-screen w-[40%] bg-gradient-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
+      <section className="hidden min-h-screen w-[40%] bg-linear-to-b from-blue-800 to-blue-700 p-6 text-neutral-200 lg:flex lg:flex-col">
         <Link href="/">
           <AppLogo descriptionClassName="text-white/70" />
         </Link>

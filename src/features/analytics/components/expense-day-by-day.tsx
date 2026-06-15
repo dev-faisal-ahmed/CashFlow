@@ -70,7 +70,7 @@ export const ExpenseDayByDay = () => {
                   color: "var(--foreground)",
                 }}
                 labelStyle={{ fontWeight: "600" }}
-                formatter={(value: number) => [`৳${value}`, "Amount"]}
+                formatter={(value) => value !== undefined ? `৳${value}` : ""}
               />
 
               {/* Legend */}
